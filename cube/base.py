@@ -92,14 +92,16 @@ class Cube(MutableMapping):
 
         :param dimensions: set -- a subset of the calling cube's dimensions. If *dimensions* is not provided, it defaults to the calling cube's.
         :param constraints: dict -- a dictionnary of constraints *{dimension: value}*. Constrained dimensions must belong to the subcube's dimensions. 
+
+        .. todo:: better checking that the constraints are valid (taking into account the field-lookup syntax)
         """
         if dimensions == None:
             dimensions = self.dimensions
 
-        if not set(constraints.keys()) <= set(dimensions):
-            raise ValueError("%s is(are) not dimension(s) of the cube, so it cannot be constrained" % (set(constraints.keys()) - set(dimensions)))
-        else:
-            return Cube(dimensions, self.queryset, self.aggregation, constraints)
+        #if not set(constraints.keys()) <= set(dimensions):
+        #    raise ValueError('%s is(are) not dimension(s) of the cube, so it cannot be constrained' % (set(constraints.keys()) - set(dimensions)))
+        #else:
+        return Cube(dimensions, self.queryset, self.aggregation, constraints)
      
     def _measure(self):
         """
@@ -112,7 +114,7 @@ class Cube(MutableMapping):
         :returns: set -- The sample space of *dimension* for the calling cube. 
         """
         sample_space = []
-        lookup_list = re.split("__", dimension)
+        lookup_list = re.split('__', dimension)
 
         if len(lookup_list) == 1:
             field = self.queryset.model._meta.get_field_by_name(lookup_list[0])[0]
@@ -136,7 +138,7 @@ class Cube(MutableMapping):
             while (key):
 
                 #TODO this is totally wrong ! What if there is a field called 'month', 'year', ... ? Should introspect model._meta ?
-                if next_key in ["day", "month", "year"]:
+                if next_key in ['day', 'month', 'year']:
                     for date in queryset.dates(key, next_key):
                         sample_space.append(date)
                     break
@@ -165,32 +167,35 @@ class Cube(MutableMapping):
         """
         constraint_copy = copy.copy(constraint)
         for dimension, value in constraint.iteritems():
-            lookup_list = re.split("__", dimension)
-            #if there is a dimension type "date__year", we need to reformat the constraints
+            lookup_list = re.split('__', dimension)
+            #if there is a dimension type 'date__year', we need to reformat the constraints
             #to convert the *date* or *datetime* to several (if month or day) constraints instead of one,
             #and whose constraint value is a int instead of date/datetime object.
-            if (isinstance(value, date) or isinstance(value, datetime)) and lookup_list[-1] in ["year", "month", "day"]:
-                base_lookup = ""
+            if (isinstance(value, date) or isinstance(value, datetime)) and lookup_list[-1] in ['year', 'month', 'day']:
+                base_lookup = ''
                 for lookup_value in lookup_list[:-1]:
-                    base_lookup += lookup_value + "__"
+                    base_lookup += lookup_value + '__'
 
-                if lookup_list[-1] == "year":
+                if lookup_list[-1] == 'year':
                     constraint_copy[dimension] = value.year
-                elif lookup_list[-1] == "month":
+                elif lookup_list[-1] == 'month':
                     constraint_copy[dimension] = value.month
-                    constraint_copy[base_lookup + "year"] = value.year
-                elif lookup_list[-1] == "day":
+                    constraint_copy[base_lookup + 'year'] = value.year
+                elif lookup_list[-1] == 'day':
                     constraint_copy[dimension] = value.day
-                    constraint_copy[base_lookup + "month"] = value.month
-                    constraint_copy[base_lookup + "year"] = value.year
+                    constraint_copy[base_lookup + 'month'] = value.month
+                    constraint_copy[base_lookup + 'year'] = value.year
 
         return constraint_copy
 
     def __repr__(self):
-        dim_str = ""
+        dim_str = ''
         for dim in self.dimensions:
-            dim_str += dim + ", "
-        return "Cube(%s)" % dim_str[:-2]
+            if self.constraints.get(dim):
+                dim_str += dim + '=' + str(self.constraints[dim]) + ', '
+            else:
+                dim_str += dim + ', '
+        return 'Cube(%s)' % dim_str[:-2]
     
     def __getitem__(self, coordinates):
         """
@@ -231,27 +236,27 @@ class Coords(MutableMapping):
 
     def __hash__(self):
         self._dimensions.sort()
-        hash_key = ""
+        hash_key = ''
         for dimension in self._dimensions:
-            hash_key += dimension + "=" + str(getattr(self, dimension))
+            hash_key += dimension + '=' + str(getattr(self, dimension))
         return hash(hash_key)
     
     def __repr__(self):
         self._dimensions.sort()
-        repr_str = "Coords("
+        coord_str = ''
         for dimension in self._dimensions:
-            repr_str += dimension + "=" + repr(getattr(self, dimension)) + ", "  
-        return repr_str[:-2] + ")"
+            coord_str += dimension + '=' + repr(getattr(self, dimension)) + ', '  
+        return 'Coords(%s)' % coord_str[:-2]
     
     def __setitem__(self, key, value):
         if not key in self._dimensions:
-            raise KeyError("%s is not a valid dimension" % key)
+            raise KeyError('%s is not a valid dimension' % key)
         else:
             setattr(self, key, value)
     
     def __getitem__(self, key):
         if not key in self._dimensions:
-            raise KeyError("%s is not a valid dimension" % key)
+            raise KeyError('%s is not a valid dimension' % key)
         else:
             return getattr(self, key)
 
