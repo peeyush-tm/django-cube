@@ -91,17 +91,17 @@ Let's create a cube
 
     >>> c1._get_sample_space('title') == set(['So What', 'All Blues', 'Blue In Green', 'South Street Stroll', 'Well You Needn\\'t', 'Blue Monk'])
     True
-    >>> c1._get_sample_space('release_date__year') == set([datetime(1944, 1, 1, 0, 0), datetime(1969, 1, 1, 0, 0), datetime(1959, 1, 1, 0, 0), datetime(1945, 1, 1, 0, 0)])
+    >>> c1._get_sample_space('release_date__year') == set([1944, 1969, 1959, 1945])
     True
-    >>> c1._get_sample_space('release_date__month') == set([datetime(1944, 2, 1, 0, 0), datetime(1945, 2, 1, 0, 0), datetime(1969, 1, 1, 0, 0), datetime(1959, 8, 1, 0, 0)])
+    >>> c1._get_sample_space('release_date__month') == set([2, 1, 8])
     True
-    >>> c1._get_sample_space('author__instrument__name') == set(['piano', 'trumpet', 'sax'])
+    >>> c1._default_sample_space('author__instrument__name') == set(['piano', 'trumpet', 'sax'])
     True
-    >>> c1._get_sample_space('author__instrument') == set([piano, trumpet, sax])
+    >>> c1._default_sample_space('author__instrument') == set([piano, trumpet, sax])
     True
-    >>> c1._get_sample_space('author__firstname') == set(['Bill', 'Miles', 'Thelonious', 'Freddie', 'Erroll'])
+    >>> c1._default_sample_space('author__firstname') == set(['Bill', 'Miles', 'Thelonious', 'Freddie', 'Erroll'])
     True
-    >>> c1._get_sample_space('author') == set([miles_davis, freddie_hubbard, erroll_garner, bill_evans_p, thelonious_monk, bill_evans_s])
+    >>> c1._default_sample_space('author') == set([miles_davis, freddie_hubbard, erroll_garner, bill_evans_p, thelonious_monk, bill_evans_s])
     True
         
     Formatting datetimes constraint
@@ -115,15 +115,15 @@ Let's create a cube
 
     Getting a dimension name from a field lookup
     ----------------------------------------------
-    >>> c1._format_dimension({'attr_date__month': 19}) == {'attr_date__month': 19}
+    >>> c1._constr_to_dim({'attr_date__month': 19}) == {'attr_date__month': 19}
     True
-    >>> c1._format_dimension({'attr': 'val'}) == {'attr': 'val'}
+    >>> c1._constr_to_dim({'attr': 'val'}) == {'attr': 'val'}
     True
-    >>> c1._format_dimension({'attr_date__in': 23}) == {'attr_date': 23}
+    >>> c1._constr_to_dim({'attr_date__in': 23}) == {'attr_date': 23}
     True
-    >>> c1._format_dimension({'attr_date__iexact': 'valala'}) == {'attr_date': 'valala'}
+    >>> c1._constr_to_dim({'attr_date__iexact': 'valala'}) == {'attr_date': 'valala'}
     True
-    >>> c1._format_dimension({'attr_date_contains': 890}) == {'attr_date_contains': 890}
+    >>> c1._constr_to_dim({'attr_date_contains': 890}) == {'attr_date_contains': 890}
     True
 
 Iterating on the cube's results
@@ -248,15 +248,34 @@ Ordering the results
 Use django field lookup syntax in constraints
 -----------------------------------------------
 
+DESIGN DECISION NEEDED
+
     >>> subcube = c.constrain({'instrument__name__in': ['trumpet', 'piano']})
     >>> measure_dict = dict(subcube)
-    >>> measure_dict
+    >>> measure_dict = {Coords(firstname='Miles', instrument__name__in=['trumpet', 'piano']): 1,
+    ...             Coords(firstname='Freddie', instrument__name__in=['trumpet', 'piano']): 1,
+    ...             Coords(firstname='Thelonious', instrument__name__in=['trumpet', 'piano']): 0,
+    ...             Coords(firstname='Bill', instrument__name__in=['trumpet', 'piano']): 0,
+    ...             Coords(firstname='Erroll', instrument__name__in=['trumpet', 'piano']): 0}
+
+Explicitely give the cube's sample space
+-----------------------------------------
+
+    >>> c = Cube(['instrument__name', 'firstname'], Musician.objects.all(), count_qs, sample_space={'instrument__name': ['trumpet', 'piano']})
+    >>> measure_dict = dict(c)
     >>> measure_dict == {Coords(firstname='Miles', instrument__name='trumpet'): 1,
     ...             Coords(firstname='Freddie', instrument__name='trumpet'): 1,
     ...             Coords(firstname='Thelonious', instrument__name='trumpet'): 0,
     ...             Coords(firstname='Bill', instrument__name='trumpet'): 0,
-    ...             Coords(firstname='Erroll', instrument__name='trumpet'): 0}
+    ...             Coords(firstname='Erroll', instrument__name='trumpet'): 0,
+    ...             Coords(firstname='Miles', instrument__name='piano'): 0,
+    ...             Coords(firstname='Freddie', instrument__name='piano'): 0,
+    ...             Coords(firstname='Thelonious', instrument__name='piano'): 1,
+    ...             Coords(firstname='Bill', instrument__name='piano'): 1,
+    ...             Coords(firstname='Erroll', instrument__name='piano'): 1}
     True
+
+
 
 """
 from django.db import models
