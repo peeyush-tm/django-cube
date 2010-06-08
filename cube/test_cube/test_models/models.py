@@ -171,7 +171,7 @@ Getting a subcube
 
 By reducing the cube's dimensions
 
-    >>> subcube = c.subcube(dim=['firstname'])
+    >>> subcube = c.subcube(['firstname'])
     >>> meas_dict = dict(subcube)
     >>> meas_dict == {Coords(firstname='Miles'): 1,
     ...             Coords(firstname='Bill'): 2,
@@ -182,7 +182,7 @@ By reducing the cube's dimensions
     
 Or by constraining the cube
 
-    >>> subcube = c.subcube(const={'instrument__name': 'trumpet'})
+    >>> subcube = c.constrain({'instrument__name': 'trumpet'})
     >>> meas_dict = dict(subcube)
     >>> meas_dict == {Coords(firstname='Miles'): 1,
     ...             Coords(firstname='Freddie'): 1,
@@ -196,7 +196,7 @@ Note that the two subcubes are very different. The first one constrains the dime
 It is also possible to use Django field-lookup syntax for date dimensions :
 
     >>> c1 = Cube(['author__lastname', 'release_date__month', 'release_date__year'], Song.objects.all(), len)
-    >>> subcube = c1.subcube(const={'release_date__month': 2})
+    >>> subcube = c1.constrain({'release_date__month': 2})
     >>> meas_dict = dict(subcube)
     >>> meas_dict == {Coords(release_date__year=1945, author__lastname="Davis"): 0,
     ...             Coords(release_date__year=1945, author__lastname="Hubbard"): 0,
@@ -223,7 +223,7 @@ It is also possible to use Django field-lookup syntax for date dimensions :
 Ordering the results
 ----------------------
 
-    >>> subcube = c.subcube(const={'instrument__name': 'trumpet'})
+    >>> subcube = c.constrain({'instrument__name': 'trumpet'})
     >>> meas_list = list(subcube.iteritems())
     >>> meas_list == [(Coords(firstname='Bill'), 0),
     ...             (Coords(firstname='Erroll'), 0),

@@ -32,14 +32,14 @@ class Cube(MutableMapping):
     """
     A cube that can calculate lists of measures for a queryset, on several dimensions.
     """
-    def __init__(self, dimensions, queryset, aggregation, const={}):
+    def __init__(self, dimensions, queryset, aggregation, constraints={}):
         """
         :param dimensions: a list of attribute names which represent the free dimensions of the cube. Nested field lookups are allowed. For example on a model `Person`, a possible dimension would be `mother__birth_date__year`, where `mother` is a foreign key to another person.
         :param queryset: the base queryset from which the cube's sample space will be extracted.
         :param aggregation: an aggregation function. must have the following signature `def agg_func(queryset)`, and return a measure on the queryset.
-        :param const: {*dimension*: *value*} -- a constraint that reduces the sample space of the cube.
+        :param constraints: {*dimension*: *value*} -- a constraint that reduces the sample space of the cube.
         """
-        self.constraints = const
+        self.constraints = constraints
         self.dimensions = set(dimensions)
         self.aggregation = aggregation
         self.queryset = queryset
@@ -70,7 +70,7 @@ class Cube(MutableMapping):
                 constraint = self._format_constraint(constraint)
                 constraints = copy.copy(self.constraints)
                 constraints.update(constraint)
-                subcube = self.subcube(const=constraints)
+                subcube = self.constrain(constraints)
                 #we yield all the measures for the constrained cube 
                 for coords, measure in subcube.iteritems():
                     merged_constraint = copy.copy(constraint)
@@ -84,23 +84,29 @@ class Cube(MutableMapping):
             yield (Coords(), self._measure())
             raise StopIteration
 
-    def subcube(self, dim=None, const={}):
+    def subcube(self, dimensions=None, constraints={}):
         """
-        :returns: Cube -- a subcube of the calling cube, whose dimensions are *dim*, and which is constrained with *const*. 
+        :returns: Cube -- a subcube of the calling cube, whose dimensions are *dimensions*, and which is constrained with *constraints*. 
 
-        :param dim: list -- a subset of the calling cube's dimensions. If *dim* is not provided, it defaults to the calling cube's.
-        :param const: dict -- a dictionnary of constraints *{dimension: value}*. Constrained dimensions must belong to the subcube's dimensions. 
+        :param dimensions: list -- a subset of the calling cube's dimensions. If *dimensions* is not provided, it defaults to the calling cube's.
+        :param constraints: dict -- a dictionnary of constraints *{dimension: value}*. Constrained dimensions must belong to the subcube's dimensions. 
 
         .. todo:: better checking that the constraints are valid (taking into account the field-lookup syntax)
         """
-        if dim == None:
-            dim = self.dimensions
-
-        #if not set(const.keys()) <= set(dim):
-        #    raise ValueError('%s is(are) not dimension(s) of the cube, so it cannot be constrained' % (set(const.keys()) - set(dim)))
+        if dimensions == None:
+            dimensions = self.dimensions
+        
+        #if not set(constraints.keys()) <= set(dimensions):
+        #    raise ValueError('%s is(are) not dimension(s) of the cube, so it cannot be constrained' % (set(constraints.keys()) - set(dimensions)))
         #else:
-        return Cube(dim, self.queryset, self.aggregation, const)
+        return Cube(dimensions, self.queryset, self.aggregation, constraints)
      
+    def constrain(self, constraints):
+        """
+        :returns: Cube -- a subcube of the calling cube, which is constrained with *constraints*. 
+        """
+        return Cube(self.dimensions, self.queryset, self.aggregation, constraints)      
+
     def _measure(self):
         """
         Calculates and returns the measure on the cube.
