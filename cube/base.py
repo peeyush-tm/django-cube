@@ -32,14 +32,14 @@ class Cube(MutableMapping):
     """
     A cube that can calculate lists of measures for a queryset, on several dimensions.
     """
-    def __init__(self, dimensions, queryset, aggregation, constraints={}):
+    def __init__(self, dimensions, queryset, aggregation, const={}):
         """
         :param dimensions: a list of attribute names which represent the free dimensions of the cube. Nested field lookups are allowed. For example on a model `Person`, a possible dimension would be `mother__birth_date__year`, where `mother` is a foreign key to another person.
         :param queryset: the base queryset from which the cube's sample space will be extracted.
         :param aggregation: an aggregation function. must have the following signature `def agg_func(queryset)`, and return a measure on the queryset.
-        :param constraints: {*dimension*: *value*} -- a constraint that reduces the sample space of the cube.
+        :param const: {*dimension*: *value*} -- a constraint that reduces the sample space of the cube.
         """
-        self.constraints = constraints
+        self.constraints = const
         self.dimensions = set(dimensions)
         self.aggregation = aggregation
         self.queryset = queryset
@@ -47,67 +47,72 @@ class Cube(MutableMapping):
             
     def iteritems(self):
         """
-        Iterates on the items (*coordinate*, *value*), where *coordinate* is a :class:`Coords` object, and *value* is the value of the aggregation at *coordinate* position. There is one item for each coordinates in the cube's sample space. 
+        Iterates on the items (*coordinate*, *measure*), where *coordinate* is a :class:`Coords` object, and *measure* is the value of the aggregation at *coordinate* position. There is one item for each coordinates in the cube's sample space.
         """
         #To cover the whole cube's sample space, we will :
-        #1- fix one of the cube's dimensions
-        #2- calculate (recursively) subcubes for every possible value in this dimension's sample space
-        #3- merge the calculated subcubes in one dictionnary that will therefore contains every possibility of the cube's sample space
-        #This results in a graph shaped algorithm that will calculate the measure for every coordinate in the cube.
-
-        #dictionnary {Coords(dim1=value1, ...): *measure*}
-        measures_dict = {}
+        #1- pick one of the cube's dimensions
+        #2- constrain it with every possible value, and calculate a subcube for each constraint
+        #3- merge the coordinates of subcubes' measures with the constraint value, in order to get the complete coordinates of the measure
 
         free_dimensions = self.dimensions - set(self.constraints.keys())
 
-        #If there are free dimensions, we need to calculate all the sub-cubes and merge the results.
+        #If there are free dimensions, we need to calculate subcubes and merge the results.
         if len(free_dimensions):
             #we fix a dimension,
             fixed_dimension = free_dimensions.pop()
-            #and create a cube with the remaining free dimensions,
-            #one for each value possible in the fixed dimension.
+            #and create a subcube with the remaining free dimensions,
+            #one for each value in the fixed dimension's sample space.
             #Every one of these cubes is constrained *fixed_dimension=value*
-            for value in self._get_sample_space(fixed_dimension):
+            sample_space = self._get_sample_space(fixed_dimension)
+            sorted_sample_space = self._sort_sample_space(sample_space)
+            for value in sorted_sample_space:
                 constraint = {fixed_dimension: value}
                 constraint = self._format_constraint(constraint)
                 constraints = copy.copy(self.constraints)
                 constraints.update(constraint)
-                cube = self.subcube(constraints=constraints)
-                #we get all measures for the constrained cube, and merge them to *measures_dict* 
-                for coords, measure in cube.iteritems():
+                subcube = self.subcube(const=constraints)
+                #we yield all the measures for the constrained cube 
+                for coords, measure in subcube.iteritems():
                     merged_constraint = copy.copy(constraint)
                     merged_constraint.update(coords)
                     merged_coords = Coords(**merged_constraint)
-                    measures_dict[merged_coords] = measure
+                    yield (merged_coords, measure)
+            raise StopIteration
 
-        #There is no free dimension, so we can calculate the measure.
+        #There is no free dimension, so we can yield the measure.
         else:
-            measures_dict[Coords()] = self._measure()
-        
-        return measures_dict.iteritems()
+            yield (Coords(), self._measure())
+            raise StopIteration
 
-    def subcube(self, dimensions=None, constraints={}):
+    def subcube(self, dim=None, const={}):
         """
-        :returns: Cube -- a subcube of the calling cube, whose dimensions are *dimensions*, and which is constrained with *constraints*. 
+        :returns: Cube -- a subcube of the calling cube, whose dimensions are *dim*, and which is constrained with *const*. 
 
-        :param dimensions: set -- a subset of the calling cube's dimensions. If *dimensions* is not provided, it defaults to the calling cube's.
-        :param constraints: dict -- a dictionnary of constraints *{dimension: value}*. Constrained dimensions must belong to the subcube's dimensions. 
+        :param dim: list -- a subset of the calling cube's dimensions. If *dim* is not provided, it defaults to the calling cube's.
+        :param const: dict -- a dictionnary of constraints *{dimension: value}*. Constrained dimensions must belong to the subcube's dimensions. 
 
         .. todo:: better checking that the constraints are valid (taking into account the field-lookup syntax)
         """
-        if dimensions == None:
-            dimensions = self.dimensions
+        if dim == None:
+            dim = self.dimensions
 
-        #if not set(constraints.keys()) <= set(dimensions):
-        #    raise ValueError('%s is(are) not dimension(s) of the cube, so it cannot be constrained' % (set(constraints.keys()) - set(dimensions)))
+        #if not set(const.keys()) <= set(dim):
+        #    raise ValueError('%s is(are) not dimension(s) of the cube, so it cannot be constrained' % (set(const.keys()) - set(dim)))
         #else:
-        return Cube(dimensions, self.queryset, self.aggregation, constraints)
+        return Cube(dim, self.queryset, self.aggregation, const)
      
     def _measure(self):
         """
         Calculates and returns the measure on the cube.
         """
         return self.aggregation(self.queryset.filter(**self.constraints))
+
+    def _sort_sample_space(self, sspace):
+        """
+        :param sspace: the sample space to sort, can be any iterable
+        :returns: list -- the sample space sorted
+        """
+        return sorted(list(sspace))
 
     def _get_sample_space(self, dimension):
         """
@@ -180,11 +185,8 @@ class Cube(MutableMapping):
                     constraint_copy[dimension] = value.year
                 elif lookup_list[-1] == 'month':
                     constraint_copy[dimension] = value.month
-                    constraint_copy[base_lookup + 'year'] = value.year
                 elif lookup_list[-1] == 'day':
                     constraint_copy[dimension] = value.day
-                    constraint_copy[base_lookup + 'month'] = value.month
-                    constraint_copy[base_lookup + 'year'] = value.year
 
         return constraint_copy
 

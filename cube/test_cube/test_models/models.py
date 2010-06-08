@@ -108,23 +108,23 @@ Let's create a cube
     ----------------------------------
     >>> c1._format_constraint({'attribute__date__year': date(1984, 1, 1)}) == {'attribute__date__year': 1984}
     True
-    >>> c1._format_constraint({'attribute__date__month': date(3000, 7, 1)}) == {'attribute__date__year': 3000, 'attribute__date__month': 7}
+    >>> c1._format_constraint({'attribute__date__month': date(3000, 7, 1)}) == {'attribute__date__month': 7}
     True
-    >>> c1._format_constraint({'attribute__date__day': datetime(1990, 8, 23, 0, 0, 0)}) == {'attribute__date__year': 1990, 'attribute__date__month': 8, 'attribute__date__day': 23}
+    >>> c1._format_constraint({'attribute__date__day': datetime(1990, 8, 23, 0, 0, 0)}) == {'attribute__date__day': 23}
     True
 
 Iterating on the cube's results
 ----------------------------------
 
-    >>> agg_list = [(coords, measure) for coords, measure in c.iteritems()]
-    >>> len(agg_list) == 5 * 3
+    >>> meas_list = [(coords, measure) for coords, measure in c.iteritems()]
+    >>> len(meas_list) == 5 * 3
     True
-    >>> agg_dict = dict(c.iteritems())
-    >>> agg_dict[Coords(instrument__name='trumpet', firstname='Bill')]
+    >>> meas_dict = dict(c.iteritems())
+    >>> meas_dict[Coords(instrument__name='trumpet', firstname='Bill')]
     0
-    >>> agg_dict[Coords(firstname='Miles', instrument__name='trumpet')]
+    >>> meas_dict[Coords(firstname='Miles', instrument__name='trumpet')]
     1
-    >>> agg_dict == {Coords(instrument__name=u'trumpet', firstname='Miles'): 1,
+    >>> meas_dict == {Coords(instrument__name=u'trumpet', firstname='Miles'): 1,
     ...             Coords(instrument__name=u'trumpet', firstname='Freddie'): 1,
     ...             Coords(instrument__name=u'trumpet', firstname='Erroll'): 0,
     ...             Coords(instrument__name=u'trumpet', firstname='Bill'): 0,
@@ -171,9 +171,9 @@ Getting a subcube
 
 By reducing the cube's dimensions
 
-    >>> subcube = c.subcube(dimensions=['firstname'])
-    >>> agg_dict = dict(subcube)
-    >>> agg_dict == {Coords(firstname='Miles'): 1,
+    >>> subcube = c.subcube(dim=['firstname'])
+    >>> meas_dict = dict(subcube)
+    >>> meas_dict == {Coords(firstname='Miles'): 1,
     ...             Coords(firstname='Bill'): 2,
     ...             Coords(firstname='Thelonious'): 1,
     ...             Coords(firstname='Freddie'): 1,
@@ -182,9 +182,9 @@ By reducing the cube's dimensions
     
 Or by constraining the cube
 
-    >>> subcube = c.subcube(constraints={'instrument__name': 'trumpet'})
-    >>> agg_dict = dict(subcube)
-    >>> agg_dict == {Coords(firstname='Miles'): 1,
+    >>> subcube = c.subcube(const={'instrument__name': 'trumpet'})
+    >>> meas_dict = dict(subcube)
+    >>> meas_dict == {Coords(firstname='Miles'): 1,
     ...             Coords(firstname='Freddie'): 1,
     ...             Coords(firstname='Thelonious'): 0,
     ...             Coords(firstname='Bill'): 0,
@@ -193,7 +193,44 @@ Or by constraining the cube
 
 Note that the two subcubes are very different. The first one constrains the dimension *'instrument__name'* to the value *'trumpet'*, so the measure calculated is the count of trumpet players for each firstname (which stays as a free dimension) ; whereas the second one removes the dimension *'instrument__name'*, so the measure calculated is the count of each *'firstname'*.
 
+It is also possible to use Django field-lookup syntax for date dimensions :
 
+    >>> c1 = Cube(['author__lastname', 'release_date__month', 'release_date__year'], Song.objects.all(), len)
+    >>> subcube = c1.subcube(const={'release_date__month': 2})
+    >>> meas_dict = dict(subcube)
+    >>> meas_dict == {Coords(release_date__year=1945, author__lastname="Davis"): 0,
+    ...             Coords(release_date__year=1945, author__lastname="Hubbard"): 0,
+    ...             Coords(release_date__year=1945, author__lastname="Garner"): 0,
+    ...             Coords(release_date__year=1945, author__lastname="Evans"): 0,
+    ...             Coords(release_date__year=1945, author__lastname="Monk"): 1,
+    ...             Coords(release_date__year=1944, author__lastname="Davis"): 0,
+    ...             Coords(release_date__year=1944, author__lastname="Hubbard"): 0,
+    ...             Coords(release_date__year=1944, author__lastname="Garner"): 0,
+    ...             Coords(release_date__year=1944, author__lastname="Evans"): 0,
+    ...             Coords(release_date__year=1944, author__lastname="Monk"): 1,
+    ...             Coords(release_date__year=1969, author__lastname="Davis"): 0,
+    ...             Coords(release_date__year=1969, author__lastname="Hubbard"): 0,
+    ...             Coords(release_date__year=1969, author__lastname="Garner"): 0,
+    ...             Coords(release_date__year=1969, author__lastname="Evans"): 0,
+    ...             Coords(release_date__year=1969, author__lastname="Monk"): 0,
+    ...             Coords(release_date__year=1959, author__lastname="Davis"): 0,
+    ...             Coords(release_date__year=1959, author__lastname="Hubbard"): 0,
+    ...             Coords(release_date__year=1959, author__lastname="Garner"): 0,
+    ...             Coords(release_date__year=1959, author__lastname="Evans"): 0,
+    ...             Coords(release_date__year=1959, author__lastname="Monk"): 0}
+    True
+
+Ordering the results
+----------------------
+
+    >>> subcube = c.subcube(const={'instrument__name': 'trumpet'})
+    >>> meas_list = list(subcube.iteritems())
+    >>> meas_list == [(Coords(firstname='Bill'), 0),
+    ...             (Coords(firstname='Erroll'), 0),
+    ...             (Coords(firstname='Freddie'), 1),
+    ...             (Coords(firstname='Miles'), 1),
+    ...             (Coords(firstname='Thelonious'), 0)]
+    True
 
 """
 from django.db import models
