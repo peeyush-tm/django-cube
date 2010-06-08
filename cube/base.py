@@ -25,6 +25,7 @@ from datetime import date, datetime
 
 from django.core.exceptions import FieldError
 from django.db.models import ForeignKey
+from django.db.models.sql import constants
 
 from collections import defaultdict
 
@@ -32,14 +33,14 @@ class Cube(MutableMapping):
     """
     A cube that can calculate lists of measures for a queryset, on several dimensions.
     """
-    def __init__(self, dimensions, queryset, aggregation, constraints={}):
+    def __init__(self, dimensions, queryset, aggregation, constraint={}):
         """
         :param dimensions: a list of attribute names which represent the free dimensions of the cube. Nested field lookups are allowed. For example on a model `Person`, a possible dimension would be `mother__birth_date__year`, where `mother` is a foreign key to another person.
         :param queryset: the base queryset from which the cube's sample space will be extracted.
         :param aggregation: an aggregation function. must have the following signature `def agg_func(queryset)`, and return a measure on the queryset.
-        :param constraints: {*dimension*: *value*} -- a constraint that reduces the sample space of the cube.
+        :param constraint: {*dimension*: *value*} -- a constraint that reduces the sample space of the cube.
         """
-        self.constraints = constraints
+        self.constraint = constraint
         self.dimensions = set(dimensions)
         self.aggregation = aggregation
         self.queryset = queryset
@@ -54,7 +55,7 @@ class Cube(MutableMapping):
         #2- constrain it with every possible value, and calculate a subcube for each constraint
         #3- merge the coordinates of subcubes' measures with the constraint value, in order to get the complete coordinates of the measure
 
-        free_dimensions = self.dimensions - set(self.constraints.keys())
+        free_dimensions = self.dimensions - set(self._format_dimension(self.constraint).keys())
 
         #If there are free dimensions, we need to calculate subcubes and merge the results.
         if len(free_dimensions):
@@ -66,15 +67,18 @@ class Cube(MutableMapping):
             sample_space = self._get_sample_space(fixed_dimension)
             sorted_sample_space = self._sort_sample_space(sample_space)
             for value in sorted_sample_space:
-                constraint = {fixed_dimension: value}
-                constraint = self._format_constraint(constraint)
-                constraints = copy.copy(self.constraints)
-                constraints.update(constraint)
-                subcube = self.constrain(constraints)
-                #we yield all the measures for the constrained cube 
+                #subcube_constraint = cube_constraint + extra_constraint
+                extra_constraint = {fixed_dimension: value}
+                extra_constraint = self._format_constraint(extra_constraint)
+                subcube_constraint = copy.copy(self.constraint)
+                subcube_constraint.update(extra_constraint)
+                #constrained subcube
+                subcube = self.constrain(extra_constraint)
+                #we yield all the measures for the constrained cube
                 for coords, measure in subcube.iteritems():
-                    merged_constraint = copy.copy(constraint)
+                    merged_constraint = copy.copy(subcube_constraint)
                     merged_constraint.update(coords)
+                    merged_constraint = self._format_dimension(merged_constraint)
                     merged_coords = Coords(**merged_constraint)
                     yield (merged_coords, measure)
             raise StopIteration
@@ -84,34 +88,38 @@ class Cube(MutableMapping):
             yield (Coords(), self._measure())
             raise StopIteration
 
-    def subcube(self, dimensions=None, constraints={}):
+    def subcube(self, dimensions=None, constraint={}):
         """
-        :returns: Cube -- a subcube of the calling cube, whose dimensions are *dimensions*, and which is constrained with *constraints*. 
+        :returns: Cube -- a subcube of the calling cube, whose dimensions are *dimensions*, and which is constrained with *constraint*. 
 
         :param dimensions: list -- a subset of the calling cube's dimensions. If *dimensions* is not provided, it defaults to the calling cube's.
-        :param constraints: dict -- a dictionnary of constraints *{dimension: value}*. Constrained dimensions must belong to the subcube's dimensions. 
+        :param constraint: dict -- a dictionnary of constraint *{dimension: value}*. Constrained dimensions must belong to the subcube's dimensions. 
 
-        .. todo:: better checking that the constraints are valid (taking into account the field-lookup syntax)
+        .. todo:: better checking that the constraint are valid (taking into account the field-lookup syntax)
         """
         if dimensions == None:
             dimensions = self.dimensions
         
-        #if not set(constraints.keys()) <= set(dimensions):
-        #    raise ValueError('%s is(are) not dimension(s) of the cube, so it cannot be constrained' % (set(constraints.keys()) - set(dimensions)))
+        #if not set(constraint.keys()) <= set(dimensions):
+        #    raise ValueError('%s is(are) not dimension(s) of the cube, so it cannot be constrained' % (set(constraint.keys()) - set(dimensions)))
         #else:
-        return Cube(dimensions, self.queryset, self.aggregation, constraints)
+        return Cube(dimensions, self.queryset, self.aggregation, constraint)
      
-    def constrain(self, constraints):
+    def constrain(self, extra_constraint):
         """
-        :returns: Cube -- a subcube of the calling cube, which is constrained with *constraints*. 
+        Merges the calling cube's constraint with *extra_constraint*.
+
+        :returns: Cube -- a subcube of the calling cube. 
         """
-        return Cube(self.dimensions, self.queryset, self.aggregation, constraints)      
+        constraint = copy.copy(self.constraint)
+        constraint.update(extra_constraint)
+        return Cube(self.dimensions, self.queryset, self.aggregation, constraint)      
 
     def _measure(self):
         """
         Calculates and returns the measure on the cube.
         """
-        return self.aggregation(self.queryset.filter(**self.constraints))
+        return self.aggregation(self.queryset.filter(**self.constraint))
 
     def _sort_sample_space(self, sspace):
         """
@@ -174,13 +182,13 @@ class Cube(MutableMapping):
     @staticmethod
     def _format_constraint(constraint):
         """
-        Formats a dictionnary of constraints to make them Django-orm-compatible 
+        Formats a dictionnary of constraint to make them Django-orm-compatible 
         """
         constraint_copy = copy.copy(constraint)
         for dimension, value in constraint.iteritems():
             lookup_list = re.split('__', dimension)
-            #if there is a dimension type 'date__year', we need to reformat the constraints
-            #to convert the *date* or *datetime* to several (if month or day) constraints instead of one,
+            #if there is a dimension type 'date__year', we need to reformat the constraint
+            #to convert the *date* or *datetime* to several (if month or day) constraint instead of one,
             #and whose constraint value is a int instead of date/datetime object.
             if (isinstance(value, date) or isinstance(value, datetime)) and lookup_list[-1] in ['year', 'month', 'day']:
                 base_lookup = ''
@@ -196,11 +204,29 @@ class Cube(MutableMapping):
 
         return constraint_copy
 
+    @staticmethod
+    def _format_dimension(constraint):
+        """
+        Transforms *constraint* *{dim: value}* so that if *dim* is a django field lookup, it will be transformed to a dimension. e.g. 'name__in' will be transformed to 'name'.
+        """
+        constraint_copy = copy.copy(constraint)
+        for dimension, value in constraint.iteritems():
+            lookup_list = re.split("__", dimension)
+            #All the 'dimensions' that end with 'contains', 'in', ... are field lookups, so we have to trim them to kep only the base of the field lookup. This excepts the 'date' lookups, which are also dimensions.
+            if (lookup_list[-1] in constants.QUERY_TERMS) and (not lookup_list[-1] in ['year', 'month', 'day', 'week_day']):
+                base_lookup = ''
+                for lookup_value in lookup_list[:-1]:
+                    base_lookup += lookup_value + '__'
+                constraint_copy[base_lookup[:-2]] = value
+                del constraint_copy[dimension]
+        
+        return constraint_copy
+
     def __repr__(self):
         dim_str = ''
         for dim in self.dimensions:
-            if self.constraints.get(dim):
-                dim_str += dim + '=' + str(self.constraints[dim]) + ', '
+            if self.constraint.get(dim):
+                dim_str += dim + '=' + str(self.constraint[dim]) + ', '
             else:
                 dim_str += dim + ', '
         return 'Cube(%s)' % dim_str[:-2]

@@ -104,7 +104,7 @@ Let's create a cube
     >>> c1._get_sample_space('author') == set([miles_davis, freddie_hubbard, erroll_garner, bill_evans_p, thelonious_monk, bill_evans_s])
     True
         
-    Formatting datetimes constraints
+    Formatting datetimes constraint
     ----------------------------------
     >>> c1._format_constraint({'attribute__date__year': date(1984, 1, 1)}) == {'attribute__date__year': 1984}
     True
@@ -113,18 +113,31 @@ Let's create a cube
     >>> c1._format_constraint({'attribute__date__day': datetime(1990, 8, 23, 0, 0, 0)}) == {'attribute__date__day': 23}
     True
 
+    Getting a dimension name from a field lookup
+    ----------------------------------------------
+    >>> c1._format_dimension({'attr_date__month': 19}) == {'attr_date__month': 19}
+    True
+    >>> c1._format_dimension({'attr': 'val'}) == {'attr': 'val'}
+    True
+    >>> c1._format_dimension({'attr_date__in': 23}) == {'attr_date': 23}
+    True
+    >>> c1._format_dimension({'attr_date__iexact': 'valala'}) == {'attr_date': 'valala'}
+    True
+    >>> c1._format_dimension({'attr_date_contains': 890}) == {'attr_date_contains': 890}
+    True
+
 Iterating on the cube's results
 ----------------------------------
 
-    >>> meas_list = [(coords, measure) for coords, measure in c.iteritems()]
-    >>> len(meas_list) == 5 * 3
+    >>> measure_list = [(coords, measure) for coords, measure in c.iteritems()]
+    >>> len(measure_list) == 5 * 3
     True
-    >>> meas_dict = dict(c.iteritems())
-    >>> meas_dict[Coords(instrument__name='trumpet', firstname='Bill')]
+    >>> measure_dict = dict(c.iteritems())
+    >>> measure_dict[Coords(instrument__name='trumpet', firstname='Bill')]
     0
-    >>> meas_dict[Coords(firstname='Miles', instrument__name='trumpet')]
+    >>> measure_dict[Coords(firstname='Miles', instrument__name='trumpet')]
     1
-    >>> meas_dict == {Coords(instrument__name=u'trumpet', firstname='Miles'): 1,
+    >>> measure_dict == {Coords(instrument__name=u'trumpet', firstname='Miles'): 1,
     ...             Coords(instrument__name=u'trumpet', firstname='Freddie'): 1,
     ...             Coords(instrument__name=u'trumpet', firstname='Erroll'): 0,
     ...             Coords(instrument__name=u'trumpet', firstname='Bill'): 0,
@@ -172,8 +185,8 @@ Getting a subcube
 By reducing the cube's dimensions
 
     >>> subcube = c.subcube(['firstname'])
-    >>> meas_dict = dict(subcube)
-    >>> meas_dict == {Coords(firstname='Miles'): 1,
+    >>> measure_dict = dict(subcube)
+    >>> measure_dict == {Coords(firstname='Miles'): 1,
     ...             Coords(firstname='Bill'): 2,
     ...             Coords(firstname='Thelonious'): 1,
     ...             Coords(firstname='Freddie'): 1,
@@ -183,12 +196,12 @@ By reducing the cube's dimensions
 Or by constraining the cube
 
     >>> subcube = c.constrain({'instrument__name': 'trumpet'})
-    >>> meas_dict = dict(subcube)
-    >>> meas_dict == {Coords(firstname='Miles'): 1,
-    ...             Coords(firstname='Freddie'): 1,
-    ...             Coords(firstname='Thelonious'): 0,
-    ...             Coords(firstname='Bill'): 0,
-    ...             Coords(firstname='Erroll'): 0}
+    >>> measure_dict = dict(subcube)
+    >>> measure_dict == {Coords(firstname='Miles', instrument__name='trumpet'): 1,
+    ...             Coords(firstname='Freddie', instrument__name='trumpet'): 1,
+    ...             Coords(firstname='Thelonious', instrument__name='trumpet'): 0,
+    ...             Coords(firstname='Bill', instrument__name='trumpet'): 0,
+    ...             Coords(firstname='Erroll', instrument__name='trumpet'): 0}
     True
 
 Note that the two subcubes are very different. The first one constrains the dimension *'instrument__name'* to the value *'trumpet'*, so the measure calculated is the count of trumpet players for each firstname (which stays as a free dimension) ; whereas the second one removes the dimension *'instrument__name'*, so the measure calculated is the count of each *'firstname'*.
@@ -197,39 +210,52 @@ It is also possible to use Django field-lookup syntax for date dimensions :
 
     >>> c1 = Cube(['author__lastname', 'release_date__month', 'release_date__year'], Song.objects.all(), len)
     >>> subcube = c1.constrain({'release_date__month': 2})
-    >>> meas_dict = dict(subcube)
-    >>> meas_dict == {Coords(release_date__year=1945, author__lastname="Davis"): 0,
-    ...             Coords(release_date__year=1945, author__lastname="Hubbard"): 0,
-    ...             Coords(release_date__year=1945, author__lastname="Garner"): 0,
-    ...             Coords(release_date__year=1945, author__lastname="Evans"): 0,
-    ...             Coords(release_date__year=1945, author__lastname="Monk"): 1,
-    ...             Coords(release_date__year=1944, author__lastname="Davis"): 0,
-    ...             Coords(release_date__year=1944, author__lastname="Hubbard"): 0,
-    ...             Coords(release_date__year=1944, author__lastname="Garner"): 0,
-    ...             Coords(release_date__year=1944, author__lastname="Evans"): 0,
-    ...             Coords(release_date__year=1944, author__lastname="Monk"): 1,
-    ...             Coords(release_date__year=1969, author__lastname="Davis"): 0,
-    ...             Coords(release_date__year=1969, author__lastname="Hubbard"): 0,
-    ...             Coords(release_date__year=1969, author__lastname="Garner"): 0,
-    ...             Coords(release_date__year=1969, author__lastname="Evans"): 0,
-    ...             Coords(release_date__year=1969, author__lastname="Monk"): 0,
-    ...             Coords(release_date__year=1959, author__lastname="Davis"): 0,
-    ...             Coords(release_date__year=1959, author__lastname="Hubbard"): 0,
-    ...             Coords(release_date__year=1959, author__lastname="Garner"): 0,
-    ...             Coords(release_date__year=1959, author__lastname="Evans"): 0,
-    ...             Coords(release_date__year=1959, author__lastname="Monk"): 0}
+    >>> measure_dict = dict(subcube)
+    >>> measure_dict == {Coords(release_date__month=2, release_date__year=1945, author__lastname="Davis"): 0,
+    ...             Coords(release_date__month=2, release_date__year=1945, author__lastname="Hubbard"): 0,
+    ...             Coords(release_date__month=2, release_date__year=1945, author__lastname="Garner"): 0,
+    ...             Coords(release_date__month=2, release_date__year=1945, author__lastname="Evans"): 0,
+    ...             Coords(release_date__month=2, release_date__year=1945, author__lastname="Monk"): 1,
+    ...             Coords(release_date__month=2, release_date__year=1944, author__lastname="Davis"): 0,
+    ...             Coords(release_date__month=2, release_date__year=1944, author__lastname="Hubbard"): 0,
+    ...             Coords(release_date__month=2, release_date__year=1944, author__lastname="Garner"): 0,
+    ...             Coords(release_date__month=2, release_date__year=1944, author__lastname="Evans"): 0,
+    ...             Coords(release_date__month=2, release_date__year=1944, author__lastname="Monk"): 1,
+    ...             Coords(release_date__month=2, release_date__year=1969, author__lastname="Davis"): 0,
+    ...             Coords(release_date__month=2, release_date__year=1969, author__lastname="Hubbard"): 0,
+    ...             Coords(release_date__month=2, release_date__year=1969, author__lastname="Garner"): 0,
+    ...             Coords(release_date__month=2, release_date__year=1969, author__lastname="Evans"): 0,
+    ...             Coords(release_date__month=2, release_date__year=1969, author__lastname="Monk"): 0,
+    ...             Coords(release_date__month=2, release_date__year=1959, author__lastname="Davis"): 0,
+    ...             Coords(release_date__month=2, release_date__year=1959, author__lastname="Hubbard"): 0,
+    ...             Coords(release_date__month=2, release_date__year=1959, author__lastname="Garner"): 0,
+    ...             Coords(release_date__month=2, release_date__year=1959, author__lastname="Evans"): 0,
+    ...             Coords(release_date__month=2, release_date__year=1959, author__lastname="Monk"): 0}
     True
 
 Ordering the results
 ----------------------
 
     >>> subcube = c.constrain({'instrument__name': 'trumpet'})
-    >>> meas_list = list(subcube.iteritems())
-    >>> meas_list == [(Coords(firstname='Bill'), 0),
-    ...             (Coords(firstname='Erroll'), 0),
-    ...             (Coords(firstname='Freddie'), 1),
-    ...             (Coords(firstname='Miles'), 1),
-    ...             (Coords(firstname='Thelonious'), 0)]
+    >>> measure_list = list(subcube.iteritems())
+    >>> measure_list == [(Coords(instrument__name='trumpet', firstname='Bill'), 0),
+    ...             (Coords(instrument__name='trumpet', firstname='Erroll'), 0),
+    ...             (Coords(instrument__name='trumpet', firstname='Freddie'), 1),
+    ...             (Coords(instrument__name='trumpet', firstname='Miles'), 1),
+    ...             (Coords(instrument__name='trumpet', firstname='Thelonious'), 0)]
+    True
+
+Use django field lookup syntax in constraints
+-----------------------------------------------
+
+    >>> subcube = c.constrain({'instrument__name__in': ['trumpet', 'piano']})
+    >>> measure_dict = dict(subcube)
+    >>> measure_dict
+    >>> measure_dict == {Coords(firstname='Miles', instrument__name='trumpet'): 1,
+    ...             Coords(firstname='Freddie', instrument__name='trumpet'): 1,
+    ...             Coords(firstname='Thelonious', instrument__name='trumpet'): 0,
+    ...             Coords(firstname='Bill', instrument__name='trumpet'): 0,
+    ...             Coords(firstname='Erroll', instrument__name='trumpet'): 0}
     True
 
 """
