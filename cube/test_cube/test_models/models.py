@@ -84,18 +84,18 @@ Let's create a cube
 
     >>> c = Cube(['instrument__name', 'firstname'], Musician.objects.all(), count_qs)
 
-.. 
-    Getting sample space of a dimension
-    --------------------------------------
+Getting sample space of a dimension
+--------------------------------------
+
     >>> c1 = Cube(['author', 'release_date'], Song.objects.all(), count_qs)
 
-    >>> c1._get_sample_space('title') == set(['So What', 'All Blues', 'Blue In Green', 'South Street Stroll', 'Well You Needn\\'t', 'Blue Monk'])
+    >>> c1.get_sample_space('title') == set(['So What', 'All Blues', 'Blue In Green', 'South Street Stroll', 'Well You Needn\\'t', 'Blue Monk'])
     True
-    >>> c1._get_sample_space('release_date__year') == set([1944, 1969, 1959, 1945])
+    >>> c1.get_sample_space('release_date__year') == set([1944, 1969, 1959, 1945])
     True
-    >>> c1._get_sample_space('release_date__absmonth') == set([datetime(1969, 1, 1, 0, 0), datetime(1945, 2, 1, 0, 0), datetime(1944, 2, 1, 0, 0), datetime(1959, 8, 1, 0, 0)])
+    >>> c1.get_sample_space('release_date__absmonth') == set([datetime(1969, 1, 1, 0, 0), datetime(1945, 2, 1, 0, 0), datetime(1944, 2, 1, 0, 0), datetime(1959, 8, 1, 0, 0)])
     True
-    >>> c1._get_sample_space('release_date__absday') == set([datetime(1969, 1, 21, 0, 0), datetime(1945, 2, 1, 0, 0), datetime(1944, 2, 1, 0, 0), datetime(1959, 8, 17, 0, 0)])
+    >>> c1.get_sample_space('release_date__absday') == set([datetime(1969, 1, 21, 0, 0), datetime(1945, 2, 1, 0, 0), datetime(1944, 2, 1, 0, 0), datetime(1959, 8, 17, 0, 0)])
     True
     >>> c1._default_sample_space('author__instrument__name') == set(['piano', 'trumpet', 'sax'])
     True
@@ -105,7 +105,9 @@ Let's create a cube
     True
     >>> c1._default_sample_space('author') == set([miles_davis, freddie_hubbard, erroll_garner, bill_evans_p, thelonious_monk, bill_evans_s])
     True
-        
+
+..
+
     Formatting datetimes constraint
     ----------------------------------
     >>> c1._format_constraint({'attribute__date__absmonth': date(3000, 7, 1)}) == {'attribute__date__month': 7, 'attribute__date__year': 3000}
@@ -273,7 +275,14 @@ Resample the sample space of a cube's dimension
     ...             Coords(firstname='Erroll', instrument__name='piano'): 1}
     True
 
+    >>> c = Cube(['release_date__absmonth', 'author__lastname'], Song.objects.all(), count_qs)
+    >>> set(c.get_sample_space('release_date__absmonth')) == set([datetime(1969, 1, 1, 0, 0), datetime(1945, 2, 1, 0, 0), datetime(1944, 2, 1, 0, 0), datetime(1959, 8, 1, 0, 0)])
+    True
+    >>> c = c.resample('release_date__absmonth', lower_bound=datetime(1945, 1, 1), upper_bound=datetime(1960, 11, 1))
+    >>> set(c.get_sample_space('release_date__absmonth')) == set([datetime(1959, 8, 1, 0, 0), datetime(1945, 2, 1, 0, 0)])
+    True
 """
+
 from django.db import models
 
 class Instrument(models.Model):

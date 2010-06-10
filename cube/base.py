@@ -66,7 +66,7 @@ class Cube(MutableMapping):
             #and create a subcube with the remaining free dimensions,
             #one for each value in the fixed dimension's sample space.
             #Every one of these cubes is constrained *fixed_dimension=value*
-            sample_space = self._get_sample_space(fixed_dimension)
+            sample_space = self.get_sample_space(fixed_dimension)
             sorted_sample_space = self._sort_sample_space(sample_space)
             for value in sorted_sample_space:
                 #subcube_constraint = cube_constraint + extra_constraint
@@ -132,7 +132,7 @@ class Cube(MutableMapping):
         If *space* is not defined, the sample space of the calling cube's *dimension* is taken instead.
         """
         #calculate dimension's new sample space
-        new_space = space or self._get_sample_space(dimension)
+        new_space = space or self.get_sample_space(dimension)
         lower_bound = lower_bound or min(new_space)
         upper_bound = upper_bound or max(new_space)
         new_space = filter(lambda elem: elem >= lower_bound and elem <= upper_bound, new_space)
@@ -156,7 +156,7 @@ class Cube(MutableMapping):
         """
         return sorted(list(sspace))
 
-    def _get_sample_space(self, dimension):
+    def get_sample_space(self, dimension):
         """
         :returns: set -- The sample space of *dimension* for the calling cube. 
         """
