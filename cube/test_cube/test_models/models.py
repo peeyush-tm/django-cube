@@ -93,7 +93,9 @@ Let's create a cube
     True
     >>> c1._get_sample_space('release_date__year') == set([1944, 1969, 1959, 1945])
     True
-    >>> c1._get_sample_space('release_date__month') == set([2, 1, 8])
+    >>> c1._get_sample_space('release_date__absmonth') == set([datetime(1969, 1, 1, 0, 0), datetime(1945, 2, 1, 0, 0), datetime(1944, 2, 1, 0, 0), datetime(1959, 8, 1, 0, 0)])
+    True
+    >>> c1._get_sample_space('release_date__absday') == set([datetime(1969, 1, 21, 0, 0), datetime(1945, 2, 1, 0, 0), datetime(1944, 2, 1, 0, 0), datetime(1959, 8, 17, 0, 0)])
     True
     >>> c1._default_sample_space('author__instrument__name') == set(['piano', 'trumpet', 'sax'])
     True
@@ -106,25 +108,11 @@ Let's create a cube
         
     Formatting datetimes constraint
     ----------------------------------
-    >>> c1._format_constraint({'attribute__date__year': date(1984, 1, 1)}) == {'attribute__date__year': 1984}
+    >>> c1._format_constraint({'attribute__date__absmonth': date(3000, 7, 1)}) == {'attribute__date__month': 7, 'attribute__date__year': 3000}
     True
-    >>> c1._format_constraint({'attribute__date__month': date(3000, 7, 1)}) == {'attribute__date__month': 7}
-    True
-    >>> c1._format_constraint({'attribute__date__day': datetime(1990, 8, 23, 0, 0, 0)}) == {'attribute__date__day': 23}
+    >>> c1._format_constraint({'attribute__date__absday': datetime(1990, 8, 23, 0, 0, 0)}) == {'attribute__date__day': 23, 'attribute__date__month': 8, 'attribute__date__year': 1990}
     True
 
-    Getting a dimension name from a field lookup
-    ----------------------------------------------
-    >>> c1._constr_to_dim({'attr_date__month': 19}) == {'attr_date__month': 19}
-    True
-    >>> c1._constr_to_dim({'attr': 'val'}) == {'attr': 'val'}
-    True
-    >>> c1._constr_to_dim({'attr_date__in': 23}) == {'attr_date': 23}
-    True
-    >>> c1._constr_to_dim({'attr_date__iexact': 'valala'}) == {'attr_date': 'valala'}
-    True
-    >>> c1._constr_to_dim({'attr_date_contains': 890}) == {'attr_date_contains': 890}
-    True
 
 Iterating on the cube's results
 ----------------------------------
@@ -248,8 +236,6 @@ Ordering the results
 Use django field lookup syntax in constraints
 -----------------------------------------------
 
-DESIGN DECISION NEEDED
-
     >>> subcube = c.constrain({'instrument__name__in': ['trumpet', 'piano']})
     >>> measure_dict = dict(subcube)
     >>> measure_dict = {Coords(firstname='Miles', instrument__name__in=['trumpet', 'piano']): 1,
@@ -275,7 +261,17 @@ Explicitely give the cube's sample space
     ...             Coords(firstname='Erroll', instrument__name='piano'): 1}
     True
 
+Resample the sample space of a cube's dimension
+-------------------------------------------------
 
+    >>> c = c.resample('instrument__name', space=['piano'])
+    >>> measure_dict = dict(c)
+    >>> measure_dict == {Coords(firstname='Miles', instrument__name='piano'): 0,
+    ...             Coords(firstname='Freddie', instrument__name='piano'): 0,
+    ...             Coords(firstname='Thelonious', instrument__name='piano'): 1,
+    ...             Coords(firstname='Bill', instrument__name='piano'): 1,
+    ...             Coords(firstname='Erroll', instrument__name='piano'): 1}
+    True
 
 """
 from django.db import models
