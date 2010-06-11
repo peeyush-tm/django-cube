@@ -108,9 +108,9 @@ Getting sample space of a dimension
     True
 
 ..
-
+    
     Formatting datetimes constraint
-    ----------------------------------
+
     >>> c1._format_constraint({'attribute__date__absmonth': date(3000, 7, 1)}) == {'attribute__date__month': 7, 'attribute__date__year': 3000}
     True
     >>> c1._format_constraint({'attribute__date__absday': datetime(1990, 8, 23, 0, 0, 0)}) == {'attribute__date__day': 23, 'attribute__date__month': 8, 'attribute__date__year': 1990}
