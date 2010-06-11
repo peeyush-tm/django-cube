@@ -47,45 +47,6 @@ class Cube(MutableMapping):
         self.aggregation = aggregation
         self.queryset = queryset
         self._results = defaultdict(defaultdict)
-            
-    def iteritems(self):
-        """
-        Iterates on the items (*coordinate*, *measure*), where *coordinate* is a :class:`Coords` object, and *measure* is the value of the aggregation at *coordinate* position. There is one item for each coordinates in the cube's sample space.
-        """
-        #To cover the whole cube's sample space, we will :
-        #1- pick one of the cube's dimensions
-        #2- constrain it with every possible value, and calculate a subcube for each constraint
-        #3- merge the coordinates of subcubes' measures with the constraint value, in order to get the complete coordinates of the measure
-
-        free_dimensions = self.dimensions - set(self.constraint.keys())
-
-        #If there are free dimensions, we need to calculate subcubes and merge the results.
-        if len(free_dimensions):
-            #we fix a dimension,
-            fixed_dimension = free_dimensions.pop()
-            #and create a subcube with the remaining free dimensions,
-            #one for each value in the fixed dimension's sample space.
-            #Every one of these cubes is constrained *fixed_dimension=value*
-            sample_space = self.get_sample_space(fixed_dimension)
-            sorted_sample_space = self._sort_sample_space(sample_space)
-            for value in sorted_sample_space:
-                #subcube_constraint = cube_constraint + extra_constraint
-                extra_constraint = {fixed_dimension: value}
-                #constrained subcube
-                subcube = self.constrain(extra_constraint)
-                subcube_constraint = copy.copy(subcube.constraint)
-                #we yield all the measures for the constrained cube
-                for coords, measure in subcube.iteritems():
-                    merged_constraint = copy.copy(subcube_constraint)
-                    merged_constraint.update(coords)
-                    merged_coords = Coords(**merged_constraint)
-                    yield (merged_coords, measure)
-            raise StopIteration
-
-        #There is no free dimension, so we can yield the measure.
-        else:
-            yield (Coords(), self._measure())
-            raise StopIteration
 
     def subcube(self, dimensions=None, extra_constraint={}):
         """
@@ -164,12 +125,6 @@ class Cube(MutableMapping):
         return cube_copy
 
     def measure(self):
-        """
-        Returns the measure calculated on the whole cube, takes no account of the cube's dimensions.
-        """
-        return self.subcube([])[Coords()]
-
-    def _measure(self):
         """
         Calculates and returns the measure on the cube.
         """
@@ -297,27 +252,78 @@ class Cube(MutableMapping):
     
     def __getitem__(self, coordinates):
         """
-        Returns the measure at *coordinates*
+        Returns the measure at *coordinates*. Every coordinate to a subcube is valid. e.g. : ::
+        
+            cube[Coords(dim1=val1, dim2=val2)] # is valid
+            cube[Coords(dim1=val1)] #is valid to, it just doesn't
+            ... # take the dimension dim2 into account when calculating the measure.
         """
-        return dict(self.iteritems())[coordinates]
+        subcube = self
+        for dimension, value in coordinates.iteritems():
+            subcube = subcube.constrain({dimension: value})
+        if set(subcube.constraint.keys()) <= set(subcube.dimensions):
+            return subcube.measure()
+        else:
+            raise KeyError("%s" % coordinates)
 
     def __len__(self):
         """
         Returns the length of the sample space
         """
-        return len(dict(self.iteritems()))
+        length = 1
+        for dimension in self.dimensions:
+            length *= len(self.get_sample_space(dimension))
+        return length
     
     def __iter__(self):
         """
-        Iterates on the whole sample space
+        Iterates on the coordinates of all subcubes of dimension 0. 
         """
-        return iter(dimension for dimension, measure in self.iteritems())
-    
+        #To cover the whole cube's sample space, we will :
+        #1- pick one of the cube's dimensions
+        #2- constrain it with every possible value, and calculate a subcube for each constraint
+        #3- merge the coordinates of subcubes' measures with the constraint value
+
+        free_dimensions = self.dimensions - set(self.constraint.keys())
+
+        #If there are free dimensions, we need to calculate subcubes and merge the results.
+        if len(free_dimensions):
+            #we fix a dimension,
+            fixed_dimension = free_dimensions.pop()
+            #and create a subcube with the remaining free dimensions,
+            #one for each value in the fixed dimension's sample space.
+            #Every one of these cubes is constrained *fixed_dimension=value*
+            sample_space = self.get_sample_space(fixed_dimension)
+            sorted_sample_space = self._sort_sample_space(sample_space)
+            for value in sorted_sample_space:
+                #subcube_constraint = cube_constraint + extra_constraint
+                extra_constraint = {fixed_dimension: value}
+                #constrained subcube
+                subcube = self.constrain(extra_constraint)
+                subcube_constraint = copy.copy(subcube.constraint)
+                #we yield all the measures for the constrained cube
+                for coords in subcube:
+                    merged_constraint = copy.copy(subcube_constraint)
+                    merged_constraint.update(coords)
+                    merged_coords = Coords(**merged_constraint)
+                    yield merged_coords
+            raise StopIteration
+
+        #There is no free dimension, so we can yield the measure.
+        else:
+            yield Coords()
+            raise StopIteration
+
     def __contains__(self, coordinates):
         """
-        Returns True if *coordinates* belongs to the cube.
+        Returns True if *coordinates* points to a valid subcube.
         """
-        return coordinates in dict(self.iteritems())
+        try:
+            self[coordinates]
+        except KeyError:
+            return False
+        else:
+            return True
     
     def __delitem__(self, key):
         raise NotImplementedError
