@@ -1,6 +1,7 @@
 """
 .. 
     >>> from cube.base import Coords, Cube
+    >>> from cube.templatetags import cube_filters
 
 Coords
 =======
@@ -281,6 +282,22 @@ Resample the sample space of a cube's dimension
     >>> c = c.resample('release_date__absmonth', lower_bound=datetime(1945, 1, 1), upper_bound=datetime(1960, 11, 1))
     >>> set(c.get_sample_space('release_date__absmonth')) == set([datetime(1959, 8, 1, 0, 0), datetime(1945, 2, 1, 0, 0)])
     True
+
+Template tags
+==============
+
+    >>> c = Cube(['release_date__absmonth', 'author__lastname', 'title'], Song.objects.all(), count_qs)
+
+    >>> subcube = cube_filters.subcube(c, 'author__lastname, title')
+    >>> subcube.dimensions == set(['author__lastname', 'title'])
+    True
+    >>> subcube.constraint == c.constraint
+    True
+    >>> subcube.sample_space == c.sample_space
+    True
+
+    >>> cube_filters.coords(subcube, 'author__lastname=Davis, title=So What')
+    1
 """
 
 from django.db import models

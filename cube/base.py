@@ -92,26 +92,30 @@ class Cube(MutableMapping):
         :returns: Cube -- a subcube of the calling cube, whose dimensions are *dimensions*, and which is constrained with *extra_constraint*. 
 
         :param dimensions: list -- a subset of the calling cube's dimensions. If *dimensions* is not provided, it defaults to the calling cube's.
-        :param extra_constraint: dict -- a dictionnary of constraint *{dimension: value}*. Constrained dimensions must belong to the subcube's dimensions. 
-
-        .. todo:: better checking that the constraint are valid (taking into account the field-lookup syntax)
+        :param extra_constraint: dict -- a dictionnary of constraint *{dimension: value}*. Constrained dimensions must belong to the subcube's dimensions.
+        
+        :raise: ValueError -- if a dimension passed along *dimensions* is not a dimension of the calling cube, or if a dimension constrained in *extra_constraint* is not a dimension of the returned subcube.
         """
+        #default value for *dimensions*
         if dimensions == None:
             dimensions = self.dimensions
+        #building the new cube's *constraint*
         else:
-            constraint_copy = copy.copy(self.constraint)
+            constraint = copy.copy(self.constraint)
             #if some dimensions are deleted, we delete also the constraints
             for dimension in (set(self.dimensions) - set(dimensions)):
                 try:
-                    constraint_copy.pop(dimension)
-                except:
+                    constraint.pop(dimension)
+                except KeyError:
                     pass
-            constraint_copy.update(extra_constraint)
-        
-        #if not set(extra_constraint.keys()) <= set(dimensions):
-        #    raise ValueError('%s is(are) not dimension(s) of the cube, so it cannot be constrained' % (set(constraint.keys()) - set(dimensions)))
-        #else:
-        return Cube(dimensions, self.queryset, self.aggregation, constraint_copy)
+            constraint.update(extra_constraint)
+
+        if not set(extra_constraint.keys()) <= set(dimensions):
+            raise ValueError('%s is(are) not valid constraint dimension(s) for this cube' % (set(constraint.keys()) - set(dimensions)))
+        elif not set(dimensions) <= self.dimensions:
+            raise ValueError('%s is(are) not dimension(s) of the cube' % (set(dimensions) - set(self.dimensions)))
+        else:
+            return Cube(dimensions, self.queryset, self.aggregation, constraint)
      
     def constrain(self, extra_constraint):
         """
