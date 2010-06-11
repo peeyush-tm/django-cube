@@ -96,11 +96,11 @@ class Cube(MutableMapping):
         
         :raise: ValueError -- if a dimension passed along *dimensions* is not a dimension of the calling cube, or if a dimension constrained in *extra_constraint* is not a dimension of the returned subcube.
         """
+        #default value for *constraint*
+        constraint = copy.copy(self.constraint)
         #default value for *dimensions*
         if dimensions == None:
             dimensions = self.dimensions
-        #default value for *constraint*
-        constraint = copy.copy(self.constraint)
         #building the new cube's *constraint*
         else:
             constraint = copy.copy(self.constraint)
