@@ -283,6 +283,13 @@ Resample the sample space of a cube's dimension
     >>> set(c.get_sample_space('release_date__absmonth')) == set([datetime(1959, 8, 1, 0, 0), datetime(1945, 2, 1, 0, 0)])
     True
 
+Filter cube's queryset
+------------------------
+
+    >>> filtered_c = c.filter(author=miles_davis)
+    >>> set([item for item in filtered_c.queryset]) == set([so_what, all_blues])
+    True
+
 Template tags
 ==============
 

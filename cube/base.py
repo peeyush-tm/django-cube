@@ -127,6 +127,12 @@ class Cube(MutableMapping):
         constraint.update(extra_constraint)
         return Cube(self.dimensions, self.queryset, self.aggregation, constraint)      
 
+    def filter(self, **kwargs):
+        """
+        Filter the cube's queryset. This method is merely a wrapper around Django's `filter` function.
+        """
+        return Cube(self.dimensions, self.queryset.filter(**kwargs), self.aggregation, self.constraint, self.sample_space)
+
     def resample(self, dimension, lower_bound=None, upper_bound=None, space=None):
         """
         Returns a copy of the calling cube, whose sample space of *dimension* is limited to : ::
