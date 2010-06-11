@@ -303,7 +303,7 @@ Template tags
     >>> subcube.sample_space == c.sample_space
     True
 
-    >>> cube_filters.coords(subcube, 'author__lastname=Davis, title=So What')
+    >>> cube_filters.coords(subcube, 'author__lastname=str("Davis"), title=str("So What")')
     1
 """
 

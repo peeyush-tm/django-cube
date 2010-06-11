@@ -8,7 +8,7 @@ def subcube(cube, args):
     """
     Returns a subcube with dimensions passed as *args*. Usage : ::
     
-        {{ cube|subcube:"dim1, dim2, dimn" }}
+        {{ cube|subcube:'dim1, dim2, dimn' }}
     """
     dim_list = re.split(r'\s*,\s*', args)
     try:
@@ -21,14 +21,22 @@ def coords(cube, args):
     """
     Returns the measure of the cube which is at coordinates *args*. Usage : ::
     
-        {{ cube|coords:"dim1=val1, dim2=val2, dimn=valn" }}
+        {{ cube|coords:'dim1=type1(val1), dim2=type2(val2), dimn=typen(valn)' }}
+
+    Example : ::
+        
+        {{ cube|coords:'title=str("a title"), amount=int(178)' }}
     """
     args_dict = {}
-    args_list = re.split('\s*,\s*', args)
-    for index in xrange(0, len(args_list)):
-        coord_value = re.split('\s*=\s*', args_list[index])
-        args_dict[coord_value[0]] = coord_value[1]
+    for result in re.finditer(r"(?P<dimension>\w+)\s*=\s*(?P<type>\w+)\((?P<value>.*?)\)", args):
+        try:
+            exec('value = %s(%s)' % (result.group('type'), result.group('value')))
+        except Exception as e:
+            return ''
+        else:
+            args_dict[result.group('dimension')] = value
+
     try:
         return cube[Coords(**args_dict)]
     except KeyError:
-        return ""
+        return ''
