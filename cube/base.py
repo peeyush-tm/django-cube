@@ -163,6 +163,12 @@ class Cube(MutableMapping):
         cube_copy.sample_space = cube_space
         return cube_copy
 
+    def measure(self):
+        """
+        Returns the measure calculated on the whole cube, takes no account of the cube's dimensions.
+        """
+        return self.subcube([])[Coords()]
+
     def _measure(self):
         """
         Calculates and returns the measure on the cube.
