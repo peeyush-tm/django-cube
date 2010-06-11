@@ -2,6 +2,7 @@
 .. 
     >>> from cube.base import Coords, Cube
     >>> from cube.templatetags import cube_filters
+    >>> import copy
 
 Coords
 =======
@@ -109,13 +110,32 @@ Getting sample space of a dimension
 
 ..
     
-    Formatting datetimes constraint
+    ----- Formatting datetimes constraint
 
     >>> c1._format_constraint({'attribute__date__absmonth': date(3000, 7, 1)}) == {'attribute__date__month': 7, 'attribute__date__year': 3000}
     True
     >>> c1._format_constraint({'attribute__date__absday': datetime(1990, 8, 23, 0, 0, 0)}) == {'attribute__date__day': 23, 'attribute__date__month': 8, 'attribute__date__year': 1990}
     True
 
+    ----- Shallow copy
+    
+    >>> c1_copy = copy.copy(c1)
+    >>> id(c1_copy) != id(c1)
+    True
+    >>> id(c1_copy.dimensions) != id(c1.dimensions) ; c1_copy.dimensions == c1.dimensions
+    True
+    True
+    >>> id(c1_copy.sample_space) != id(c1.sample_space) ; c1_copy.sample_space == c1.sample_space
+    True
+    True
+    >>> id(c1_copy.constraint) != id(c1.constraint) ; c1_copy.constraint == c1.constraint
+    True
+    True
+    >>> id(c1_copy.queryset) != id(c1.queryset) ; list(c1_copy.queryset) == list(c1.queryset)
+    True
+    True
+    >>> c1_copy.aggregation == c1.aggregation
+    True
 
 Iterating on the cube's results
 ----------------------------------

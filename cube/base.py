@@ -115,7 +115,10 @@ class Cube(MutableMapping):
         elif not set(dimensions) <= self.dimensions:
             raise ValueError('%s is(are) not dimension(s) of the cube' % (set(dimensions) - set(self.dimensions)))
         else:
-            return Cube(dimensions, self.queryset, self.aggregation, constraint)
+            cube_copy = copy.copy(self)
+            cube_copy.dimensions = set(dimensions)
+            cube_copy.constraint = constraint
+            return cube_copy
      
     def constrain(self, extra_constraint):
         """
@@ -125,13 +128,17 @@ class Cube(MutableMapping):
         """
         constraint = copy.copy(self.constraint)
         constraint.update(extra_constraint)
-        return Cube(self.dimensions, self.queryset, self.aggregation, constraint)      
+        cube_copy = copy.copy(self)
+        cube_copy.constraint = constraint
+        return cube_copy
 
     def filter(self, **kwargs):
         """
         Filter the cube's queryset. This method is merely a wrapper around Django's `filter` function.
         """
-        return Cube(self.dimensions, self.queryset.filter(**kwargs), self.aggregation, self.constraint, self.sample_space)
+        cube_copy = copy.copy(self)
+        cube_copy.queryset = self.queryset.filter(**kwargs)
+        return cube_copy
 
     def resample(self, dimension, lower_bound=None, upper_bound=None, space=None):
         """
@@ -150,7 +157,9 @@ class Cube(MutableMapping):
         cube_space = copy.copy(self.sample_space)
         cube_space.update({dimension: new_space})        
 
-        return Cube(self.dimensions, self.queryset, self.aggregation, sample_space=cube_space)
+        cube_copy = copy.copy(self)
+        cube_copy.sample_space = cube_space
+        return cube_copy
 
     def _measure(self):
         """
@@ -257,6 +266,17 @@ class Cube(MutableMapping):
                     constraint_copy[base_lookup + 'year'] = value.year
 
         return constraint_copy
+
+    def __copy__(self):
+        """
+        Returns a shallow copy of the cube.
+        """
+        dimensions = copy.copy(self.dimensions)
+        queryset = copy.copy(self.queryset)
+        sample_space = copy.copy(self.sample_space)
+        constraint = copy.copy(self.constraint)
+        aggregation = self.aggregation
+        return Cube(dimensions, queryset, aggregation, constraint=constraint, sample_space=sample_space)
 
     def __repr__(self):
         dim_str = ''
