@@ -99,6 +99,8 @@ class Cube(MutableMapping):
         #default value for *dimensions*
         if dimensions == None:
             dimensions = self.dimensions
+        #default value for *constraint*
+        constraint = copy.copy(self.constraint)
         #building the new cube's *constraint*
         else:
             constraint = copy.copy(self.constraint)
