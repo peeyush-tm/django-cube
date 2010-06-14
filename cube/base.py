@@ -331,6 +331,63 @@ class Cube(MutableMapping):
     def __setitem__(self, key, value):
         raise NotImplementedError
 
+    def __add__(self, other):
+        """
+        Usage : ::
+            
+            cube = cube1 + cube2
+
+        Returns a cube that is a copy of *cube1*, but which aggregation function is 
+        
+            cube.aggregation(value) == cube1.aggregation(value) + cube2.aggregation(value)  
+        """
+        cube_copy = copy.copy(self)
+        cube_copy.aggregation = lambda queryset: self.aggregation(queryset) + other.aggregation(queryset)
+        return cube_copy
+
+    def __sub__(self, other):
+        """
+        Usage : ::
+            
+            cube = cube1 - cube2
+
+        Returns a cube that is a copy of *cube1*, but which aggregation function is 
+        
+            cube.aggregation(value) == cube1.aggregation(value) - cube2.aggregation(value)  
+        """
+        cube_copy = copy.copy(self)
+        cube_copy.aggregation = lambda queryset: self.aggregation(queryset) - other.aggregation(queryset)
+        return cube_copy
+
+    def __div__(self, other):
+        """
+        Usage : ::
+            
+            cube = cube1 / cube2
+
+        Returns a cube that is a copy of *cube1*, but which aggregation function is 
+        
+            cube.aggregation(value) == cube1.aggregation(value) / cube2.aggregation(value)
+        
+        .. todo:: ZeroDivisionError  
+        """
+        cube_copy = copy.copy(self)
+        cube_copy.aggregation = lambda queryset: self.aggregation(queryset) / other.aggregation(queryset)
+        return cube_copy
+
+    def __mul__(self, other):
+        """
+        Usage : ::
+            
+            cube = cube1 * cube2
+
+        Returns a cube that is a copy of *cube1*, but which aggregation function is 
+        
+            cube.aggregation(value) == cube1.aggregation(value) * cube2.aggregation(value)
+        """
+        cube_copy = copy.copy(self)
+        cube_copy.aggregation = lambda queryset: self.aggregation(queryset) * other.aggregation(queryset)
+        return cube_copy
 
 class Coords(MutableMapping):
     def __init__(self, **kwargs):

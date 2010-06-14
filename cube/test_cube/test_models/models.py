@@ -328,6 +328,11 @@ Filter cube's queryset
     >>> set([item for item in filtered_c.queryset]) == set([so_what, all_blues])
     True
 
+Creating a cube from other cubes + - * /
+------------------------------------------
+
+    >>> cube1 = Cube([])
+
 Template tags
 ==============
 
