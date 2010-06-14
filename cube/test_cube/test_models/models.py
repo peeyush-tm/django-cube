@@ -331,7 +331,7 @@ Filter cube's queryset
 Creating a cube from other cubes + - * /
 ------------------------------------------
 
-    >>> cube1 = Cube([])
+    >>> 
 
 Template tags
 ==============

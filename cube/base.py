@@ -29,11 +29,12 @@ from django.db.models.sql import constants
 
 from collections import defaultdict
 
-class Cube(MutableMapping):
+
+class BaseCube(MutableMapping):
     """
     A cube that can calculate lists of measures for a queryset, on several dimensions.
     """
-    def __init__(self, dimensions, queryset, aggregation, constraint={}, sample_space={}):
+    def __init__(self, dimensions, aggregation, constraint={}, sample_space={}):
         """
         :param dimensions: a list of attribute names which represent the free dimensions of the cube. All Django nested field lookups are allowed. For example on a model `Person`, a possible dimension would be `mother__birth_date__in`, where `mother` would (why not?!) be foreign key to another person. You can also use two special lookups: *absmonth* and *absday* which both take :class:`datetime` or :class:`date`, and represent absolute months or days. E.g. To search for November 1986, you would have to use *"date__month=11, date__year=1986"*, instead you can just use *"date__absmonth=date(1986, 11, 1)"*.
         :param queryset: the base queryset from which the cube's sample space will be extracted.
@@ -45,8 +46,6 @@ class Cube(MutableMapping):
         self.constraint = constraint
         self.dimensions = set(dimensions)
         self.aggregation = aggregation
-        self.queryset = queryset
-        self._results = defaultdict(defaultdict)
 
     def subcube(self, dimensions=None, extra_constraint={}):
         """
@@ -95,14 +94,6 @@ class Cube(MutableMapping):
         cube_copy.constraint = constraint
         return cube_copy
 
-    def filter(self, **kwargs):
-        """
-        Filter the cube's queryset. This method is merely a wrapper around Django's `filter` function.
-        """
-        cube_copy = copy.copy(self)
-        cube_copy.queryset = self.queryset.filter(**kwargs)
-        return cube_copy
-
     def resample(self, dimension, lower_bound=None, upper_bound=None, space=None):
         """
         Returns a copy of the calling cube, whose sample space of *dimension* is limited to : ::
@@ -128,8 +119,7 @@ class Cube(MutableMapping):
         """
         Calculates and returns the measure on the cube.
         """
-        constraint = self._format_constraint(self.constraint)
-        return self.aggregation(self.queryset.filter(**constraint))
+        raise NotImplementedError
 
     def _sort_sample_space(self, sspace):
         """
@@ -145,7 +135,140 @@ class Cube(MutableMapping):
         try:
             return self.sample_space[dimension]
         except KeyError:
-            return self._default_sample_space(dimension) 
+            return self._default_sample_space(dimension)
+
+        return constraint_copy
+
+    def __copy__(self):
+        """
+        Returns a shallow copy of the cube.
+        """
+        dimensions = copy.copy(self.dimensions)
+        sample_space = copy.copy(self.sample_space)
+        constraint = copy.copy(self.constraint)
+        aggregation = self.aggregation
+        return Cube(dimensions, aggregation, constraint=constraint, sample_space=sample_space)
+
+    def __repr__(self):
+        dim_str = ''
+        for dim in self.dimensions:
+            if self.constraint.get(dim):
+                dim_str += dim + '=' + str(self.constraint[dim]) + ', '
+            else:
+                dim_str += dim + ', '
+        return 'Cube(%s)' % dim_str[:-2]
+    
+    def __getitem__(self, coordinates):
+        """
+        Returns the measure at *coordinates*. Every coordinate to a subcube is valid. e.g. : ::
+        
+            cube[Coords(dim1=val1, dim2=val2)] # is valid
+            cube[Coords(dim1=val1)] #is valid to, it just doesn't
+            ... # take the dimension dim2 into account when calculating the measure.
+        """
+        subcube = self
+        for dimension, value in coordinates.iteritems():
+            subcube = subcube.constrain({dimension: value})
+        if set(subcube.constraint.keys()) <= set(subcube.dimensions):
+            return subcube.measure()
+        else:
+            raise KeyError("%s" % coordinates)
+
+    def __len__(self):
+        """
+        Returns the length of the sample space
+        """
+        length = 1
+        for dimension in self.dimensions:
+            length *= len(self.get_sample_space(dimension))
+        return length
+    
+    def __iter__(self):
+        """
+        Iterates on the coordinates of all subcubes of dimension 0. 
+        """
+        #To cover the whole cube's sample space, we will :
+        #1- pick one of the cube's dimensions
+        #2- constrain it with every possible value, and calculate a subcube for each constraint
+        #3- merge the coordinates of subcubes' measures with the constraint value
+
+        free_dimensions = self.dimensions - set(self.constraint.keys())
+
+        #If there are free dimensions, we need to calculate subcubes and merge the results.
+        if len(free_dimensions):
+            #we fix a dimension,
+            fixed_dimension = free_dimensions.pop()
+            #and create a subcube with the remaining free dimensions,
+            #one for each value in the fixed dimension's sample space.
+            #Every one of these cubes is constrained *fixed_dimension=value*
+            sample_space = self.get_sample_space(fixed_dimension)
+            sorted_sample_space = self._sort_sample_space(sample_space)
+            for value in sorted_sample_space:
+                #subcube_constraint = cube_constraint + extra_constraint
+                extra_constraint = {fixed_dimension: value}
+                #constrained subcube
+                subcube = self.constrain(extra_constraint)
+                subcube_constraint = copy.copy(subcube.constraint)
+                #we yield all the measures for the constrained cube
+                for coords in subcube:
+                    merged_constraint = copy.copy(subcube_constraint)
+                    merged_constraint.update(coords)
+                    merged_coords = Coords(**merged_constraint)
+                    yield merged_coords
+            raise StopIteration
+
+        #There is no free dimension, so we can yield the measure.
+        else:
+            yield Coords()
+            raise StopIteration
+
+    def __contains__(self, coordinates):
+        """
+        Returns True if *coordinates* points to a valid subcube.
+        """
+        try:
+            self[coordinates]
+        except KeyError:
+            return False
+        else:
+            return True
+    
+    def __delitem__(self, key):
+        raise NotImplementedError
+    
+    def __setitem__(self, key, value):
+        raise NotImplementedError
+
+
+class Cube(BaseCube):
+    """
+    A cube that can calculate lists of measures for a queryset, on several dimensions.
+    """
+    def __init__(self, dimensions, queryset, aggregation, constraint={}, sample_space={}):
+        """
+        :param dimensions: a list of attribute names which represent the free dimensions of the cube. All Django nested field lookups are allowed. For example on a model `Person`, a possible dimension would be `mother__birth_date__in`, where `mother` would (why not?!) be foreign key to another person. You can also use two special lookups: *absmonth* and *absday* which both take :class:`datetime` or :class:`date`, and represent absolute months or days. E.g. To search for November 1986, you would have to use *"date__month=11, date__year=1986"*, instead you can just use *"date__absmonth=date(1986, 11, 1)"*.
+        :param queryset: the base queryset from which the cube's sample space will be extracted.
+        :param aggregation: an aggregation function. must have the following signature `def agg_func(queryset)`, and return a measure on the queryset.
+        :param constraint: {*dimension*: *value*} -- a constraint that reduces the sample space of the cube.
+        :param sample_space: {*dimension*: *sample_space*} -- specifies the sample space of *dimension*. If it is not specified, then default sample space is all the values that the dimension takes on the queryset.  
+        """
+        super(Cube, self).__init__(dimensions, aggregation, constraint, sample_space)
+        self.queryset = queryset
+    
+    def filter(self, **kwargs):
+        """
+        Filter the cube's queryset. This method is merely a wrapper around Django's `filter` function.
+        """
+        cube_copy = copy.copy(self)
+        cube_copy.queryset = self.queryset.filter(**kwargs)
+        return cube_copy
+
+    def measure(self):
+        """
+        Calculates and returns the measure on the cube.
+        """
+        constraint = self._format_constraint(self.constraint)
+        return self.aggregation(self.queryset.filter(**constraint))
 
     def _default_sample_space(self, dimension):
         """
@@ -241,153 +364,8 @@ class Cube(MutableMapping):
         aggregation = self.aggregation
         return Cube(dimensions, queryset, aggregation, constraint=constraint, sample_space=sample_space)
 
-    def __repr__(self):
-        dim_str = ''
-        for dim in self.dimensions:
-            if self.constraint.get(dim):
-                dim_str += dim + '=' + str(self.constraint[dim]) + ', '
-            else:
-                dim_str += dim + ', '
-        return 'Cube(%s)' % dim_str[:-2]
-    
-    def __getitem__(self, coordinates):
-        """
-        Returns the measure at *coordinates*. Every coordinate to a subcube is valid. e.g. : ::
-        
-            cube[Coords(dim1=val1, dim2=val2)] # is valid
-            cube[Coords(dim1=val1)] #is valid to, it just doesn't
-            ... # take the dimension dim2 into account when calculating the measure.
-        """
-        subcube = self
-        for dimension, value in coordinates.iteritems():
-            subcube = subcube.constrain({dimension: value})
-        if set(subcube.constraint.keys()) <= set(subcube.dimensions):
-            return subcube.measure()
-        else:
-            raise KeyError("%s" % coordinates)
-
-    def __len__(self):
-        """
-        Returns the length of the sample space
-        """
-        length = 1
-        for dimension in self.dimensions:
-            length *= len(self.get_sample_space(dimension))
-        return length
-    
-    def __iter__(self):
-        """
-        Iterates on the coordinates of all subcubes of dimension 0. 
-        """
-        #To cover the whole cube's sample space, we will :
-        #1- pick one of the cube's dimensions
-        #2- constrain it with every possible value, and calculate a subcube for each constraint
-        #3- merge the coordinates of subcubes' measures with the constraint value
-
-        free_dimensions = self.dimensions - set(self.constraint.keys())
-
-        #If there are free dimensions, we need to calculate subcubes and merge the results.
-        if len(free_dimensions):
-            #we fix a dimension,
-            fixed_dimension = free_dimensions.pop()
-            #and create a subcube with the remaining free dimensions,
-            #one for each value in the fixed dimension's sample space.
-            #Every one of these cubes is constrained *fixed_dimension=value*
-            sample_space = self.get_sample_space(fixed_dimension)
-            sorted_sample_space = self._sort_sample_space(sample_space)
-            for value in sorted_sample_space:
-                #subcube_constraint = cube_constraint + extra_constraint
-                extra_constraint = {fixed_dimension: value}
-                #constrained subcube
-                subcube = self.constrain(extra_constraint)
-                subcube_constraint = copy.copy(subcube.constraint)
-                #we yield all the measures for the constrained cube
-                for coords in subcube:
-                    merged_constraint = copy.copy(subcube_constraint)
-                    merged_constraint.update(coords)
-                    merged_coords = Coords(**merged_constraint)
-                    yield merged_coords
-            raise StopIteration
-
-        #There is no free dimension, so we can yield the measure.
-        else:
-            yield Coords()
-            raise StopIteration
-
-    def __contains__(self, coordinates):
-        """
-        Returns True if *coordinates* points to a valid subcube.
-        """
-        try:
-            self[coordinates]
-        except KeyError:
-            return False
-        else:
-            return True
-    
-    def __delitem__(self, key):
-        raise NotImplementedError
-    
-    def __setitem__(self, key, value):
-        raise NotImplementedError
-
-    def __add__(self, other):
-        """
-        Usage : ::
-            
-            cube = cube1 + cube2
-
-        Returns a cube that is a copy of *cube1*, but which aggregation function is 
-        
-            cube.aggregation(value) == cube1.aggregation(value) + cube2.aggregation(value)  
-        """
-        cube_copy = copy.copy(self)
-        cube_copy.aggregation = lambda queryset: self.aggregation(queryset) + other.aggregation(queryset)
-        return cube_copy
-
-    def __sub__(self, other):
-        """
-        Usage : ::
-            
-            cube = cube1 - cube2
-
-        Returns a cube that is a copy of *cube1*, but which aggregation function is 
-        
-            cube.aggregation(value) == cube1.aggregation(value) - cube2.aggregation(value)  
-        """
-        cube_copy = copy.copy(self)
-        cube_copy.aggregation = lambda queryset: self.aggregation(queryset) - other.aggregation(queryset)
-        return cube_copy
-
-    def __div__(self, other):
-        """
-        Usage : ::
-            
-            cube = cube1 / cube2
-
-        Returns a cube that is a copy of *cube1*, but which aggregation function is 
-        
-            cube.aggregation(value) == cube1.aggregation(value) / cube2.aggregation(value)
-        
-        .. todo:: ZeroDivisionError  
-        """
-        cube_copy = copy.copy(self)
-        cube_copy.aggregation = lambda queryset: self.aggregation(queryset) / other.aggregation(queryset)
-        return cube_copy
-
-    def __mul__(self, other):
-        """
-        Usage : ::
-            
-            cube = cube1 * cube2
-
-        Returns a cube that is a copy of *cube1*, but which aggregation function is 
-        
-            cube.aggregation(value) == cube1.aggregation(value) * cube2.aggregation(value)
-        """
-        cube_copy = copy.copy(self)
-        cube_copy.aggregation = lambda queryset: self.aggregation(queryset) * other.aggregation(queryset)
-        return cube_copy
+class BaseDimension(object):
+    pass
 
 class Coords(MutableMapping):
     def __init__(self, **kwargs):
