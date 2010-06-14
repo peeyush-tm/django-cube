@@ -1,6 +1,6 @@
 """
 .. 
-    >>> from cube.base import Coords, Cube
+    >>> from cube.base import Coords, Cube, Dimension
     >>> from cube.templatetags import cube_filters
     >>> import copy
 
@@ -46,6 +46,26 @@ __hash__
     True
     
     >>> Coords(x=1, y=2) == Coords(y=2, x=1)
+    True
+
+Dimensions
+===========
+
+Creation
+---------
+
+    >>> d = Dimension('author__mother__mother__birthdate__month', name='yerk_field', sample_space=range(1, 13))
+    
+__repr__
+---------
+
+    >>> print d
+    Dimension(yerk_field)
+    
+__hash__
+----------
+
+    >>> 'yerk_field' in set([d])
     True
 
 Cube

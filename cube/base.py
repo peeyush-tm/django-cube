@@ -35,18 +35,17 @@ class Cube(MutableMapping):
     """
     def __init__(self, dimensions, queryset, aggregation, constraint={}, sample_space={}):
         """
-        :param dimensions: a list of attribute names which represent the free dimensions of the cube. All Django nested field lookups are allowed. For example on a model `Person`, a possible dimension would be `mother__birth_date__in`, where `mother` would (why not?!) be foreign key to another person. You can also use two special lookups: *absmonth* and *absday* which both take :class:`datetime` or :class:`date`, and represent absolute months or days. E.g. To search for November 1986, you would have to use *"date__month=11, date__year=1986"*, instead you can just use *"date__absmonth=date(1986, 11, 1)"*.
+        :param dimensions: a list of attribute names or :class:`Dimension` which represent the free dimensions of the cube. All Django nested field lookups are allowed. For example on a model `Person`, a possible dimension would be `mother__birth_date__in`, where `mother` would (why not?!) be foreign key to another person. You can also use two special lookups: *absmonth* and *absday* which both take :class:`datetime` or :class:`date`, and represent absolute months or days. E.g. To search for November 1986, you would have to use *"date__month=11, date__year=1986"*, instead you can just use *"date__absmonth=date(1986, 11, 1)"*.
         :param queryset: the base queryset from which the cube's sample space will be extracted.
         :param aggregation: an aggregation function. must have the following signature `def agg_func(queryset)`, and return a measure on the queryset.
-        :param constraint: {*dimension*: *value*} -- a constraint that reduces the sample space of the cube.
-        :param sample_space: {*dimension*: *sample_space*} -- specifies the sample space of *dimension*. If it is not specified, then default sample space is all the values that the dimension takes on the queryset.  
+        :param constraint: {*dimension's name*: *value*} -- a constraint that reduces the sample space of the cube.
+        :param sample_space: {*dimension's name*: *sample_space*} -- specifies the sample space of *dimension*. If it is not specified, then default sample space is all the values that the dimension takes on the queryset.  
         """
         self.sample_space = sample_space
         self.constraint = constraint
-        self.dimensions = set(dimensions)
+        self.dimensions = self._to_dimensions(dimensions)
         self.aggregation = aggregation
         self.queryset = queryset
-        self._results = defaultdict(defaultdict)
             
     def iteritems(self):
         """
@@ -57,7 +56,7 @@ class Cube(MutableMapping):
         #2- constrain it with every possible value, and calculate a subcube for each constraint
         #3- merge the coordinates of subcubes' measures with the constraint value, in order to get the complete coordinates of the measure
 
-        free_dimensions = self.dimensions - set(self.constraint.keys())
+        free_dimensions = [self.dimensions[name] for name in set(self.dimensions) - set(self.constraint)]
 
         #If there are free dimensions, we need to calculate subcubes and merge the results.
         if len(free_dimensions):
@@ -66,11 +65,11 @@ class Cube(MutableMapping):
             #and create a subcube with the remaining free dimensions,
             #one for each value in the fixed dimension's sample space.
             #Every one of these cubes is constrained *fixed_dimension=value*
-            sample_space = self.get_sample_space(fixed_dimension)
+            sample_space = self.get_sample_space(fixed_dimension.name)
             sorted_sample_space = self._sort_sample_space(sample_space)
             for value in sorted_sample_space:
                 #subcube_constraint = cube_constraint + extra_constraint
-                extra_constraint = {fixed_dimension: value}
+                extra_constraint = {fixed_dimension.name: value}
                 #constrained subcube
                 subcube = self.constrain(extra_constraint)
                 subcube_constraint = copy.copy(subcube.constraint)
@@ -91,8 +90,8 @@ class Cube(MutableMapping):
         """
         :returns: Cube -- a subcube of the calling cube, whose dimensions are *dimensions*, and which is constrained with *extra_constraint*. 
 
-        :param dimensions: list -- a subset of the calling cube's dimensions. If *dimensions* is not provided, it defaults to the calling cube's.
-        :param extra_constraint: dict -- a dictionnary of constraint *{dimension: value}*. Constrained dimensions must belong to the subcube's dimensions.
+        :param dimensions: list -- a subset of the calling cube's dimensions namees. If *dimensions* is not provided, it defaults to the calling cube's.
+        :param extra_constraint: dict -- a dictionnary of constraint *{dimension_name: value}*. Constrained dimensions must belong to the subcube's dimensions.
         
         :raise: ValueError -- if a dimension passed along *dimensions* is not a dimension of the calling cube, or if a dimension constrained in *extra_constraint* is not a dimension of the returned subcube.
         """
@@ -103,6 +102,7 @@ class Cube(MutableMapping):
             dimensions = self.dimensions
         #building the new cube's *constraint*
         else:
+            dimensions = self._to_dimensions(dimensions)
             constraint = copy.copy(self.constraint)
             #if some dimensions are deleted, we delete also the constraints
             for dimension in (set(self.dimensions) - set(dimensions)):
@@ -112,13 +112,13 @@ class Cube(MutableMapping):
                     pass
             constraint.update(extra_constraint)
 
-        if not set(extra_constraint.keys()) <= set(dimensions):
-            raise ValueError('%s is(are) not valid constraint dimension(s) for this cube' % (set(constraint.keys()) - set(dimensions)))
-        elif not set(dimensions) <= self.dimensions:
-            raise ValueError('%s is(are) not dimension(s) of the cube' % (set(dimensions) - set(self.dimensions)))
+        if not set(extra_constraint) <= set(dimensions):
+            raise ValueError('%s is(are) not valid constraint dimension(s) for this cube' % (set(constraint.keys()) - dimensions))
+        elif not dimensions <= self.dimensions:
+            raise ValueError('%s is(are) not dimension(s) of the cube' % (dimensions - self.dimensions))
         else:
             cube_copy = copy.copy(self)
-            cube_copy.dimensions = set(dimensions)
+            cube_copy.dimensions = dimensions
             cube_copy.constraint = constraint
             return cube_copy
      
@@ -134,14 +134,6 @@ class Cube(MutableMapping):
         cube_copy.constraint = constraint
         return cube_copy
 
-    def filter(self, **kwargs):
-        """
-        Filter the cube's queryset. This method is merely a wrapper around Django's `filter` function.
-        """
-        cube_copy = copy.copy(self)
-        cube_copy.queryset = self.queryset.filter(**kwargs)
-        return cube_copy
-
     def resample(self, dimension, lower_bound=None, upper_bound=None, space=None):
         """
         Returns a copy of the calling cube, whose sample space of *dimension* is limited to : ::
@@ -151,7 +143,7 @@ class Cube(MutableMapping):
         If *space* is not defined, the sample space of the calling cube's *dimension* is taken instead.
         """
         #calculate dimension's new sample space
-        new_space = space or self.get_sample_space(dimension)
+        new_space = space or dimension.get_sample_space(dimension)
         lower_bound = lower_bound or min(new_space)
         upper_bound = upper_bound or max(new_space)
         new_space = filter(lambda elem: elem >= lower_bound and elem <= upper_bound, new_space)
@@ -183,72 +175,20 @@ class Cube(MutableMapping):
         """
         return sorted(list(sspace))
 
-    def get_sample_space(self, dimension):
+    @staticmethod
+    def _to_dimensions(composite_list):
         """
-        :returns: set -- The sample space of *dimension* for the calling cube. 
+        Takes a list of both :class:`Dimension` objects and string, and returns a set of :class:`Dimension` objects. 
         """
-        try:
-            return self.sample_space[dimension]
-        except KeyError:
-            return self._default_sample_space(dimension) 
-
-    def _default_sample_space(self, dimension):
-        """
-        Returns the default sample space for *dimension*, which is all the values taken by *dimension* in the cube's queryset.
-        
-        .. todo:: rewrite prettier
-        """
-        sample_space = []
-        lookup_list = re.split('__', dimension)
-
-        if len(lookup_list) == 1:
-            field = self.queryset.model._meta.get_field_by_name(lookup_list[0])[0]
-            #if ForeignKey, we get all distinct objects of foreign model
-            if type(field) == ForeignKey:
-                sample_space = field.related.parent_model.objects.distinct()
+        dimensions = dict()
+        for dimension in composite_list:
+            if isinstance(dimension, str):
+                dimensions[dimension] = Dimension(dimension)
+            elif isinstance(dimension, Dimension):
+                dimensions[dimension] = copy.copy(dimension)
             else:
-                sample_space = self.queryset.values_list(lookup_list[0], flat=True).distinct()
-
-        else:
-            queryset = self.queryset
-
-            #we assume first item is always a field_name
-            key = lookup_list.pop(0)
-            
-            #we loop over the rest
-            next_key = lookup_list.pop(0)
-    
-            #For the field lookup, we just assume that a 'month', 'day' or 'year' lookup is always terminal,
-            #same thing for a field that is not a foreign key.
-            while (key):
-
-                #TODO this is totally wrong ! What if there is a field called 'month', 'year', ... ? Should introspect model._meta ?
-                if next_key in ['day', 'month', 'year']:
-                    for date in queryset.dates(key, next_key):
-                        sample_space.append(getattr(date, next_key))
-                    break
-                elif next_key in ['absday', 'absmonth']:
-                    query_key = {'absday': 'day', 'absmonth': 'month'}[next_key]
-                    for date in queryset.dates(key, query_key):
-                        sample_space.append(date)
-                    break 
-                else:
-                    field = queryset.model._meta.get_field_by_name(key)[0]
-                    #if ForeignKey, we get all distinct objects of foreign model
-                    if type(field) == ForeignKey:
-                        sample_space = queryset = field.related.parent_model.objects.distinct()
-                    #else, we just return values
-                    else:
-                        sample_space = queryset.values_list(key, flat=True).distinct()
-                        break
-
-                key = next_key
-                try:
-                    next_key = lookup_list.pop(0)
-                except IndexError:
-                    next_key = None
-
-        return set(sample_space)
+                raise TypeError('\'%s\' of type %s is not an appropriate dimension for a cube' % (dimension, type(dimension)))
+        return dimensions
 
     @staticmethod
     def _format_constraint(constraint):
@@ -325,6 +265,90 @@ class Cube(MutableMapping):
     def __setitem__(self, key, value):
         raise NotImplementedError
 
+
+class Dimension(object):
+    
+    def __init__(self, field, queryset=None, name=None, sample_space=None):
+        self.field = field
+        self.name = name or field
+        self.queryset = queryset
+        self.sample_space = sample_space or self._default_sample_space()
+    
+    def __hash__(self):
+        return self.name.__hash__()
+    
+    def __copy__(self):
+        return Dimension(self.field, self.name, self.sample_space)
+    
+    def __eq__(self, other):
+        if isinstance(other, Dimension):
+            return self.name == other.name
+        elif isinstance(other, str):
+            return self.name == other
+        else:
+            raise TypeError("Cannot compare dimension to %s" % type(other))
+
+    def __repr__(self):
+        return "Dimension(%s)" % self.name
+
+    def _default_sample_space(self):
+        """
+        Returns the default sample space for the calling *dimension*, which is all the values taken by *dimension* in the queryset.
+        
+        .. todo:: rewrite prettier
+        """
+        sample_space = []
+        lookup_list = re.split('__', self.field)
+
+        if len(lookup_list) == 1:
+            field = self.queryset.model._meta.get_field_by_name(lookup_list[0])[0]
+            #if ForeignKey, we get all distinct objects of foreign model
+            if type(field) == ForeignKey:
+                sample_space = field.related.parent_model.objects.distinct()
+            else:
+                sample_space = self.queryset.values_list(lookup_list[0], flat=True).distinct()
+
+        else:
+            queryset = self.queryset
+
+            #we assume first item is always a field_name
+            key = lookup_list.pop(0)
+            
+            #we loop over the rest
+            next_key = lookup_list.pop(0)
+    
+            #For the field lookup, we just assume that a 'month', 'day' or 'year' lookup is always terminal,
+            #same thing for a field that is not a foreign key.
+            while (key):
+
+                #TODO this is totally wrong ! What if there is a field called 'month', 'year', ... ? Should introspect model._meta ?
+                if next_key in ['day', 'month', 'year']:
+                    for date in queryset.dates(key, next_key):
+                        sample_space.append(getattr(date, next_key))
+                    break
+                elif next_key in ['absday', 'absmonth']:
+                    query_key = {'absday': 'day', 'absmonth': 'month'}[next_key]
+                    for date in queryset.dates(key, query_key):
+                        sample_space.append(date)
+                    break 
+                else:
+                    field = queryset.model._meta.get_field_by_name(key)[0]
+                    #if ForeignKey, we get all distinct objects of foreign model
+                    if type(field) == ForeignKey:
+                        sample_space = queryset = field.related.parent_model.objects.distinct()
+                    #else, we just return values
+                    else:
+                        sample_space = queryset.values_list(key, flat=True).distinct()
+                        break
+
+                key = next_key
+                try:
+                    next_key = lookup_list.pop(0)
+                except IndexError:
+                    next_key = None
+
+        return set(sample_space)
+        
 
 class Coords(MutableMapping):
     def __init__(self, **kwargs):
