@@ -99,11 +99,11 @@ Getting sample space of a dimension
     True
     >>> c1.get_sample_space('release_date__absday') == set([datetime(1969, 1, 21, 0, 0), datetime(1945, 2, 1, 0, 0), datetime(1944, 2, 1, 0, 0), datetime(1959, 8, 17, 0, 0)])
     True
-    >>> c1._default_sample_space('author__instrument__name') == set(['piano', 'trumpet', 'sax'])
+    >>> c1._default_sample_space('author__instrument__name') == set(['piano', 'trumpet'])
     True
-    >>> c1._default_sample_space('author__instrument') == set([piano, trumpet, sax])
+    >>> c1._default_sample_space('author__instrument') == set([piano, trumpet])
     True
-    >>> c1._default_sample_space('author__firstname') == set(['Bill', 'Miles', 'Thelonious', 'Freddie', 'Erroll'])
+    >>> c1._default_sample_space('author__firstname') == set(['Bill', 'Miles', 'Thelonious', 'Freddie'])
     True
     >>> c1._default_sample_space('author') == set([miles_davis, freddie_hubbard, erroll_garner, bill_evans_p, thelonious_monk, bill_evans_s])
     True
@@ -242,22 +242,18 @@ It is also possible to use Django field-lookup syntax for date dimensions :
     >>> measure_dict = dict(subcube)
     >>> measure_dict == {Coords(release_date__month=2, release_date__year=1945, author__lastname="Davis"): 0,
     ...             Coords(release_date__month=2, release_date__year=1945, author__lastname="Hubbard"): 0,
-    ...             Coords(release_date__month=2, release_date__year=1945, author__lastname="Garner"): 0,
     ...             Coords(release_date__month=2, release_date__year=1945, author__lastname="Evans"): 0,
     ...             Coords(release_date__month=2, release_date__year=1945, author__lastname="Monk"): 1,
     ...             Coords(release_date__month=2, release_date__year=1944, author__lastname="Davis"): 0,
     ...             Coords(release_date__month=2, release_date__year=1944, author__lastname="Hubbard"): 0,
-    ...             Coords(release_date__month=2, release_date__year=1944, author__lastname="Garner"): 0,
     ...             Coords(release_date__month=2, release_date__year=1944, author__lastname="Evans"): 0,
     ...             Coords(release_date__month=2, release_date__year=1944, author__lastname="Monk"): 1,
     ...             Coords(release_date__month=2, release_date__year=1969, author__lastname="Davis"): 0,
     ...             Coords(release_date__month=2, release_date__year=1969, author__lastname="Hubbard"): 0,
-    ...             Coords(release_date__month=2, release_date__year=1969, author__lastname="Garner"): 0,
     ...             Coords(release_date__month=2, release_date__year=1969, author__lastname="Evans"): 0,
     ...             Coords(release_date__month=2, release_date__year=1969, author__lastname="Monk"): 0,
     ...             Coords(release_date__month=2, release_date__year=1959, author__lastname="Davis"): 0,
     ...             Coords(release_date__month=2, release_date__year=1959, author__lastname="Hubbard"): 0,
-    ...             Coords(release_date__month=2, release_date__year=1959, author__lastname="Garner"): 0,
     ...             Coords(release_date__month=2, release_date__year=1959, author__lastname="Evans"): 0,
     ...             Coords(release_date__month=2, release_date__year=1959, author__lastname="Monk"): 0}
     True

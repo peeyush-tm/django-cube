@@ -314,7 +314,8 @@ class Cube(BaseCube):
                     field = queryset.model._meta.get_field_by_name(key)[0]
                     #if ForeignKey, we get all distinct objects of foreign model
                     if type(field) == ForeignKey:
-                        sample_space = queryset = field.related.parent_model.objects.distinct()
+                        sample_space = queryset.values_list(key, flat=True).distinct()
+                        queryset = sample_space = field.related.parent_model.objects.filter(pk__in=sample_space)
                     #else, we just return values
                     else:
                         sample_space = queryset.values_list(key, flat=True).distinct()
