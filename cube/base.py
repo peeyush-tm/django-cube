@@ -377,7 +377,7 @@ class Coords(MutableMapping):
         self._dimensions.sort()
         hash_key = ''
         for dimension in self._dimensions:
-            hash_key += dimension + '=' + str(getattr(self, dimension))
+            hash_key += dimension + '=' + unicode(getattr(self, dimension))
         return hash(hash_key)
     
     def __repr__(self):
