@@ -119,11 +119,11 @@ Getting sample space of a dimension
     True
     >>> c1.get_sample_space('release_date__absday') == set([datetime(1969, 1, 21, 0, 0), datetime(1945, 2, 1, 0, 0), datetime(1944, 2, 1, 0, 0), datetime(1959, 8, 17, 0, 0)])
     True
-    >>> c1._default_sample_space('author__instrument__name') == set(['piano', 'trumpet', 'sax'])
+    >>> c1._default_sample_space('author__instrument__name') == set(['piano', 'trumpet'])
     True
-    >>> c1._default_sample_space('author__instrument') == set([piano, trumpet, sax])
+    >>> c1._default_sample_space('author__instrument') == set([piano, trumpet])
     True
-    >>> c1._default_sample_space('author__firstname') == set(['Bill', 'Miles', 'Thelonious', 'Freddie', 'Erroll'])
+    >>> c1._default_sample_space('author__firstname') == set(['Bill', 'Miles', 'Thelonious', 'Freddie'])
     True
     >>> c1._default_sample_space('author') == set([miles_davis, freddie_hubbard, erroll_garner, bill_evans_p, thelonious_monk, bill_evans_s])
     True
@@ -157,35 +157,6 @@ Getting sample space of a dimension
     >>> c1_copy.aggregation == c1.aggregation
     True
 
-Iterating on the cube's results
-----------------------------------
-
-    >>> measure_list = [(coords, measure) for coords, measure in c.iteritems()]
-    >>> len(measure_list) == 5 * 3
-    True
-    >>> measure_dict = dict(c.iteritems())
-    >>> measure_dict[Coords(instrument__name='trumpet', firstname='Bill')]
-    0
-    >>> measure_dict[Coords(firstname='Miles', instrument__name='trumpet')]
-    1
-    >>> measure_dict == {Coords(instrument__name=u'trumpet', firstname='Miles'): 1,
-    ...             Coords(instrument__name=u'trumpet', firstname='Freddie'): 1,
-    ...             Coords(instrument__name=u'trumpet', firstname='Erroll'): 0,
-    ...             Coords(instrument__name=u'trumpet', firstname='Bill'): 0,
-    ...             Coords(instrument__name=u'trumpet', firstname='Thelonious'): 0,
-    ...             Coords(instrument__name=u'piano', firstname='Miles'): 0,
-    ...             Coords(instrument__name=u'piano', firstname='Freddie'): 0,
-    ...             Coords(instrument__name=u'piano', firstname='Erroll'): 1,
-    ...             Coords(instrument__name=u'piano', firstname='Bill'): 1,
-    ...             Coords(instrument__name=u'piano', firstname='Thelonious'): 1,
-    ...             Coords(instrument__name=u'sax', firstname='Miles'): 0,
-    ...             Coords(instrument__name=u'sax', firstname='Freddie'): 0,
-    ...             Coords(instrument__name=u'sax', firstname='Erroll'): 0,
-    ...             Coords(instrument__name=u'sax', firstname='Bill'): 1,
-    ...             Coords(instrument__name=u'sax', firstname='Thelonious'): 0,
-    ...             }
-    True
-
 Cube's dictionnary-ness
 -------------------------
 
@@ -209,6 +180,53 @@ Cube's dictionnary-ness
     ...             Coords(instrument__name=u'sax', firstname='Bill'),
     ...             Coords(instrument__name=u'sax', firstname='Thelonious')])
     True
+
+Iterating on the cube's results
+----------------------------------
+    >>> set([coord for coord in c]) == set([
+    ...     Coords(instrument__name=u'trumpet', firstname='Miles'),
+    ...     Coords(instrument__name=u'trumpet', firstname='Freddie'),
+    ...     Coords(instrument__name=u'trumpet', firstname='Erroll'),
+    ...     Coords(instrument__name=u'trumpet', firstname='Bill'),
+    ...     Coords(instrument__name=u'trumpet', firstname='Thelonious'),
+    ...     Coords(instrument__name=u'piano', firstname='Miles'),
+    ...     Coords(instrument__name=u'piano', firstname='Freddie'),
+    ...     Coords(instrument__name=u'piano', firstname='Erroll'),
+    ...     Coords(instrument__name=u'piano', firstname='Bill'),
+    ...     Coords(instrument__name=u'piano', firstname='Thelonious'),
+    ...     Coords(instrument__name=u'sax', firstname='Miles'),
+    ...     Coords(instrument__name=u'sax', firstname='Freddie'),
+    ...     Coords(instrument__name=u'sax', firstname='Erroll'),
+    ...     Coords(instrument__name=u'sax', firstname='Bill'),
+    ...     Coords(instrument__name=u'sax', firstname='Thelonious')])
+    True
+
+    >>> len(c) == 5 * 3
+    True
+
+    >>> measure_dict = dict(c.iteritems())
+    >>> measure_dict[Coords(instrument__name='trumpet', firstname='Bill')]
+    0
+    >>> measure_dict[Coords(firstname='Miles', instrument__name='trumpet')]
+    1
+    >>> measure_dict == {Coords(instrument__name=u'trumpet', firstname='Miles'): 1,
+    ...             Coords(instrument__name=u'trumpet', firstname='Freddie'): 1,
+    ...             Coords(instrument__name=u'trumpet', firstname='Erroll'): 0,
+    ...             Coords(instrument__name=u'trumpet', firstname='Bill'): 0,
+    ...             Coords(instrument__name=u'trumpet', firstname='Thelonious'): 0,
+    ...             Coords(instrument__name=u'piano', firstname='Miles'): 0,
+    ...             Coords(instrument__name=u'piano', firstname='Freddie'): 0,
+    ...             Coords(instrument__name=u'piano', firstname='Erroll'): 1,
+    ...             Coords(instrument__name=u'piano', firstname='Bill'): 1,
+    ...             Coords(instrument__name=u'piano', firstname='Thelonious'): 1,
+    ...             Coords(instrument__name=u'sax', firstname='Miles'): 0,
+    ...             Coords(instrument__name=u'sax', firstname='Freddie'): 0,
+    ...             Coords(instrument__name=u'sax', firstname='Erroll'): 0,
+    ...             Coords(instrument__name=u'sax', firstname='Bill'): 1,
+    ...             Coords(instrument__name=u'sax', firstname='Thelonious'): 0,
+    ...             }
+    True
+
 
 Getting a subcube
 ------------------
@@ -244,22 +262,18 @@ It is also possible to use Django field-lookup syntax for date dimensions :
     >>> measure_dict = dict(subcube)
     >>> measure_dict == {Coords(release_date__month=2, release_date__year=1945, author__lastname="Davis"): 0,
     ...             Coords(release_date__month=2, release_date__year=1945, author__lastname="Hubbard"): 0,
-    ...             Coords(release_date__month=2, release_date__year=1945, author__lastname="Garner"): 0,
     ...             Coords(release_date__month=2, release_date__year=1945, author__lastname="Evans"): 0,
     ...             Coords(release_date__month=2, release_date__year=1945, author__lastname="Monk"): 1,
     ...             Coords(release_date__month=2, release_date__year=1944, author__lastname="Davis"): 0,
     ...             Coords(release_date__month=2, release_date__year=1944, author__lastname="Hubbard"): 0,
-    ...             Coords(release_date__month=2, release_date__year=1944, author__lastname="Garner"): 0,
     ...             Coords(release_date__month=2, release_date__year=1944, author__lastname="Evans"): 0,
     ...             Coords(release_date__month=2, release_date__year=1944, author__lastname="Monk"): 1,
     ...             Coords(release_date__month=2, release_date__year=1969, author__lastname="Davis"): 0,
     ...             Coords(release_date__month=2, release_date__year=1969, author__lastname="Hubbard"): 0,
-    ...             Coords(release_date__month=2, release_date__year=1969, author__lastname="Garner"): 0,
     ...             Coords(release_date__month=2, release_date__year=1969, author__lastname="Evans"): 0,
     ...             Coords(release_date__month=2, release_date__year=1969, author__lastname="Monk"): 0,
     ...             Coords(release_date__month=2, release_date__year=1959, author__lastname="Davis"): 0,
     ...             Coords(release_date__month=2, release_date__year=1959, author__lastname="Hubbard"): 0,
-    ...             Coords(release_date__month=2, release_date__year=1959, author__lastname="Garner"): 0,
     ...             Coords(release_date__month=2, release_date__year=1959, author__lastname="Evans"): 0,
     ...             Coords(release_date__month=2, release_date__year=1959, author__lastname="Monk"): 0}
     True
@@ -276,10 +290,10 @@ Ordering the results
     ...             (Coords(instrument__name='trumpet', firstname='Thelonious'), 0)]
     True
 
-Use django field lookup syntax in constraints
+Use django field lookup syntax in dimensions
 -----------------------------------------------
 
-    >>> subcube = c.constrain({'instrument__name__in': ['trumpet', 'piano']})
+    >>> c1 = Cube(['instrument__name__in'], Musician.objects.all(), len)
     >>> measure_dict = dict(subcube)
     >>> measure_dict = {Coords(firstname='Miles', instrument__name__in=['trumpet', 'piano']): 1,
     ...             Coords(firstname='Freddie', instrument__name__in=['trumpet', 'piano']): 1,
@@ -329,6 +343,11 @@ Filter cube's queryset
     >>> filtered_c = c.filter(author=miles_davis)
     >>> set([item for item in filtered_c.queryset]) == set([so_what, all_blues])
     True
+
+Creating a cube from other cubes + - * /
+------------------------------------------
+
+    >>> 
 
 Template tags
 ==============
