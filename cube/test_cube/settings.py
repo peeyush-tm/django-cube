@@ -92,4 +92,5 @@ TEMPLATE_DIRS = (
 
 INSTALLED_APPS = (
     'test_cube.test_models',
+    'cube'
 )

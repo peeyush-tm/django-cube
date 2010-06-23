@@ -36,7 +36,7 @@ class BaseCube(MutableMapping):
     """
     def __init__(self, dimensions, aggregation, constraint={}, sample_space={}):
         """
-        :param dimensions: a list of attribute names which represent the free dimensions of the cube. All Django nested field lookups are allowed. For example on a model `Person`, a possible dimension would be `mother__birth_date__in`, where `mother` would (why not?!) be foreign key to another person. You can also use two special lookups: *absmonth* and *absday* which both take :class:`datetime` or :class:`date`, and represent absolute months or days. E.g. To search for November 1986, you would have to use *"date__month=11, date__year=1986"*, instead you can just use *"date__absmonth=date(1986, 11, 1)"*.
+        :param dimensions: a list of attribute names which represent the free dimensions of the cube. All Django nested field lookups are allowed. For example on a model `Person`, a possible dimension would be `mother__birth_date__in`, where `mother` would (why not?!) be foreign key to another person. You can also use two special lookups: *absmonth* and *absday* which both take :class:`datetime` or :class:`date`, and represent absolute months or days. E.g. To search for November 1986, you would have to use *'date__month=11, date__year=1986'*, instead you can just use *'date__absmonth=date(1986, 11, 1)'*.
         :param queryset: the base queryset from which the cube's sample space will be extracted.
         :param aggregation: an aggregation function. must have the following signature `def agg_func(queryset)`, and return a measure on the queryset.
         :param constraint: {*dimension*: *value*} -- a constraint that reduces the sample space of the cube.
@@ -82,6 +82,53 @@ class BaseCube(MutableMapping):
             cube_copy.constraint = constraint
             return cube_copy
      
+    def subcubes(self, *dimensions):
+        """
+        Return an ordered list of all the sucubes of the calling cube, with *dimensions* constrained to all the possible values in their sample spaces. For example :
+
+            >>> sample_space = {
+            ...     'name': ['John', 'Jack'],
+            ...     'instrument': ['Trumpet'],
+            ...     'age': [14, 89],
+            ... }
+            >>> Cube(['name', 'instrument', 'age'], len, sample_space=sample_space).subcubes()
+            [Cube(age, name='John', instrument='Trumpet'), Cube(age, name='Jack', instrument='Trumpet')]
+
+        If one of the *dimensions* passed as parameter is already constrained in the calling cube, it is not considered as an error. The sample space taken for this dimension will merely be a singleton : the constraint value. 
+        """
+        dimensions = list(copy.copy(dimensions))
+
+        for index, dimension in enumerate(dimensions):
+            if dimension not in self.dimensions:
+                raise ValueError("invalid dimension %s" % dimension)
+            #if dimension is constrained we don't need to iterate for it.
+            if dimension in self.constraint.keys():
+                dimensions.pop(index)
+
+        if len(dimensions):
+            #we fix a dimension,
+            fixed_dimension = dimensions.pop()
+            #and create a subcube with the remaining free dimensions,
+            #one for each value in the fixed dimension's sample space.
+            #Every one of these cubes is constrained *fixed_dimension=value*
+            sample_space = self.get_sample_space(fixed_dimension)
+            sorted_sample_space = self._sort_sample_space(sample_space)
+            for value in sorted_sample_space:
+                #subcube_constraint = cube_constraint + extra_constraint
+                extra_constraint = {fixed_dimension: value}
+                #constrained subcube
+                subcube = self.constrain(extra_constraint)
+                subcube_constraint = copy.copy(subcube.constraint)
+                #we yield all the measures for the constrained cube
+                for subsubcube in subcube.subcubes(*dimensions):
+                    yield subsubcube
+            raise StopIteration
+
+        #There is no free dimension, so we can yield the measure.
+        else:
+            yield self
+            raise StopIteration
+
     def constrain(self, extra_constraint):
         """
         Merges the calling cube's constraint with *extra_constraint*.
@@ -126,7 +173,7 @@ class BaseCube(MutableMapping):
         """
         for coords in self:
             coords = dict(coords)
-            coords.update({"measure": self[coords]})
+            coords.update({'measure': self[coords]})
             yield coords
         raise StopIteration
 
@@ -159,13 +206,10 @@ class BaseCube(MutableMapping):
         return Cube(dimensions, aggregation, constraint=constraint, sample_space=sample_space)
 
     def __repr__(self):
-        dim_str = ''
-        for dim in self.dimensions:
-            if self.constraint.get(dim):
-                dim_str += dim + '=' + str(self.constraint[dim]) + ', '
-            else:
-                dim_str += dim + ', '
-        return 'Cube(%s)' % dim_str[:-2]
+        constr_dimensions = sorted(["%s=%s" % (dim, value) for dim, value in self.constraint.iteritems()])
+        free_dimensions = sorted(list(self.dimensions - set(self.constraint.keys())))
+
+        return 'Cube(%s)' % ", ".join(free_dimensions + constr_dimensions)
     
     def __getitem__(self, coordinates):
         """
@@ -181,7 +225,7 @@ class BaseCube(MutableMapping):
         if set(subcube.constraint.keys()) <= set(subcube.dimensions):
             return subcube.measure()
         else:
-            raise KeyError("%s" % coordinates)
+            raise KeyError('%s' % coordinates)
 
     def __len__(self):
         """
@@ -255,7 +299,7 @@ class Cube(BaseCube):
     """
     def __init__(self, dimensions, queryset, aggregation, constraint={}, sample_space={}):
         """
-        :param dimensions: a list of attribute names which represent the free dimensions of the cube. All Django nested field lookups are allowed. For example on a model `Person`, a possible dimension would be `mother__birth_date__in`, where `mother` would (why not?!) be foreign key to another person. You can also use two special lookups: *absmonth* and *absday* which both take :class:`datetime` or :class:`date`, and represent absolute months or days. E.g. To search for November 1986, you would have to use *"date__month=11, date__year=1986"*, instead you can just use *"date__absmonth=date(1986, 11, 1)"*.
+        :param dimensions: a list of attribute names which represent the free dimensions of the cube. All Django nested field lookups are allowed. For example on a model `Person`, a possible dimension would be `mother__birth_date__in`, where `mother` would (why not?!) be foreign key to another person. You can also use two special lookups: *absmonth* and *absday* which both take :class:`datetime` or :class:`date`, and represent absolute months or days. E.g. To search for November 1986, you would have to use *'date__month=11, date__year=1986'*, instead you can just use *'date__absmonth=date(1986, 11, 1)'*.
         :param queryset: the base queryset from which the cube's sample space will be extracted.
         :param aggregation: an aggregation function. must have the following signature `def agg_func(queryset)`, and return a measure on the queryset.
         :param constraint: {*dimension*: *value*} -- a constraint that reduces the sample space of the cube.
@@ -324,7 +368,7 @@ class Cube(BaseCube):
                     #if ForeignKey, we get all distinct objects of foreign model
                     if type(field) == ForeignKey:
                         sample_space = queryset.values_list(key, flat=True).distinct()
-                        filter_dict = {"%s__in" % field.rel.field_name: sample_space}
+                        filter_dict = {'%s__in' % field.rel.field_name: sample_space}
                         queryset = sample_space = field.related.parent_model.objects.filter(**filter_dict)
                     #else, we just return values
                     else:

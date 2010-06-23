@@ -1,7 +1,6 @@
 """
 .. 
-    >>> from cube.base import Coords, Cube, Dimension
-    >>> from cube.templatetags import cube_filters
+    >>> from cube.base import Coords, Cube
     >>> import copy
 
 Coords
@@ -46,26 +45,6 @@ __hash__
     True
     
     >>> Coords(x=1, y=2) == Coords(y=2, x=1)
-    True
-
-Dimensions
-===========
-
-Creation
----------
-
-    >>> d = Dimension('author__mother__mother__birthdate__month', name='yerk_field', sample_space=range(1, 13))
-    
-__repr__
----------
-
-    >>> print d
-    Dimension(yerk_field)
-    
-__hash__
-----------
-
-    >>> 'yerk_field' in set([d])
     True
 
 Cube
@@ -260,22 +239,22 @@ It is also possible to use Django field-lookup syntax for date dimensions :
     >>> c1 = Cube(['author__lastname', 'release_date__month', 'release_date__year'], Song.objects.all(), len)
     >>> subcube = c1.constrain({'release_date__month': 2})
     >>> measure_dict = dict(subcube)
-    >>> measure_dict == {Coords(release_date__month=2, release_date__year=1945, author__lastname="Davis"): 0,
-    ...             Coords(release_date__month=2, release_date__year=1945, author__lastname="Hubbard"): 0,
-    ...             Coords(release_date__month=2, release_date__year=1945, author__lastname="Evans"): 0,
-    ...             Coords(release_date__month=2, release_date__year=1945, author__lastname="Monk"): 1,
-    ...             Coords(release_date__month=2, release_date__year=1944, author__lastname="Davis"): 0,
-    ...             Coords(release_date__month=2, release_date__year=1944, author__lastname="Hubbard"): 0,
-    ...             Coords(release_date__month=2, release_date__year=1944, author__lastname="Evans"): 0,
-    ...             Coords(release_date__month=2, release_date__year=1944, author__lastname="Monk"): 1,
-    ...             Coords(release_date__month=2, release_date__year=1969, author__lastname="Davis"): 0,
-    ...             Coords(release_date__month=2, release_date__year=1969, author__lastname="Hubbard"): 0,
-    ...             Coords(release_date__month=2, release_date__year=1969, author__lastname="Evans"): 0,
-    ...             Coords(release_date__month=2, release_date__year=1969, author__lastname="Monk"): 0,
-    ...             Coords(release_date__month=2, release_date__year=1959, author__lastname="Davis"): 0,
-    ...             Coords(release_date__month=2, release_date__year=1959, author__lastname="Hubbard"): 0,
-    ...             Coords(release_date__month=2, release_date__year=1959, author__lastname="Evans"): 0,
-    ...             Coords(release_date__month=2, release_date__year=1959, author__lastname="Monk"): 0}
+    >>> measure_dict == {Coords(release_date__month=2, release_date__year=1945, author__lastname='Davis'): 0,
+    ...             Coords(release_date__month=2, release_date__year=1945, author__lastname='Hubbard'): 0,
+    ...             Coords(release_date__month=2, release_date__year=1945, author__lastname='Evans'): 0,
+    ...             Coords(release_date__month=2, release_date__year=1945, author__lastname='Monk'): 1,
+    ...             Coords(release_date__month=2, release_date__year=1944, author__lastname='Davis'): 0,
+    ...             Coords(release_date__month=2, release_date__year=1944, author__lastname='Hubbard'): 0,
+    ...             Coords(release_date__month=2, release_date__year=1944, author__lastname='Evans'): 0,
+    ...             Coords(release_date__month=2, release_date__year=1944, author__lastname='Monk'): 1,
+    ...             Coords(release_date__month=2, release_date__year=1969, author__lastname='Davis'): 0,
+    ...             Coords(release_date__month=2, release_date__year=1969, author__lastname='Hubbard'): 0,
+    ...             Coords(release_date__month=2, release_date__year=1969, author__lastname='Evans'): 0,
+    ...             Coords(release_date__month=2, release_date__year=1969, author__lastname='Monk'): 0,
+    ...             Coords(release_date__month=2, release_date__year=1959, author__lastname='Davis'): 0,
+    ...             Coords(release_date__month=2, release_date__year=1959, author__lastname='Hubbard'): 0,
+    ...             Coords(release_date__month=2, release_date__year=1959, author__lastname='Evans'): 0,
+    ...             Coords(release_date__month=2, release_date__year=1959, author__lastname='Monk'): 0}
     True
 
 Ordering the results
@@ -344,6 +323,13 @@ Filter cube's queryset
     >>> set([item for item in filtered_c.queryset]) == set([so_what, all_blues])
     True
 
+Iterate over cube's subcubes
+----------------------------
+
+    >>> c = Cube(['firstname', 'instrument__name'], Musician.objects.all(), count_qs)
+    >>> list(c.subcubes('firstname'))
+    [Cube(instrument__name, firstname=Bill), Cube(instrument__name, firstname=Erroll), Cube(instrument__name, firstname=Freddie), Cube(instrument__name, firstname=Miles), Cube(instrument__name, firstname=Thelonious)]
+
 Creating a cube from other cubes + - * /
 ------------------------------------------
 
@@ -351,19 +337,58 @@ Creating a cube from other cubes + - * /
 
 Template tags
 ==============
+..
 
-    >>> c = Cube(['release_date__absmonth', 'author__lastname', 'title'], Song.objects.all(), count_qs)
+    >>> from cube.templatetags import cube_templatetags
+    >>> from django.template import Template, Context
+    >>> import re
 
-    >>> subcube = cube_filters.subcube(c, 'author__lastname, title')
-    >>> subcube.dimensions == set(['author__lastname', 'title'])
-    True
-    >>> subcube.constraint == c.constraint
-    True
-    >>> subcube.sample_space == c.sample_space
+Iterating over cube's subcubes
+-------------------------------
+
+    >>> c = Cube(['firstname', 'lastname', 'instrument__name'], Musician.objects.all(), count_qs, sample_space={
+    ...     'firstname': ['Miles'],
+    ...     'instrument__name': ['trumpet', 'piano'],
+    ...     'lastname': ['Davis', 'Evans']
+    ... })
+    >>> context = Context({'my_cube': c})
+
+    >>> template = Template(
+    ...     '{% load cube_templatetags %}'
+    ...     '{% subcubes my_cube by firstname, instrument__name as subcube1 %}'
+    ...     '   {{ subcube1 }}:{{ subcube1.measure }}'
+    ...     '   {% subcubes subcube1 by lastname as subcube2 %}'
+    ...     '      {{ subcube2 }}:{{ subcube2.measure }}'
+    ...     '   {% endsubcubes %}'
+    ...     '{% endsubcubes %}'
+    ... )
+
+    >>> awaited = re.sub(' ', '', ''
+    ... '   Cube(lastname, firstname=Miles, instrument__name=piano):0'
+    ... '      Cube(firstname=Miles, instrument__name=piano, lastname=Davis):0'
+    ... '      Cube(firstname=Miles, instrument__name=piano, lastname=Evans):0'
+    ... '   Cube(lastname, firstname=Miles, instrument__name=trumpet):1'
+    ... '      Cube(firstname=Miles, instrument__name=trumpet, lastname=Davis):1'
+    ... '      Cube(firstname=Miles, instrument__name=trumpet, lastname=Evans):0'
+    ... )
+    >>> awaited == re.sub(' ', '', template.render(context))
     True
 
-    >>> cube_filters.coords(subcube, 'author__lastname=str("Davis"), title=str("So What")')
-    1
+Get a constraint value
+------------------------
+
+    >>> c = Cube(['firstname', 'lastname', 'instrument__name'], Musician.objects.all(), count_qs, constraint={
+    ...     'firstname': 'John',
+    ...     'instrument__name': 'sax',
+    ... })
+    >>> context = Context({'my_cube': c})
+
+    >>> template = Template(
+    ... '{% load cube_templatetags %}'
+    ... '>FUNKY<{{ my_cube|getconstraint:\\'instrument__name\\' }}>FUNKY<'
+    ... )
+    >>> template.render(context)
+    u'>FUNKY<sax>FUNKY<'
 """
 
 from django.db import models
