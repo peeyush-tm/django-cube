@@ -76,6 +76,7 @@ def do_subcubes(parser, token):
                     <li>{{ i_subcube|getconstraint:"name" }} : {{ i_subcube.measure }}</li>
                     {% endfor %}
                 </ul>
+                </li>
         {% endsubcubes %}
         </ul>
 

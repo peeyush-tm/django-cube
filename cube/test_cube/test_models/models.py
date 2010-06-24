@@ -90,21 +90,21 @@ Getting sample space of a dimension
 
     >>> c1 = Cube(['author', 'release_date'], Song.objects.all(), count_qs)
 
-    >>> c1.get_sample_space('title') == set(['So What', 'All Blues', 'Blue In Green', 'South Street Stroll', 'Well You Needn\\'t', 'Blue Monk'])
+    >>> c1.get_sample_space('title') == sorted(set(['So What', 'All Blues', 'Blue In Green', 'South Street Stroll', 'Well You Needn\\'t', 'Blue Monk']))
     True
-    >>> c1.get_sample_space('release_date__year') == set([1944, 1969, 1959, 1945])
+    >>> c1.get_sample_space('release_date__year') == sorted(set([1944, 1969, 1959, 1945]))
     True
-    >>> c1.get_sample_space('release_date__absmonth') == set([datetime(1969, 1, 1, 0, 0), datetime(1945, 2, 1, 0, 0), datetime(1944, 2, 1, 0, 0), datetime(1959, 8, 1, 0, 0)])
+    >>> c1.get_sample_space('release_date__absmonth') == sorted(set([datetime(1969, 1, 1, 0, 0), datetime(1945, 2, 1, 0, 0), datetime(1944, 2, 1, 0, 0), datetime(1959, 8, 1, 0, 0)]))
     True
-    >>> c1.get_sample_space('release_date__absday') == set([datetime(1969, 1, 21, 0, 0), datetime(1945, 2, 1, 0, 0), datetime(1944, 2, 1, 0, 0), datetime(1959, 8, 17, 0, 0)])
+    >>> c1.get_sample_space('release_date__absday') == sorted(set([datetime(1969, 1, 21, 0, 0), datetime(1945, 2, 1, 0, 0), datetime(1944, 2, 1, 0, 0), datetime(1959, 8, 17, 0, 0)]))
     True
-    >>> c1._default_sample_space('author__instrument__name') == set(['piano', 'trumpet'])
+    >>> c1.get_sample_space('author__instrument__name') == sorted(['piano', 'trumpet'])
     True
-    >>> c1._default_sample_space('author__instrument') == set([piano, trumpet])
+    >>> set(c1.get_sample_space('author__instrument')) == set([piano, trumpet])
     True
-    >>> c1._default_sample_space('author__firstname') == set(['Bill', 'Miles', 'Thelonious', 'Freddie'])
+    >>> c1.get_sample_space('author__firstname') == sorted(['Bill', 'Miles', 'Thelonious', 'Freddie'])
     True
-    >>> c1._default_sample_space('author') == set([miles_davis, freddie_hubbard, erroll_garner, bill_evans_p, thelonious_monk, bill_evans_s])
+    >>> set(c1.get_sample_space('author')) == set([miles_davis, freddie_hubbard, erroll_garner, bill_evans_p, thelonious_monk, bill_evans_s])
     True
 
 ..
@@ -312,7 +312,7 @@ Resample the sample space of a cube's dimension
     >>> c = Cube(['release_date__absmonth', 'author__lastname'], Song.objects.all(), count_qs)
     >>> set(c.get_sample_space('release_date__absmonth')) == set([datetime(1969, 1, 1, 0, 0), datetime(1945, 2, 1, 0, 0), datetime(1944, 2, 1, 0, 0), datetime(1959, 8, 1, 0, 0)])
     True
-    >>> c = c.resample('release_date__absmonth', lower_bound=datetime(1945, 1, 1), upper_bound=datetime(1960, 11, 1))
+    >>> c = c.resample('release_date__absmonth', lbound=datetime(1945, 1, 1), ubound=datetime(1960, 11, 1))
     >>> set(c.get_sample_space('release_date__absmonth')) == set([datetime(1959, 8, 1, 0, 0), datetime(1945, 2, 1, 0, 0)])
     True
 
@@ -329,6 +329,40 @@ Iterate over cube's subcubes
     >>> c = Cube(['firstname', 'instrument__name'], Musician.objects.all(), count_qs)
     >>> list(c.subcubes('firstname'))
     [Cube(instrument__name, firstname=Bill), Cube(instrument__name, firstname=Erroll), Cube(instrument__name, firstname=Freddie), Cube(instrument__name, firstname=Miles), Cube(instrument__name, firstname=Thelonious)]
+
+Multidimensionnal dictionnary of measures
+-------------------------------------------
+
+    >>> c = c.resample('instrument__name', space=['piano', 'trumpet']).resample('firstname', space=['Philly', 'Bill', 'Miles'])
+    >>> c.measure_dict('firstname', 'instrument__name') == {
+    ...     'Bill': {
+    ...         'piano': {'measure': 1},
+    ...         'trumpet': {'measure': 0},
+    ...         'measure': 2
+    ...     },
+    ...     'Miles': {
+    ...         'piano': {'measure': 0},
+    ...         'trumpet': {'measure': 1},
+    ...         'measure': 1
+    ...     },
+    ...     'Philly': {
+    ...         'piano': {'measure': 0},
+    ...         'trumpet': {'measure': 0},
+    ...         'measure': 0
+    ...     },
+    ...     'measure': 6
+    ... }
+    True
+
+Multidimensionnal list of measures
+------------------------------------
+
+    >>> c.measure_list('firstname', 'instrument__name') == [
+    ...     [1, 0],
+    ...     [0, 1],
+    ...     [0, 0],
+    ... ]
+    True
 
 Creating a cube from other cubes + - * /
 ------------------------------------------
@@ -395,13 +429,19 @@ from django.db import models
 
 class Instrument(models.Model):
     name = models.CharField(max_length=100)
+    def __unicode__(self):
+        return u'%s' % self.name
 
 class Musician(models.Model):
     firstname = models.CharField(max_length=100)
     lastname = models.CharField(max_length=100)
     instrument = models.ForeignKey(Instrument)
+    def __unicode__(self):
+        return u'%s %s' % (self.firstname, self.lastname)
     
 class Song(models.Model):
     title = models.CharField(max_length=100)
     release_date = models.DateField()
-    author = models.ForeignKey(Musician)    
+    author = models.ForeignKey(Musician)
+    def __unicode__(self):
+        return u'%s' % self.title
