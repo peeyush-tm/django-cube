@@ -112,8 +112,7 @@ class BaseCube(MutableMapping):
             #one for each value in the fixed dimension's sample space.
             #Every one of these cubes is constrained *fixed_dimension=value*
             sample_space = self.get_sample_space(fixed_dimension)
-            sorted_sample_space = self._sort_sample_space(sample_space)
-            for value in sorted_sample_space:
+            for value in sample_space:
                 #subcube_constraint = cube_constraint + extra_constraint
                 extra_constraint = {fixed_dimension: value}
                 #constrained subcube
@@ -141,19 +140,19 @@ class BaseCube(MutableMapping):
         cube_copy.constraint = constraint
         return cube_copy
 
-    def resample(self, dimension, lower_bound=None, upper_bound=None, space=None):
+    def resample(self, dimension, lbound=None, ubound=None, space=None):
         """
         Returns a copy of the calling cube, whose sample space of *dimension* is limited to : ::
 
-            *space* INTER [*lower_bound*, *upper_bound*]
+            *space* INTER [*lbound*, *ubound*]
 
         If *space* is not defined, the sample space of the calling cube's *dimension* is taken instead.
         """
         #calculate dimension's new sample space
         new_space = space or self.get_sample_space(dimension)
-        lower_bound = lower_bound or min(new_space)
-        upper_bound = upper_bound or max(new_space)
-        new_space = filter(lambda elem: elem >= lower_bound and elem <= upper_bound, new_space)
+        lbound = lbound or min(new_space)
+        ubound = ubound or max(new_space)
+        new_space = filter(lambda elem: elem >= lbound and elem <= ubound, new_space)
         #calculate cube's new sample space
         cube_space = copy.copy(self.sample_space)
         cube_space.update({dimension: new_space})        
@@ -168,14 +167,68 @@ class BaseCube(MutableMapping):
         """
         raise NotImplementedError
 
-    def measures(self):
+    def measure_dict(self, *free_dimensions):
         """
+        Returns a multidimensionnal dictionnary of measures from the cube, structured following *free_dimensions*. For example : ::
+
+            >>> cube(['dim1', 'dim2']).measures_dict('dim2', 'dim1') == {
+            ...     dim2_val1: {
+            ...         dim1_val1: {'measure': measure1_1},
+            ...         dim1_val2: {'measure': measure1_2},
+            ...
+            ...         dim1_valN: {'measure': measure1_N},
+            ...         'measure': measure1
+            ...     },
+            ... 
+            ...     dim2_valN: {
+            ...         dim1_val1: {'measure': measureN_1},
+            ...         dim1_val2: {'measure': measureN_2},
+            ...
+            ...         dim1_valN: {'measure': measureN_N},
+            ...         'measure': measureN
+            ...     },
+            ...     'measure': measure
+            ... }
+
+        .. todo:: if 'measure' is already in the dict ?
         """
-        for coords in self:
-            coords = dict(coords)
-            coords.update({'measure': self[coords]})
-            yield coords
-        raise StopIteration
+        returned_dict = {}
+        #if free dimensions, we have to fix one, and iterate over the subcubes. 
+        if free_dimensions:
+            free_dimensions = list(free_dimensions)
+            fixed_dimension = free_dimensions.pop(0)
+            for subcube in self.subcubes(fixed_dimension):
+                dim_value = subcube.constraint[fixed_dimension]
+                returned_dict[dim_value] = subcube.measure_dict(*free_dimensions)
+        returned_dict['measure'] = self.measure()
+        return returned_dict
+
+    def measure_list(self, *free_dimensions):
+        """
+        Returns a multidimensionnal list of measures from the cube, structured following *free_dimensions*. For example : ::
+
+            >>> cube(['dim1', 'dim2']).measures_list('dim2', 'dim1') == [
+            ...     [measure_11_21, measure_11_22, , measure_11_2N],]
+            ...     [measure_12_21, measure_12_22, , measure_12_2N],]
+            ... 
+            ...     [measure_1N_21, measure_1N_22, , measure_1N_2N],]
+            ... ] # Where <measure_AB_CD> means measure of cube with dimA=B and dimC=D
+        """
+        returned_list = []
+        if free_dimensions:
+            free_dimensions = list(free_dimensions)
+            fixed_dimension = free_dimensions.pop(0)
+        else:
+            return [self.measure()]
+         
+        if free_dimensions:
+            for subcube in self.subcubes(fixed_dimension):
+                returned_list.append(subcube.measure_list(*free_dimensions))
+        else:
+            for subcube in self.subcubes(fixed_dimension):
+                returned_list.append(subcube.measure())
+        return returned_list
+        
 
     def _sort_sample_space(self, sspace):
         """
@@ -189,11 +242,11 @@ class BaseCube(MutableMapping):
         :returns: set -- The sample space of *dimension* for the calling cube. 
         """
         try:
-            return self.sample_space[dimension]
+            sample_space = self.sample_space[dimension]
         except KeyError:
-            return self._default_sample_space(dimension)
+            sample_space = self._default_sample_space(dimension)
 
-        return constraint_copy
+        return self._sort_sample_space(sample_space)
 
     def __copy__(self):
         """
@@ -381,7 +434,7 @@ class Cube(BaseCube):
                 except IndexError:
                     next_key = None
 
-        return set(sample_space)
+        return sample_space
 
     @staticmethod
     def _format_constraint(constraint):
