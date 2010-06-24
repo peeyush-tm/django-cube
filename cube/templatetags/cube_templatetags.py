@@ -6,7 +6,6 @@ register = Library()
 
 
 class SubcubesNode(Node):
-    child_nodelists = ('nodelist_loop', 'nodelist_empty')
 
     def __init__(self, cube, dimensions, subcube_var, nodelist):
         self.dimensions, self.cube = dimensions, cube
@@ -139,4 +138,10 @@ def get_constraint(cube, dimension):
     return cube.constraint[dimension]
 
 register.filter('getconstraint', get_constraint)
+
+def inspect_object(obj):
+    return obj.measure()
+    #return '///'.join([memb + " %s" % type(getattr(obj, memb)) for memb in dir(obj)])
+
+register.filter('my_super_unique_inspect', inspect_object)
 

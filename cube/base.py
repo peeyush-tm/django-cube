@@ -30,7 +30,7 @@ from django.db.models.sql import constants
 from collections import defaultdict
 
 
-class BaseCube(MutableMapping):
+class BaseCube(object):
     """
     A cube that can calculate lists of measures for a queryset, on several dimensions.
     """
@@ -81,7 +81,7 @@ class BaseCube(MutableMapping):
                 #subcube_constraint = cube_constraint + extra_constraint
                 extra_constraint = {fixed_dimension: value}
                 #constrained subcube
-                subcube = self.constrain(extra_constraint)
+                subcube = self.constrain(**extra_constraint)
                 subcube_constraint = copy.copy(subcube.constraint)
                 #we yield all the measures for the constrained cube
                 for subsubcube in subcube.subcubes(*dimensions):
@@ -90,7 +90,7 @@ class BaseCube(MutableMapping):
 
         #There is no free dimension, so we can yield the measure.
         else:
-            yield self
+            yield copy.copy(self)
             raise StopIteration
 
     def constrain(self, **extra_constraint):
@@ -132,31 +132,41 @@ class BaseCube(MutableMapping):
         """
         raise NotImplementedError
 
-    def measure_dict(self, *free_dimensions):
+    def measure_dict(self, *free_dimensions, **kwargs):
         """
         Returns a multidimensionnal dictionnary of measures from the cube, structured following *free_dimensions*. For example : ::
 
             >>> cube(['dim1', 'dim2']).measures_dict('dim2', 'dim1') == {
             ...     dim2_val1: {
             ...         dim1_val1: {'measure': measure1_1},
-            ...         dim1_val2: {'measure': measure1_2},
             ...
             ...         dim1_valN: {'measure': measure1_N},
             ...         'measure': measure1
             ...     },
             ... 
             ...     dim2_valN: {
-            ...         dim1_val1: {'measure': measureN_1},
-            ...         dim1_val2: {'measure': measureN_2},
             ...
-            ...         dim1_valN: {'measure': measureN_N},
-            ...         'measure': measureN
             ...     },
             ...     'measure': measure
             ... }
 
+        If *full=False*, only the measures for which all dimensions in *free_dimensions* are fixed will be returned. For example : ::
+
+            >>> cube(['dim1', 'dim2']).measures_dict('dim2', 'dim1', full=False) == {
+            ...     dim2_val1: {
+            ...         dim1_val1: {'measure': measure1_1},
+            ...
+            ...         dim1_valN: {'measure': measure1_N},
+            ...     },
+            ... 
+            ...     dim2_valN: {
+            ...
+            ...     },
+            ... }
+
         .. todo:: if 'measure' is already in the dict ?
         """
+        full = kwargs.setdefault('full', True)
         returned_dict = {}
         #if free dimensions, we have to fix one, and iterate over the subcubes. 
         if free_dimensions:
@@ -164,8 +174,11 @@ class BaseCube(MutableMapping):
             fixed_dimension = free_dimensions.pop(0)
             for subcube in self.subcubes(fixed_dimension):
                 dim_value = subcube.constraint[fixed_dimension]
-                returned_dict[dim_value] = subcube.measure_dict(*free_dimensions)
-        returned_dict['measure'] = self.measure()
+                returned_dict[dim_value] = subcube.measure_dict(*free_dimensions, **kwargs)
+            if full:
+                returned_dict['measure'] = self.measure()
+        else:
+            returned_dict['measure'] = self.measure()
         return returned_dict
 
     def measure_list(self, *free_dimensions):
@@ -228,28 +241,6 @@ class BaseCube(MutableMapping):
         free_dimensions = sorted(list(self.dimensions - set(self.constraint.keys())))
 
         return 'Cube(%s)' % ", ".join(free_dimensions + constr_dimensions)
-    
-    def __getitem__(self, coordinates):
-        """
-        """
-
-    def __len__(self):
-        """
-        """
-    
-    def __iter__(self):
-        """
-        """
-
-    def __contains__(self, coordinates):
-        """
-        """
-    
-    def __delitem__(self, key):
-        raise NotImplementedError
-    
-    def __setitem__(self, key, value):
-        raise NotImplementedError
 
 
 class Cube(BaseCube):
@@ -369,6 +360,9 @@ class Cube(BaseCube):
         constraint = copy.copy(self.constraint)
         aggregation = self.aggregation
         return Cube(dimensions, queryset, aggregation, constraint=constraint, sample_space=sample_space)
+    
+    def testitesti(self):
+        return 68
 
 class BaseDimension(object):
     pass
