@@ -46,41 +46,6 @@ class BaseCube(MutableMapping):
         self.constraint = constraint
         self.dimensions = set(dimensions)
         self.aggregation = aggregation
-
-    def subcube(self, dimensions=None, extra_constraint={}):
-        """
-        :returns: Cube -- a subcube of the calling cube, whose dimensions are *dimensions*, and which is constrained with *extra_constraint*. 
-
-        :param dimensions: list -- a subset of the calling cube's dimensions. If *dimensions* is not provided, it defaults to the calling cube's.
-        :param extra_constraint: dict -- a dictionnary of constraint *{dimension: value}*. Constrained dimensions must belong to the subcube's dimensions.
-        
-        :raise: ValueError -- if a dimension passed along *dimensions* is not a dimension of the calling cube, or if a dimension constrained in *extra_constraint* is not a dimension of the returned subcube.
-        """
-        #default value for *constraint*
-        constraint = copy.copy(self.constraint)
-        #default value for *dimensions*
-        if dimensions == None:
-            dimensions = self.dimensions
-        #building the new cube's *constraint*
-        else:
-            constraint = copy.copy(self.constraint)
-            #if some dimensions are deleted, we delete also the constraints
-            for dimension in (set(self.dimensions) - set(dimensions)):
-                try:
-                    constraint.pop(dimension)
-                except KeyError:
-                    pass
-            constraint.update(extra_constraint)
-
-        if not set(extra_constraint.keys()) <= set(dimensions):
-            raise ValueError('%s is(are) not valid constraint dimension(s) for this cube' % (set(constraint.keys()) - set(dimensions)))
-        elif not set(dimensions) <= self.dimensions:
-            raise ValueError('%s is(are) not dimension(s) of the cube' % (set(dimensions) - set(self.dimensions)))
-        else:
-            cube_copy = copy.copy(self)
-            cube_copy.dimensions = set(dimensions)
-            cube_copy.constraint = constraint
-            return cube_copy
      
     def subcubes(self, *dimensions):
         """
@@ -128,7 +93,7 @@ class BaseCube(MutableMapping):
             yield self
             raise StopIteration
 
-    def constrain(self, extra_constraint):
+    def constrain(self, **extra_constraint):
         """
         Merges the calling cube's constraint with *extra_constraint*.
 
@@ -266,78 +231,19 @@ class BaseCube(MutableMapping):
     
     def __getitem__(self, coordinates):
         """
-        Returns the measure at *coordinates*. Every coordinate to a subcube is valid. e.g. : ::
-        
-            cube[Coords(dim1=val1, dim2=val2)] # is valid
-            cube[Coords(dim1=val1)] #is valid to, it just doesn't
-            ... # take the dimension dim2 into account when calculating the measure.
         """
-        subcube = self
-        for dimension, value in coordinates.iteritems():
-            subcube = subcube.constrain({dimension: value})
-        if set(subcube.constraint.keys()) <= set(subcube.dimensions):
-            return subcube.measure()
-        else:
-            raise KeyError('%s' % coordinates)
 
     def __len__(self):
         """
-        Returns the length of the sample space
         """
-        length = 1
-        for dimension in self.dimensions:
-            length *= len(self.get_sample_space(dimension))
-        return length
     
     def __iter__(self):
         """
-        Iterates on the coordinates of all subcubes of dimension 0. 
         """
-        #To cover the whole cube's sample space, we will :
-        #1- pick one of the cube's dimensions
-        #2- constrain it with every possible value, and calculate a subcube for each constraint
-        #3- merge the coordinates of subcubes' measures with the constraint value
-
-        free_dimensions = self.dimensions - set(self.constraint.keys())
-
-        #If there are free dimensions, we need to calculate subcubes and merge the results.
-        if len(free_dimensions):
-            #we fix a dimension,
-            fixed_dimension = free_dimensions.pop()
-            #and create a subcube with the remaining free dimensions,
-            #one for each value in the fixed dimension's sample space.
-            #Every one of these cubes is constrained *fixed_dimension=value*
-            sample_space = self.get_sample_space(fixed_dimension)
-            sorted_sample_space = self._sort_sample_space(sample_space)
-            for value in sorted_sample_space:
-                #subcube_constraint = cube_constraint + extra_constraint
-                extra_constraint = {fixed_dimension: value}
-                #constrained subcube
-                subcube = self.constrain(extra_constraint)
-                subcube_constraint = copy.copy(subcube.constraint)
-                #we yield all the measures for the constrained cube
-                for coords in subcube:
-                    merged_constraint = copy.copy(subcube_constraint)
-                    merged_constraint.update(coords)
-                    merged_coords = Coords(**merged_constraint)
-                    yield merged_coords
-            raise StopIteration
-
-        #There is no free dimension, so we can yield the measure.
-        else:
-            yield Coords()
-            raise StopIteration
 
     def __contains__(self, coordinates):
         """
-        Returns True if *coordinates* points to a valid subcube.
         """
-        try:
-            self[coordinates]
-        except KeyError:
-            return False
-        else:
-            return True
     
     def __delitem__(self, key):
         raise NotImplementedError
@@ -360,14 +266,6 @@ class Cube(BaseCube):
         """
         super(Cube, self).__init__(dimensions, aggregation, constraint, sample_space)
         self.queryset = queryset
-    
-    def filter(self, **kwargs):
-        """
-        Filter the cube's queryset. This method is merely a wrapper around Django's `filter` function.
-        """
-        cube_copy = copy.copy(self)
-        cube_copy.queryset = self.queryset.filter(**kwargs)
-        return cube_copy
 
     def measure(self):
         """
@@ -474,50 +372,6 @@ class Cube(BaseCube):
 
 class BaseDimension(object):
     pass
-
-class Coords(MutableMapping):
-    def __init__(self, **kwargs):
-        self._dimensions = kwargs.keys()
-        for dimension, value in kwargs.iteritems():
-            setattr(self, dimension, value)
-
-    def __hash__(self):
-        self._dimensions.sort()
-        hash_key = ''
-        for dimension in self._dimensions:
-            hash_key += dimension + '=' + unicode(getattr(self, dimension))
-        return hash(hash_key)
-    
-    def __repr__(self):
-        self._dimensions.sort()
-        coord_str = ''
-        for dimension in self._dimensions:
-            coord_str += dimension + '=' + repr(getattr(self, dimension)) + ', '  
-        return 'Coords(%s)' % coord_str[:-2]
-    
-    def __setitem__(self, key, value):
-        if not key in self._dimensions:
-            raise KeyError('%s is not a valid dimension' % key)
-        else:
-            setattr(self, key, value)
-    
-    def __getitem__(self, key):
-        if not key in self._dimensions:
-            raise KeyError('%s is not a valid dimension' % key)
-        else:
-            return getattr(self, key)
-
-    def __len__(self):
-        return len(self._dimensions)
-    
-    def __iter__(self):
-        return iter(self._dimensions)
-    
-    def __contains__(self, key):
-        return key in self._dimensions
-    
-    def __delitem__(self, key):
-        raise NotImplementedError
     
         
         

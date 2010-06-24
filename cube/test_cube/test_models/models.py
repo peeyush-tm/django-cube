@@ -1,51 +1,7 @@
 """
 .. 
-    >>> from cube.base import Coords, Cube
+    >>> from cube.base import Cube
     >>> import copy
-
-Coords
-=======
-
-Creation
-----------
-    >>> coord1 = Coords(x=0, y='bottom')
-    >>> coord1.x
-    0
-    >>> coord1.y
-    'bottom'
-
-__repr__
-----------
-    >>> coord1
-    Coords(x=0, y='bottom')
-
-__hash__
-----------
-    >>> coord1 = Coords(x='top', altitude='a lot', y=23)
-    >>> coord2 = Coords(y=23, x='top', altitude='a lot')
-    >>> hash(coord1) == hash(coord2)
-    True
-
-    >>> coord1 = Coords(x='top', altitude='a lot', y=23)
-    >>> coord2 = Coords(y=23, x='top', altitude='lot')
-    >>> hash(coord1) == hash(coord2)
-    False
-
-'dictionnary-ness'
------------------------
-    >>> items = [(key, value) for key, value in coord1.iteritems()]
-    >>> ('x', 'top') in items
-    True
-    >>> ('altitude', 'a lot') in items
-    True
-    >>> ('y', 23) in items
-    True
-
-    >>> dict(coord1) == {'x': 'top', 'altitude': 'a lot', 'y': 23}
-    True
-    
-    >>> Coords(x=1, y=2) == Coords(y=2, x=1)
-    True
 
 Cube
 ======
@@ -136,100 +92,70 @@ Getting sample space of a dimension
     >>> c1_copy.aggregation == c1.aggregation
     True
 
-Cube's dictionnary-ness
--------------------------
+Iterate over cube's subcubes
+----------------------------
 
-    >>> c[Coords(instrument__name=u'trumpet', firstname='Miles')]
-    1
-    >>> c[Coords(instrument__name=u'piano', firstname='Thelonious')]
-    1
-    >>> set([coord for coord in c]) == set([Coords(instrument__name=u'trumpet', firstname='Miles'),
-    ...             Coords(instrument__name=u'trumpet', firstname='Freddie'),
-    ...             Coords(instrument__name=u'trumpet', firstname='Erroll'),
-    ...             Coords(instrument__name=u'trumpet', firstname='Bill'),
-    ...             Coords(instrument__name=u'trumpet', firstname='Thelonious'),
-    ...             Coords(instrument__name=u'piano', firstname='Miles'),
-    ...             Coords(instrument__name=u'piano', firstname='Freddie'),
-    ...             Coords(instrument__name=u'piano', firstname='Erroll'),
-    ...             Coords(instrument__name=u'piano', firstname='Bill'),
-    ...             Coords(instrument__name=u'piano', firstname='Thelonious'),
-    ...             Coords(instrument__name=u'sax', firstname='Miles'),
-    ...             Coords(instrument__name=u'sax', firstname='Freddie'),
-    ...             Coords(instrument__name=u'sax', firstname='Erroll'),
-    ...             Coords(instrument__name=u'sax', firstname='Bill'),
-    ...             Coords(instrument__name=u'sax', firstname='Thelonious')])
+    >>> c = Cube(['firstname', 'instrument__name'], Musician.objects.all(), count_qs)
+    >>> list(c.subcubes('firstname'))
+    [Cube(instrument__name, firstname=Bill), Cube(instrument__name, firstname=Erroll), Cube(instrument__name, firstname=Freddie), Cube(instrument__name, firstname=Miles), Cube(instrument__name, firstname=Thelonious)]
+
+Multidimensionnal dictionnary of measures
+-------------------------------------------
+
+    >>> c = c.resample('instrument__name', space=['piano', 'trumpet']).resample('firstname', space=['Philly', 'Bill', 'Miles'])
+    >>> c.measure_dict('firstname', 'instrument__name') == {
+    ...     'Bill': {
+    ...         'piano': {'measure': 1},
+    ...         'trumpet': {'measure': 0},
+    ...         'measure': 2
+    ...     },
+    ...     'Miles': {
+    ...         'piano': {'measure': 0},
+    ...         'trumpet': {'measure': 1},
+    ...         'measure': 1
+    ...     },
+    ...     'Philly': {
+    ...         'piano': {'measure': 0},
+    ...         'trumpet': {'measure': 0},
+    ...         'measure': 0
+    ...     },
+    ...     'measure': 6
+    ... }
     True
 
-Iterating on the cube's results
-----------------------------------
-    >>> set([coord for coord in c]) == set([
-    ...     Coords(instrument__name=u'trumpet', firstname='Miles'),
-    ...     Coords(instrument__name=u'trumpet', firstname='Freddie'),
-    ...     Coords(instrument__name=u'trumpet', firstname='Erroll'),
-    ...     Coords(instrument__name=u'trumpet', firstname='Bill'),
-    ...     Coords(instrument__name=u'trumpet', firstname='Thelonious'),
-    ...     Coords(instrument__name=u'piano', firstname='Miles'),
-    ...     Coords(instrument__name=u'piano', firstname='Freddie'),
-    ...     Coords(instrument__name=u'piano', firstname='Erroll'),
-    ...     Coords(instrument__name=u'piano', firstname='Bill'),
-    ...     Coords(instrument__name=u'piano', firstname='Thelonious'),
-    ...     Coords(instrument__name=u'sax', firstname='Miles'),
-    ...     Coords(instrument__name=u'sax', firstname='Freddie'),
-    ...     Coords(instrument__name=u'sax', firstname='Erroll'),
-    ...     Coords(instrument__name=u'sax', firstname='Bill'),
-    ...     Coords(instrument__name=u'sax', firstname='Thelonious')])
-    True
+Multidimensionnal list of measures
+------------------------------------
 
-    >>> len(c) == 5 * 3
+    >>> c.measure_list('firstname', 'instrument__name') == [
+    ...     [1, 0],
+    ...     [0, 1],
+    ...     [0, 0],
+    ... ]
     True
-
-    >>> measure_dict = dict(c.iteritems())
-    >>> measure_dict[Coords(instrument__name='trumpet', firstname='Bill')]
-    0
-    >>> measure_dict[Coords(firstname='Miles', instrument__name='trumpet')]
-    1
-    >>> measure_dict == {Coords(instrument__name=u'trumpet', firstname='Miles'): 1,
-    ...             Coords(instrument__name=u'trumpet', firstname='Freddie'): 1,
-    ...             Coords(instrument__name=u'trumpet', firstname='Erroll'): 0,
-    ...             Coords(instrument__name=u'trumpet', firstname='Bill'): 0,
-    ...             Coords(instrument__name=u'trumpet', firstname='Thelonious'): 0,
-    ...             Coords(instrument__name=u'piano', firstname='Miles'): 0,
-    ...             Coords(instrument__name=u'piano', firstname='Freddie'): 0,
-    ...             Coords(instrument__name=u'piano', firstname='Erroll'): 1,
-    ...             Coords(instrument__name=u'piano', firstname='Bill'): 1,
-    ...             Coords(instrument__name=u'piano', firstname='Thelonious'): 1,
-    ...             Coords(instrument__name=u'sax', firstname='Miles'): 0,
-    ...             Coords(instrument__name=u'sax', firstname='Freddie'): 0,
-    ...             Coords(instrument__name=u'sax', firstname='Erroll'): 0,
-    ...             Coords(instrument__name=u'sax', firstname='Bill'): 1,
-    ...             Coords(instrument__name=u'sax', firstname='Thelonious'): 0,
-    ...             }
-    True
-
 
 Getting a subcube
 ------------------
 
-By reducing the cube's dimensions
-
-    >>> subcube = c.subcube(['firstname'])
-    >>> measure_dict = dict(subcube)
-    >>> measure_dict == {Coords(firstname='Miles'): 1,
-    ...             Coords(firstname='Bill'): 2,
-    ...             Coords(firstname='Thelonious'): 1,
-    ...             Coords(firstname='Freddie'): 1,
-    ...             Coords(firstname='Erroll'): 1}
-    True
-    
-Or by constraining the cube
+By constraining the cube
 
     >>> subcube = c.constrain({'instrument__name': 'trumpet'})
-    >>> measure_dict = dict(subcube)
-    >>> measure_dict == {Coords(firstname='Miles', instrument__name='trumpet'): 1,
-    ...             Coords(firstname='Freddie', instrument__name='trumpet'): 1,
-    ...             Coords(firstname='Thelonious', instrument__name='trumpet'): 0,
-    ...             Coords(firstname='Bill', instrument__name='trumpet'): 0,
-    ...             Coords(firstname='Erroll', instrument__name='trumpet'): 0}
+    >>> subcube.measure_dict('first_name', 'instrument__name') == {
+    ...     'Miles': {
+    ...         'trumpet': {'measure': 1},
+    ...     },
+    ...     'Freddie': {
+    ...         'trumpet': {'measure': 1},
+    ...     },
+    ...     'Thelonious': {
+    ...         'trumpet': {'measure': 0},
+    ...     },
+    ...     'Bill': {
+    ...         'trumpet': {'measure': 0},
+    ...     },
+    ...     'Erroll': {
+    ...         'trumpet': {'measure': 0},
+    ...     },
+    ... }
     True
 
 Note that the two subcubes are very different. The first one constrains the dimension *'instrument__name'* to the value *'trumpet'*, so the measure calculated is the count of trumpet players for each firstname (which stays as a free dimension) ; whereas the second one removes the dimension *'instrument__name'*, so the measure calculated is the count of each *'firstname'*.
@@ -316,53 +242,6 @@ Resample the sample space of a cube's dimension
     >>> set(c.get_sample_space('release_date__absmonth')) == set([datetime(1959, 8, 1, 0, 0), datetime(1945, 2, 1, 0, 0)])
     True
 
-Filter cube's queryset
-------------------------
-
-    >>> filtered_c = c.filter(author=miles_davis)
-    >>> set([item for item in filtered_c.queryset]) == set([so_what, all_blues])
-    True
-
-Iterate over cube's subcubes
-----------------------------
-
-    >>> c = Cube(['firstname', 'instrument__name'], Musician.objects.all(), count_qs)
-    >>> list(c.subcubes('firstname'))
-    [Cube(instrument__name, firstname=Bill), Cube(instrument__name, firstname=Erroll), Cube(instrument__name, firstname=Freddie), Cube(instrument__name, firstname=Miles), Cube(instrument__name, firstname=Thelonious)]
-
-Multidimensionnal dictionnary of measures
--------------------------------------------
-
-    >>> c = c.resample('instrument__name', space=['piano', 'trumpet']).resample('firstname', space=['Philly', 'Bill', 'Miles'])
-    >>> c.measure_dict('firstname', 'instrument__name') == {
-    ...     'Bill': {
-    ...         'piano': {'measure': 1},
-    ...         'trumpet': {'measure': 0},
-    ...         'measure': 2
-    ...     },
-    ...     'Miles': {
-    ...         'piano': {'measure': 0},
-    ...         'trumpet': {'measure': 1},
-    ...         'measure': 1
-    ...     },
-    ...     'Philly': {
-    ...         'piano': {'measure': 0},
-    ...         'trumpet': {'measure': 0},
-    ...         'measure': 0
-    ...     },
-    ...     'measure': 6
-    ... }
-    True
-
-Multidimensionnal list of measures
-------------------------------------
-
-    >>> c.measure_list('firstname', 'instrument__name') == [
-    ...     [1, 0],
-    ...     [0, 1],
-    ...     [0, 0],
-    ... ]
-    True
 
 Creating a cube from other cubes + - * /
 ------------------------------------------
