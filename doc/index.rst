@@ -12,5 +12,5 @@ Members -- :mod:`cube.base`
 Template tags -- :mod:`cube.templatetags.cube_filters`
 =========================================================
 
-.. automodule:: cube.templatetags.cube_filters
+.. automodule:: cube.templatetags.cube_templatetags
     :members:
