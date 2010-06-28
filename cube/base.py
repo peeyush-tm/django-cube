@@ -67,7 +67,7 @@ class BaseCube(object):
             if dimension not in self.dimensions:
                 raise ValueError("invalid dimension %s" % dimension)
             #if dimension is constrained we don't need to iterate for it.
-            if dimension in self.constraint.keys():
+            if dimension in self.constraint:
                 dimensions.pop(index)
 
         if len(dimensions):
@@ -126,15 +126,19 @@ class BaseCube(object):
         cube_copy.sample_space = cube_space
         return cube_copy
 
-    def measure(self):
+    def measure(self, **coordinates):
         """
-        Calculates and returns the measure on the cube.
+        Calculates and returns the measure on the cube at *coordinates*. For example :
+            
+            >>> cube.measure(dim1=val1, dim2=val2, dimN=valN)
+
+        If *coordinates* is empty, the measure returned is calculated on the whole cube. 
         """
         raise NotImplementedError
 
     def measure_dict(self, *free_dimensions, **kwargs):
         """
-        Returns a multidimensionnal dictionnary of measures from the cube, structured following *free_dimensions*. For example : ::
+        Returns a multidimensionnal dictionnary of measures from the cube, structured following *free_dimensions*. For example :
 
             >>> cube(['dim1', 'dim2']).measures_dict('dim2', 'dim1') == {
             ...     dim2_val1: {
@@ -164,7 +168,7 @@ class BaseCube(object):
             ...     },
             ... }
 
-        .. todo:: if 'measure' is already in the dict ?
+        .. todo:: if key 'measure' is already in the dict ?
         """
         full = kwargs.setdefault('full', True)
         returned_dict = {}
@@ -258,11 +262,19 @@ class Cube(BaseCube):
         super(Cube, self).__init__(dimensions, aggregation, constraint, sample_space)
         self.queryset = queryset
 
-    def measure(self):
-        """
-        Calculates and returns the measure on the cube.
-        """
-        constraint = self._format_constraint(self.constraint)
+    def measure(self, **coordinates):
+        constraint = copy.copy(self.constraint)
+
+        #we check the coordinates passed
+        for dimension, value in coordinates.iteritems():
+            if not dimension in self.dimensions:
+                raise ValueError("invalid dimension %s" % dimension)
+            if dimension in self.constraint:
+                raise ValueError("dimension %s is constrained" % dimension)
+
+        #calculate the total constraint
+        constraint.update(coordinates)
+        constraint = self._format_constraint(constraint)
         return self.aggregation(self.queryset.filter(**constraint))
 
     def _default_sample_space(self, dimension):
@@ -360,9 +372,6 @@ class Cube(BaseCube):
         constraint = copy.copy(self.constraint)
         aggregation = self.aggregation
         return Cube(dimensions, queryset, aggregation, constraint=constraint, sample_space=sample_space)
-    
-    def testitesti(self):
-        return 68
 
 class BaseDimension(object):
     pass
