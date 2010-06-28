@@ -109,6 +109,21 @@ Resample the sample space of a cube's dimension
     >>> set(c.get_sample_space('release_date__absmonth')) == set([datetime(1959, 8, 1, 0, 0), datetime(1945, 2, 1, 0, 0)])
     True
 
+Getting a measure from the cube
+--------------------------------
+
+    >>> c = Cube(['firstname', 'instrument__name'], Musician.objects.all(), count_qs)
+    >>> c.measure(firstname='Miles')
+    1
+    >>> c.measure(firstname='Bill')
+    2
+    >>> c.measure(firstname='Miles', instrument__name='trumpet')
+    1
+    >>> c.measure(firstname='Miles', instrument__name='piano')
+    0
+    >>> c.measure()
+    6
+
 Iterate over cube's subcubes
 ----------------------------
 
