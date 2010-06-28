@@ -295,24 +295,22 @@ Iterating over cube's subcubes
     >>> template = Template(
     ...     '{% load cube_templatetags %}'
     ...     '{% subcubes my_cube by firstname, instrument__name as subcube1 %}'
-    ...     '   {{ subcube1 }}:{{ subcube1.measure }}'
-    ...     '   {% subcubes subcube1 by lastname as subcube2 %}'
-    ...     '      {{ subcube2 }}:{{ subcube2.measure }}'
-    ...     '   {% endsubcubes %}'
+    ...        '{{ subcube1 }}:{{ subcube1.measure }}'
+    ...        '{% subcubes subcube1 by lastname as subcube2 %}'
+    ...           '{{ subcube2 }}:{{ subcube2.measure }}'
+    ...        '{% endsubcubes %}'
     ...     '{% endsubcubes %}'
     ... )
 
-    >>> awaited = re.sub(' ', '', ''
-    ... '   Cube(lastname, firstname=Miles, instrument__name=piano):0'
-    ... '      Cube(firstname=Miles, instrument__name=piano, lastname=Davis):0'
-    ... '      Cube(firstname=Miles, instrument__name=piano, lastname=Evans):0'
-    ... '   Cube(lastname, firstname=Miles, instrument__name=trumpet):1'
-    ... '      Cube(firstname=Miles, instrument__name=trumpet, lastname=Davis):1'
-    ... '      Cube(firstname=Miles, instrument__name=trumpet, lastname=Evans):0'
+    >>> template.render(context) == re.sub(' ', '', ''
+    ...    'Cube(lastname, firstname=Miles, instrument__name=piano):0'
+    ...       'Cube(firstname=Miles, instrument__name=piano, lastname=Davis):0'
+    ...       'Cube(firstname=Miles, instrument__name=piano, lastname=Evans):0'
+    ...    'Cube(lastname, firstname=Miles, instrument__name=trumpet):1'
+    ...       'Cube(firstname=Miles, instrument__name=trumpet, lastname=Davis):1'
+    ...       'Cube(firstname=Miles, instrument__name=trumpet, lastname=Evans):0'
     ... )
 
-    >>> awaited == re.sub(' ', '', template.render(context))
-    True
 
 Get a constraint value
 ------------------------
