@@ -276,7 +276,7 @@ class Cube(BaseCube):
         constraint = self._format_constraint(constraint)
         return self.aggregation(self.queryset.filter(**constraint))
 
-    def queryset(self, new_queryset):
+    def reset_queryset(self, new_queryset):
         """
         Returns a copy of the calling cube, whose queryset is *new_queryset*
         """
