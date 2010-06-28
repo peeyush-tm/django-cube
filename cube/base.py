@@ -276,6 +276,14 @@ class Cube(BaseCube):
         constraint = self._format_constraint(constraint)
         return self.aggregation(self.queryset.filter(**constraint))
 
+    def queryset(self, new_queryset):
+        """
+        Returns a copy of the calling cube, whose queryset is *new_queryset*
+        """
+        cube_copy = copy.copy(self)
+        cube_copy.queryset = new_queryset
+        return cube_copy
+
     def _default_sample_space(self, dimension):
         """
         Returns the default sample space for *dimension*, which is all the values taken by *dimension* in the cube's queryset.
