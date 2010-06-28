@@ -32,12 +32,11 @@ from collections import defaultdict
 
 class BaseCube(object):
     """
-    A cube that can calculate lists of measures for a queryset, on several dimensions.
+    The base class for a cube.
     """
     def __init__(self, dimensions, aggregation, constraint={}, sample_space={}):
         """
         :param dimensions: a list of attribute names which represent the free dimensions of the cube. All Django nested field lookups are allowed. For example on a model `Person`, a possible dimension would be `mother__birth_date__in`, where `mother` would (why not?!) be foreign key to another person. You can also use two special lookups: *absmonth* and *absday* which both take :class:`datetime` or :class:`date`, and represent absolute months or days. E.g. To search for November 1986, you would have to use *'date__month=11, date__year=1986'*, instead you can just use *'date__absmonth=date(1986, 11, 1)'*.
-        :param queryset: the base queryset from which the cube's sample space will be extracted.
         :param aggregation: an aggregation function. must have the following signature `def agg_func(queryset)`, and return a measure on the queryset.
         :param constraint: {*dimension*: *value*} -- a constraint that reduces the sample space of the cube.
         :param sample_space: {*dimension*: *sample_space*} -- specifies the sample space of *dimension*. If it is not specified, then default sample space is all the values that the dimension takes on the queryset.  
@@ -56,7 +55,7 @@ class BaseCube(object):
             ...     'instrument': ['Trumpet'],
             ...     'age': [14, 89],
             ... }
-            >>> Cube(['name', 'instrument', 'age'], len, sample_space=sample_space).subcubes()
+            >>> Cube(['name', 'instrument', 'age'], len, sample_space=sample_space).subcubes('name', 'instrument')
             [Cube(age, name='John', instrument='Trumpet'), Cube(age, name='Jack', instrument='Trumpet')]
 
         If one of the *dimensions* passed as parameter is already constrained in the calling cube, it is not considered as an error. The sample space taken for this dimension will merely be a singleton : the constraint value. 
@@ -109,7 +108,7 @@ class BaseCube(object):
         """
         Returns a copy of the calling cube, whose sample space of *dimension* is limited to : ::
 
-            *space* INTER [*lbound*, *ubound*]
+            <space> INTER [<lbound>, <ubound>]
 
         If *space* is not defined, the sample space of the calling cube's *dimension* is taken instead.
         """
@@ -221,7 +220,7 @@ class BaseCube(object):
 
     def get_sample_space(self, dimension):
         """
-        :returns: set -- The sample space of *dimension* for the calling cube. 
+        :returns: list -- The sorted sample space of *dimension* for the calling cube. 
         """
         try:
             sample_space = self.sample_space[dimension]
@@ -249,7 +248,7 @@ class BaseCube(object):
 
 class Cube(BaseCube):
     """
-    A cube that can calculate lists of measures for a queryset, on several dimensions.
+    A cube that calculates measures on a Django queryset.
     """
     def __init__(self, dimensions, queryset, aggregation, constraint={}, sample_space={}):
         """
