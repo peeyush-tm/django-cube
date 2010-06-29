@@ -328,12 +328,12 @@ Let's create a cube
 
 Here's how to use the template tag *subcubes* to iterate over subcubes :
 
-    >>> context = Context({'my_cube': c})
+    >>> context = Context({'my_cube': c, 'dim1': 'firstname'})
     >>> template = Template(
     ... '{% load cube_templatetags %}'
-    ... '{% subcubes my_cube by firstname, instrument__name as subcube1 %}'
+    ... '{% subcubes my_cube by dim1, "instrument__name" as subcube1 %}'
     ... '   {{ subcube1 }}:{{ subcube1.measure }}'
-    ... '   {% subcubes subcube1 by lastname as subcube2 %}'
+    ... '   {% subcubes subcube1 by "lastname" as subcube2 %}'
     ... '      {{ subcube2 }}:{{ subcube2.measure }}'
     ... '   {% endsubcubes %}'
     ... '{% endsubcubes %}'
