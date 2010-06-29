@@ -256,16 +256,18 @@ class Cube(BaseCube):
     """
     A cube that calculates measures on a Django queryset.
     """
-    def __init__(self, dimensions, queryset, aggregation, constraint={}, sample_space={}):
+    def __init__(self, dimensions, queryset, aggregation, constraint={}, sample_space={}, measure_none=0.0):
         """
         :param dimensions: a list of attribute names which represent the free dimensions of the cube. All Django nested field lookups are allowed. For example on a model `Person`, a possible dimension would be `mother__birth_date__in`, where `mother` would (why not?!) be foreign key to another person. You can also use two special lookups: *absmonth* and *absday* which both take :class:`datetime` or :class:`date`, and represent absolute months or days. E.g. To search for November 1986, you would have to use *'date__month=11, date__year=1986'*, instead you can just use *'date__absmonth=date(1986, 11, 1)'*.
         :param queryset: the base queryset from which the cube's sample space will be extracted.
         :param aggregation: an aggregation function. must have the following signature `def agg_func(queryset)`, and return a measure on the queryset.
         :param constraint: {*dimension*: *value*} -- a constraint that reduces the sample space of the cube.
-        :param sample_space: {*dimension*: *sample_space*} -- specifies the sample space of *dimension*. If it is not specified, then default sample space is all the values that the dimension takes on the queryset.  
+        :param sample_space: {*dimension*: *sample_space*} -- specifies the sample space of *dimension*. If it is not specified, then default sample space is all the values that the dimension takes on the queryset.
+        :param measure_none: the value that the measure should actually return if the calculation returned *None*
         """
         super(Cube, self).__init__(dimensions, aggregation, constraint, sample_space)
         self.queryset = queryset
+        self.measure_none = measure_none
 
     def measure(self, **coordinates):
         constraint = copy.copy(self.constraint)
@@ -280,7 +282,7 @@ class Cube(BaseCube):
         #calculate the total constraint
         constraint.update(coordinates)
         constraint = self._format_constraint(constraint)
-        return self.aggregation(self.queryset.filter(**constraint))
+        return self.aggregation(self.queryset.filter(**constraint)) or self.measure_none
 
     def reset_queryset(self, new_queryset):
         """
