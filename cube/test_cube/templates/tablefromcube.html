@@ -1,0 +1,31 @@
+<table>
+    <theader>
+        <tr>
+            <th></th>
+        {% for col_name in col_names %}
+            <th>{{ col_name }}</th>
+        {% endfor %}
+            <th>OVERALL</th>
+        </tr>
+    </theader>
+    <tbody>
+        {% for row in rows %}
+        <tr>
+            <th>{{ row.name }}</th>
+            {% for value in row.values %}
+            <td>{{ value }}</td>
+            {% endfor %}
+            <td>{{ row.overall }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+    <tfooter>
+        <tr>
+            <th>OVERALL</th>
+        {% for col_overall in col_overalls %}
+            <td>{{ col_overall }}</td>
+        {% endfor %}
+            <td>{{ overall }}</td>
+        </tr>
+    </tfooter>
+</table>

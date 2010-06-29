@@ -8,10 +8,12 @@ cube.base.BaseCube class index.html
 cube.base.BaseCube.measure method index.html
 cube.base.BaseCube.measure_list method index.html
 cube.base.BaseCube.constrain method index.html
+cube.base.Cube.reset_queryset method index.html
 cube.templatetags.cube_templatetags.get_constraint function index.html
 cube.base.BaseCube.measure_dict method index.html
 cube.base.BaseCube.subcubes method index.html
 cube.templatetags.cube_templatetags.do_subcubes function index.html
 cube.base.BaseCube.resample method index.html
 cube.base.BaseCube.get_sample_space method index.html
+cube.templatetags.cube_templatetags.do_tablefromcube function index.html
 cube.base.Cube class index.html

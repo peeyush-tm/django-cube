@@ -170,7 +170,6 @@ class BaseCube(object):
             ...
             ...     },
             ... }
-
         """
         full = kwargs.setdefault('full', True)
         returned_dict = {}
