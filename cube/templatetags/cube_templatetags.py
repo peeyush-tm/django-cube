@@ -1,16 +1,155 @@
 import re
 
-from django.template import Node, NodeList, TemplateSyntaxError, Library, Variable
+from django.template import Node, NodeList, TemplateSyntaxError, Library, Variable, Context
+from django.template.loader  import get_template
+from django.conf import settings
 
 register = Library()
 
 
-class PlaneNode(Node):
-    def __init__(self):
-        pass
+class TableFromCubeNode(Node):
+    def __init__(self, cube, dimensions, filepath):
+        self.filepath = filepath
+        self.dimensions, self.cube = dimensions, cube
+
+    @staticmethod
+    def build_context(cube, dimensions):
+        col_names = []
+        row_names = []
+        cols = []
+        rows = []
+        row_overalls = []
+        col_overalls = []
+        overall = None
+
+        coltable_dict = cube.measure_dict(dimensions[0], dimensions[1])
+        rowtable_dict = cube.measure_dict(dimensions[1], dimensions[0])
+
+        #columns variables in the context
+        for col_name, col_dict in coltable_dict['subcubes'].iteritems():
+            col_names.append(col_name)
+            col_overalls.append(col_dict['measure'])
+            col = {'values': [], 'overall': col_dict['measure'], 'name': col_name}
+            for row_name, cell_dict in col_dict['subcubes'].iteritems():
+                col['values'].append(cell_dict['measure'])
+            cols.append(col)
+        #rows variables in the context
+        for row_name, row_dict in rowtable_dict['subcubes'].iteritems():
+            row_names.append(row_name)
+            row_overalls.append(row_dict['measure'])
+            row = {'values': [], 'overall': row_dict['measure'], 'name': row_name}
+            for col_name, cell_dict in row_dict['subcubes'].iteritems():
+                row['values'].append(cell_dict['measure'])
+            rows.append(row)
+        #context dict
+        return {
+            'col_names': col_names,
+            'row_names': row_names,
+            'cols': cols,
+            'rows': rows,
+            'row_overalls': row_overalls,
+            'col_overalls': col_overalls,
+            'overall': cube.measure()
+        }
+
+    def render(self, context):
+
+        #resolve filename
+        matched = re.match('(?P<quote>"|\')(?P<literal>\w+)(?P=quote)', self.filepath)
+        if matched:
+            filepath = matched.group('literal')
+        else:
+            try:
+                filepath = Variable(self.filepath).resolve(context)
+            except VariableDoesNotExist:
+                if settings.DEBUG:
+                    return "[couldn't resolve file path]"
+                else:
+                    return ''
+        
+        #resolve cube from context
+        try:
+            cube = self.cube.resolve(context, False)
+        except VariableDoesNotExist:
+            if settings.DEBUG:
+                return "[couldn't resolve cube]"
+            else:
+                return ''
+
+        #resolve dimensions
+        dimensions = []
+        for dimension in self.dimensions:
+            matched = re.match('(?P<quote>"|\')(?P<literal>\w+)(?P=quote)', dimension)
+            if matched:
+                dimensions.append(matched.group('literal'))
+            else:
+                try:
+                    dimensions.append(Variable(dimension).resolve(context))
+                except VariableDoesNotExist:
+                    if settings.DEBUG:
+                        return "[couldn't resolve dimension]"
+                    else:
+                        return ''
+
+        #build context
+        try:
+            context_dict = self.build_context(cube, dimensions)
+        except ValueError as e:
+            if settings.DEBUG:
+                return "[%s]" % e
+            else:
+                return ''
+
+        #rendering template
+        try:
+            t = get_template(filepath)
+            c = Context(context_dict)
+            return t.render(c)
+        except TemplateSyntaxError, e:
+            if settings.TEMPLATE_DEBUG:
+                raise
+            return ''
+        except:
+            return '' # Fail silently for invalid included templates.
+
+
+def do_tablefromcube(parser, token):
+    """
+    Inclusion tag to render a table using a defined template. Usage : ::
     
-    def render(self):
-        pass
+        {% tablefromcube <cube> by <dimension1>, <dimension2> using <template_name> %}
+
+    For example : ::
+    
+        {% tablefromcube my_cube by some_dimension, "some_other_dimension" using "mytable.html" %}
+    """
+    bits = token.contents.split()
+
+    tagname = bits[0]
+    by_index = 2
+    using_index = 5
+    filepath_index = -1
+
+    if not len(bits) == 7:
+        raise TemplateSyntaxError("'%s' tag should have seven words: %s" % (tagname, token.contents))
+    
+    if not bits[by_index] == 'by' or not bits[using_index] == 'using':
+        raise TemplateSyntaxError("'%s' invalid syntax, 'by' or 'using'"
+                                  "not at the expected position %s" % (tagname, token.contents))
+
+    #trim the spaces around comas, and then split the list to have all the dimensions
+    dimensions = re.sub(r' *, *', ',', ' '.join(bits[by_index + 1:using_index])).split(',')
+    for dim in dimensions:
+        if not dim or ' ' in dim:
+            raise TemplateSyntaxError("'%s' tag received an invalid argument:"
+                                      " %s" % (tagname, token.contents))
+
+    #turns the cube argument into a template.Variable
+    cube = parser.compile_filter(bits[1])
+
+    return TableFromCubeNode(cube, dimensions, bits[filepath_index])
+do_tablefromcube = register.tag('tablefromcube', do_tablefromcube)
+
 
 class SubcubesNode(Node):
 
@@ -41,7 +180,10 @@ class SubcubesNode(Node):
             if matched:
                 dimensions.append(matched.group('literal'))
             else:
-                dimensions.append(Variable(dimension).resolve(context))
+                try:
+                    dimensions.append(Variable(dimension).resolve(context))
+                except VariableDoesNotExist:
+                    return ''
 
         #loop subcubes and render nodes
         nodelist = NodeList()
@@ -52,11 +194,6 @@ class SubcubesNode(Node):
 
         return nodelist.render(context)
 
-def do_plane(parser, token):
-    """
-    {% plane <cube> by <dimension1> <dimension2> as <my_plane> %}
-    {{  }}
-    """
 
 def do_subcubes(parser, token):
     """

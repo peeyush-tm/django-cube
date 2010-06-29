@@ -169,20 +169,28 @@
 </div>
 <p>Then, let&#8217;s iterate over the cube&#8217;s subcubes, calculating the measures for all subcube possible :</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">c</span><span class="o">.</span><span class="n">measure_dict</span><span class="p">(</span><span class="s">&#39;firstname&#39;</span><span class="p">,</span> <span class="s">&#39;instrument__name&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="p">{</span>
-<span class="gp">... </span>    <span class="s">&#39;Bill&#39;</span><span class="p">:</span> <span class="p">{</span>
-<span class="gp">... </span>        <span class="s">&#39;piano&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s">&#39;measure&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">},</span>
-<span class="gp">... </span>        <span class="s">&#39;trumpet&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s">&#39;measure&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">},</span>
-<span class="gp">... </span>        <span class="s">&#39;measure&#39;</span><span class="p">:</span> <span class="mi">2</span>
-<span class="gp">... </span>    <span class="p">},</span>
-<span class="gp">... </span>    <span class="s">&#39;Miles&#39;</span><span class="p">:</span> <span class="p">{</span>
-<span class="gp">... </span>        <span class="s">&#39;piano&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s">&#39;measure&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">},</span>
-<span class="gp">... </span>        <span class="s">&#39;trumpet&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s">&#39;measure&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">},</span>
-<span class="gp">... </span>        <span class="s">&#39;measure&#39;</span><span class="p">:</span> <span class="mi">1</span>
-<span class="gp">... </span>    <span class="p">},</span>
-<span class="gp">... </span>    <span class="s">&#39;Philly&#39;</span><span class="p">:</span> <span class="p">{</span>
-<span class="gp">... </span>        <span class="s">&#39;piano&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s">&#39;measure&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">},</span>
-<span class="gp">... </span>        <span class="s">&#39;trumpet&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s">&#39;measure&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">},</span>
-<span class="gp">... </span>        <span class="s">&#39;measure&#39;</span><span class="p">:</span> <span class="mi">0</span>
+<span class="gp">... </span>    <span class="s">&#39;subcubes&#39;</span><span class="p">:</span> <span class="p">{</span>
+<span class="gp">... </span>        <span class="s">&#39;Bill&#39;</span><span class="p">:</span> <span class="p">{</span>
+<span class="gp">... </span>            <span class="s">&#39;subcubes&#39;</span><span class="p">:</span> <span class="p">{</span>
+<span class="gp">... </span>                <span class="s">&#39;piano&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s">&#39;measure&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">},</span>
+<span class="gp">... </span>                <span class="s">&#39;trumpet&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s">&#39;measure&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">},</span>
+<span class="gp">... </span>            <span class="p">},</span>
+<span class="gp">... </span>            <span class="s">&#39;measure&#39;</span><span class="p">:</span> <span class="mi">2</span>
+<span class="gp">... </span>        <span class="p">},</span>
+<span class="gp">... </span>        <span class="s">&#39;Miles&#39;</span><span class="p">:</span> <span class="p">{</span>
+<span class="gp">... </span>            <span class="s">&#39;subcubes&#39;</span><span class="p">:</span> <span class="p">{</span>
+<span class="gp">... </span>                <span class="s">&#39;piano&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s">&#39;measure&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">},</span>
+<span class="gp">... </span>                <span class="s">&#39;trumpet&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s">&#39;measure&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">},</span>
+<span class="gp">... </span>            <span class="p">},</span>
+<span class="gp">... </span>            <span class="s">&#39;measure&#39;</span><span class="p">:</span> <span class="mi">1</span>
+<span class="gp">... </span>        <span class="p">},</span>
+<span class="gp">... </span>        <span class="s">&#39;Philly&#39;</span><span class="p">:</span> <span class="p">{</span>
+<span class="gp">... </span>            <span class="s">&#39;subcubes&#39;</span><span class="p">:</span> <span class="p">{</span>
+<span class="gp">... </span>                <span class="s">&#39;piano&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s">&#39;measure&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">},</span>
+<span class="gp">... </span>                <span class="s">&#39;trumpet&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s">&#39;measure&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">},</span>
+<span class="gp">... </span>            <span class="p">},</span>
+<span class="gp">... </span>            <span class="s">&#39;measure&#39;</span><span class="p">:</span> <span class="mi">0</span>
+<span class="gp">... </span>        <span class="p">}</span>
 <span class="gp">... </span>    <span class="p">},</span>
 <span class="gp">... </span>    <span class="s">&#39;measure&#39;</span><span class="p">:</span> <span class="mi">6</span>
 <span class="gp">... </span><span class="p">}</span>
@@ -325,27 +333,26 @@
 </pre></div>
 </div>
 <p>Here&#8217;s how to use the template tag <em>subcubes</em> to iterate over subcubes :</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">context</span> <span class="o">=</span> <span class="n">Context</span><span class="p">({</span><span class="s">&#39;my_cube&#39;</span><span class="p">:</span> <span class="n">c</span><span class="p">})</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">context</span> <span class="o">=</span> <span class="n">Context</span><span class="p">({</span><span class="s">&#39;my_cube&#39;</span><span class="p">:</span> <span class="n">c</span><span class="p">,</span> <span class="s">&#39;dim1&#39;</span><span class="p">:</span> <span class="s">&#39;firstname&#39;</span><span class="p">})</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">template</span> <span class="o">=</span> <span class="n">Template</span><span class="p">(</span>
-<span class="gp">... </span><span class="s">&#39;{</span><span class="si">% lo</span><span class="s">ad cube_templatetags %}&#39;</span>
-<span class="gp">... </span><span class="s">&#39;{</span><span class="si">% s</span><span class="s">ubcubes my_cube by firstname, instrument__name as subcube1 %}&#39;</span>
-<span class="gp">... </span><span class="s">&#39;   {{ subcube1 }}:{{ subcube1.measure }}&#39;</span>
-<span class="gp">... </span><span class="s">&#39;   {</span><span class="si">% s</span><span class="s">ubcubes subcube1 by lastname as subcube2 %}&#39;</span>
-<span class="gp">... </span><span class="s">&#39;      {{ subcube2 }}:{{ subcube2.measure }}&#39;</span>
-<span class="gp">... </span><span class="s">&#39;   {</span><span class="si">% e</span><span class="s">ndsubcubes %}&#39;</span>
-<span class="gp">... </span><span class="s">&#39;{</span><span class="si">% e</span><span class="s">ndsubcubes %}&#39;</span>
+<span class="gp">... </span>    <span class="s">&#39;{</span><span class="si">% lo</span><span class="s">ad cube_templatetags %}&#39;</span>
+<span class="gp">... </span>    <span class="s">&#39;{</span><span class="si">% s</span><span class="s">ubcubes my_cube by dim1, &quot;instrument__name&quot; as subcube1 %}&#39;</span>
+<span class="gp">... </span>        <span class="s">&#39;{{ subcube1 }}:{{ subcube1.measure }}&#39;</span>
+<span class="gp">... </span>        <span class="s">&#39;{</span><span class="si">% s</span><span class="s">ubcubes subcube1 by &quot;lastname&quot; as subcube2 %}&#39;</span>
+<span class="gp">... </span>            <span class="s">&#39;{{ subcube2 }}:{{ subcube2.measure }}&#39;</span>
+<span class="gp">... </span>        <span class="s">&#39;{</span><span class="si">% e</span><span class="s">ndsubcubes %}&#39;</span>
+<span class="gp">... </span>    <span class="s">&#39;{</span><span class="si">% e</span><span class="s">ndsubcubes %}&#39;</span>
 <span class="gp">... </span><span class="p">)</span>
 </pre></div>
 </div>
 <p>Here is what the rendering gives :</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">awaited</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="s">&#39; &#39;</span><span class="p">,</span> <span class="s">&#39;&#39;</span><span class="p">,</span> <span class="s">&#39;&#39;</span>
-<span class="gp">... </span><span class="s">&#39;   Cube(lastname, firstname=Miles, instrument__name=piano):0&#39;</span>
-<span class="gp">... </span><span class="s">&#39;      Cube(firstname=Miles, instrument__name=piano, lastname=Davis):0&#39;</span>
-<span class="gp">... </span><span class="s">&#39;      Cube(firstname=Miles, instrument__name=piano, lastname=Evans):0&#39;</span>
-<span class="gp">... </span><span class="s">&#39;   Cube(lastname, firstname=Miles, instrument__name=trumpet):1&#39;</span>
-<span class="gp">... </span><span class="s">&#39;      Cube(firstname=Miles, instrument__name=trumpet, lastname=Davis):1&#39;</span>
-<span class="gp">... </span><span class="s">&#39;      Cube(firstname=Miles, instrument__name=trumpet, lastname=Evans):0&#39;</span>
-<span class="gp">... </span><span class="p">)</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">awaited</span> <span class="o">=</span> <span class="s">&#39;&#39;</span>\
+<span class="gp">... </span>    <span class="s">&#39;Cube(lastname, firstname=Miles, instrument__name=piano):0&#39;</span>\
+<span class="gp">... </span>        <span class="s">&#39;Cube(firstname=Miles, instrument__name=piano, lastname=Davis):0&#39;</span>\
+<span class="gp">... </span>        <span class="s">&#39;Cube(firstname=Miles, instrument__name=piano, lastname=Evans):0&#39;</span>\
+<span class="gp">... </span>    <span class="s">&#39;Cube(lastname, firstname=Miles, instrument__name=trumpet):1&#39;</span>\
+<span class="gp">... </span>        <span class="s">&#39;Cube(firstname=Miles, instrument__name=trumpet, lastname=Davis):1&#39;</span>\
+<span class="gp">... </span>        <span class="s">&#39;Cube(firstname=Miles, instrument__name=trumpet, lastname=Evans):0&#39;</span>
 </pre></div>
 </div>
 </div>
@@ -364,6 +371,58 @@
 <span class="go">u&#39;&gt;FUNKY&lt;sax&gt;FUNKY&lt;&#39;</span>
 </pre></div>
 </div>
+</div>
+<div class="section" id="insert-a-table">
+<h3>Insert a table<a class="headerlink" href="#insert-a-table" title="Permalink to this headline">¶</a></h3>
+<p>Let&#8217;s create a cube</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">c</span> <span class="o">=</span> <span class="n">Cube</span><span class="p">([</span><span class="s">&#39;firstname&#39;</span><span class="p">,</span> <span class="s">&#39;lastname&#39;</span><span class="p">,</span> <span class="s">&#39;instrument__name&#39;</span><span class="p">],</span> <span class="n">Musician</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">all</span><span class="p">(),</span> <span class="nb">len</span><span class="p">,</span> <span class="n">sample_space</span><span class="o">=</span><span class="p">{</span>
+<span class="gp">... </span>    <span class="s">&#39;firstname&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s">&#39;Miles&#39;</span><span class="p">],</span>
+<span class="gp">... </span>    <span class="s">&#39;instrument__name&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s">&#39;trumpet&#39;</span><span class="p">,</span> <span class="s">&#39;piano&#39;</span><span class="p">],</span>
+<span class="gp">... </span>    <span class="s">&#39;lastname&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s">&#39;Davis&#39;</span><span class="p">,</span> <span class="s">&#39;Evans&#39;</span><span class="p">]</span>
+<span class="gp">... </span><span class="p">})</span>
+</pre></div>
+</div>
+<p>Here&#8217;s how to use the inclusion tag <em>tablefromcube</em> to insert a table in your template :</p>
+<blockquote>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">context</span> <span class="o">=</span> <span class="n">Context</span><span class="p">({</span><span class="s">&#39;my_cube&#39;</span><span class="p">:</span> <span class="n">c</span><span class="p">,</span> <span class="s">&#39;dim1&#39;</span><span class="p">:</span> <span class="s">&#39;firstname&#39;</span><span class="p">,</span> <span class="s">&#39;template_name&#39;</span><span class="p">:</span> <span class="s">&#39;tablefromcube.html&#39;</span><span class="p">})</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">template</span> <span class="o">=</span> <span class="n">Template</span><span class="p">(</span>
+<span class="gp">... </span><span class="s">&#39;{</span><span class="si">% lo</span><span class="s">ad cube_templatetags %}&#39;</span>
+<span class="gp">... </span><span class="s">&#39;{% tablefromcube my_cube by dim1, &quot;instrument__name&quot; using template_name %}&#39;</span>
+<span class="gp">... </span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">awaited</span> <span class="o">=</span> <span class="s">&#39;&#39;</span>\
+<span class="gp">... </span><span class="s">&#39;&lt;table&gt;&#39;</span>\
+<span class="gp">... </span>    <span class="s">&#39;&lt;theader&gt;&#39;</span>\
+<span class="gp">... </span>        <span class="s">&#39;&lt;tr&gt;&#39;</span>\
+<span class="gp">... </span>            <span class="s">&#39;&lt;th&gt;&lt;/th&gt;&#39;</span>\
+<span class="gp">... </span>            <span class="s">&#39;&lt;th&gt;Miles&lt;/th&gt;&#39;</span>\
+<span class="gp">... </span>            <span class="s">&#39;&lt;th&gt;OVERALL&lt;/th&gt;&#39;</span>\
+<span class="gp">... </span>        <span class="s">&#39;&lt;/tr&gt;&#39;</span>\
+<span class="gp">... </span>    <span class="s">&#39;&lt;/theader&gt;&#39;</span>\
+<span class="gp">... </span>    <span class="s">&#39;&lt;tbody&gt;&#39;</span>\
+<span class="gp">... </span>        <span class="s">&#39;&lt;tr&gt;&#39;</span>\
+<span class="gp">... </span>            <span class="s">&#39;&lt;th&gt;piano&lt;/th&gt;&#39;</span>\
+<span class="gp">... </span>            <span class="s">&#39;&lt;td&gt;0&lt;/td&gt;&#39;</span>\
+<span class="gp">... </span>            <span class="s">&#39;&lt;td&gt;3&lt;/td&gt;&#39;</span>\
+<span class="gp">... </span>        <span class="s">&#39;&lt;/tr&gt;&#39;</span>\
+<span class="gp">... </span>        <span class="s">&#39;&lt;tr&gt;&#39;</span>\
+<span class="gp">... </span>            <span class="s">&#39;&lt;th&gt;trumpet&lt;/th&gt;&#39;</span>\
+<span class="gp">... </span>            <span class="s">&#39;&lt;td&gt;1&lt;/td&gt;&#39;</span>\
+<span class="gp">... </span>            <span class="s">&#39;&lt;td&gt;2&lt;/td&gt;&#39;</span>\
+<span class="gp">... </span>        <span class="s">&#39;&lt;/tr&gt;&#39;</span>\
+<span class="gp">... </span>    <span class="s">&#39;&lt;/tbody&gt;&#39;</span>\
+<span class="gp">... </span>    <span class="s">&#39;&lt;tfooter&gt;&#39;</span>\
+<span class="gp">... </span>        <span class="s">&#39;&lt;tr&gt;&#39;</span>\
+<span class="gp">... </span>            <span class="s">&#39;&lt;th&gt;OVERALL&lt;/th&gt;&#39;</span>\
+<span class="gp">... </span>            <span class="s">&#39;&lt;td&gt;1&lt;/td&gt;&#39;</span>\
+<span class="gp">... </span>            <span class="s">&#39;&lt;td&gt;6&lt;/td&gt;&#39;</span>\
+<span class="gp">... </span>        <span class="s">&#39;&lt;/tr&gt;&#39;</span>\
+<span class="gp">... </span>    <span class="s">&#39;&lt;/tfooter&gt;&#39;</span>\
+<span class="gp">... </span><span class="s">&#39;&lt;/table&gt;&#39;</span>
+</pre></div>
+</div>
+</blockquote>
 </div>
 </div>
 </div>
@@ -394,7 +453,7 @@
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field"><th class="field-name">Returns:</th><td class="field-body">set &#8211; The sample space of <em>dimension</em> for the calling cube.</td>
+<tr class="field"><th class="field-name">Returns:</th><td class="field-body">list &#8211; The sorted sample space of <em>dimension</em> for the calling cube.</td>
 </tr>
 </tbody>
 </table>
@@ -415,15 +474,19 @@
 <tt class="descname">measure_dict</tt><big>(</big><em>*free_dimensions</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#cube.base.BaseCube.measure_dict" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns a multidimensionnal dictionnary of measures from the cube, structured following <em>free_dimensions</em>. For example :</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">cube</span><span class="p">([</span><span class="s">&#39;dim1&#39;</span><span class="p">,</span> <span class="s">&#39;dim2&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">measures_dict</span><span class="p">(</span><span class="s">&#39;dim2&#39;</span><span class="p">,</span> <span class="s">&#39;dim1&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="p">{</span>
-<span class="gp">... </span>    <span class="n">dim2_val1</span><span class="p">:</span> <span class="p">{</span>
-<span class="gp">... </span>        <span class="n">dim1_val1</span><span class="p">:</span> <span class="p">{</span><span class="s">&#39;measure&#39;</span><span class="p">:</span> <span class="n">measure1_1</span><span class="p">},</span>
+<span class="gp">... </span>    <span class="s">&#39;subcubes&#39;</span><span class="p">:</span> <span class="p">{</span>
+<span class="gp">... </span>        <span class="n">dim2_val1</span><span class="p">:</span> <span class="p">{</span>
+<span class="gp">... </span>            <span class="s">&#39;subcubes&#39;</span><span class="p">:</span> <span class="p">{</span>
+<span class="gp">... </span>                <span class="n">dim1_val1</span><span class="p">:</span> <span class="p">{</span><span class="s">&#39;measure&#39;</span><span class="p">:</span> <span class="n">measure1_1</span><span class="p">},</span>
 <span class="gp">...</span>
-<span class="gp">... </span>        <span class="n">dim1_valN</span><span class="p">:</span> <span class="p">{</span><span class="s">&#39;measure&#39;</span><span class="p">:</span> <span class="n">measure1_N</span><span class="p">},</span>
-<span class="gp">... </span>        <span class="s">&#39;measure&#39;</span><span class="p">:</span> <span class="n">measure1</span>
-<span class="gp">... </span>    <span class="p">},</span>
+<span class="gp">... </span>                <span class="n">dim1_valN</span><span class="p">:</span> <span class="p">{</span><span class="s">&#39;measure&#39;</span><span class="p">:</span> <span class="n">measure1_N</span><span class="p">},</span>
+<span class="gp">... </span>            <span class="p">},</span>
+<span class="gp">... </span>            <span class="s">&#39;measure&#39;</span><span class="p">:</span> <span class="n">measure1</span>
+<span class="gp">... </span>        <span class="p">},</span>
 <span class="gp">... </span>
-<span class="gp">... </span>    <span class="n">dim2_valN</span><span class="p">:</span> <span class="p">{</span>
+<span class="gp">... </span>        <span class="n">dim2_valN</span><span class="p">:</span> <span class="p">{</span>
 <span class="gp">...</span>
+<span class="gp">... </span>        <span class="p">},</span>
 <span class="gp">... </span>    <span class="p">},</span>
 <span class="gp">... </span>    <span class="s">&#39;measure&#39;</span><span class="p">:</span> <span class="n">measure</span>
 <span class="gp">... </span><span class="p">}</span>
@@ -463,7 +526,7 @@
 <dt id="cube.base.BaseCube.resample">
 <tt class="descname">resample</tt><big>(</big><em>dimension</em>, <em>lbound=None</em>, <em>ubound=None</em>, <em>space=None</em><big>)</big><a class="headerlink" href="#cube.base.BaseCube.resample" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns a copy of the calling cube, whose sample space of <em>dimension</em> is limited to :</p>
-<div class="highlight-python"><pre>*space* INTER [*lbound*, *ubound*]</pre>
+<div class="highlight-python"><pre>&lt;space&gt; INTER [&lt;lbound&gt;, &lt;ubound&gt;]</pre>
 </div>
 <p>If <em>space</em> is not defined, the sample space of the calling cube&#8217;s <em>dimension</em> is taken instead.</p>
 </dd></dl>
@@ -477,7 +540,7 @@
 <span class="gp">... </span>    <span class="s">&#39;instrument&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s">&#39;Trumpet&#39;</span><span class="p">],</span>
 <span class="gp">... </span>    <span class="s">&#39;age&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mi">14</span><span class="p">,</span> <span class="mi">89</span><span class="p">],</span>
 <span class="gp">... </span><span class="p">}</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">Cube</span><span class="p">([</span><span class="s">&#39;name&#39;</span><span class="p">,</span> <span class="s">&#39;instrument&#39;</span><span class="p">,</span> <span class="s">&#39;age&#39;</span><span class="p">],</span> <span class="nb">len</span><span class="p">,</span> <span class="n">sample_space</span><span class="o">=</span><span class="n">sample_space</span><span class="p">)</span><span class="o">.</span><span class="n">subcubes</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Cube</span><span class="p">([</span><span class="s">&#39;name&#39;</span><span class="p">,</span> <span class="s">&#39;instrument&#39;</span><span class="p">,</span> <span class="s">&#39;age&#39;</span><span class="p">],</span> <span class="nb">len</span><span class="p">,</span> <span class="n">sample_space</span><span class="o">=</span><span class="n">sample_space</span><span class="p">)</span><span class="o">.</span><span class="n">subcubes</span><span class="p">(</span><span class="s">&#39;name&#39;</span><span class="p">,</span> <span class="s">&#39;instrument&#39;</span><span class="p">)</span>
 <span class="go">[Cube(age, name=&#39;John&#39;, instrument=&#39;Trumpet&#39;), Cube(age, name=&#39;Jack&#39;, instrument=&#39;Trumpet&#39;)]</span>
 </pre></div>
 </div>
@@ -489,7 +552,13 @@
 <dl class="class">
 <dt id="cube.base.Cube">
 <em class="property">class </em><tt class="descclassname">cube.base.</tt><tt class="descname">Cube</tt><big>(</big><em>dimensions</em>, <em>queryset</em>, <em>aggregation</em>, <em>constraint={}</em>, <em>sample_space={}</em><big>)</big><a class="headerlink" href="#cube.base.Cube" title="Permalink to this definition">¶</a></dt>
-<dd>A cube that can calculate lists of measures for a queryset, on several dimensions.</dd></dl>
+<dd><p>A cube that calculates measures on a Django queryset.</p>
+<dl class="method">
+<dt id="cube.base.Cube.reset_queryset">
+<tt class="descname">reset_queryset</tt><big>(</big><em>new_queryset</em><big>)</big><a class="headerlink" href="#cube.base.Cube.reset_queryset" title="Permalink to this definition">¶</a></dt>
+<dd>Returns a copy of the calling cube, whose queryset is <em>new_queryset</em></dd></dl>
+
+</dd></dl>
 
 </div>
 <div class="section" id="module-cube.templatetags.cube_templatetags">
@@ -504,10 +573,10 @@
 </div>
 <p>Example :</p>
 <div class="highlight-python"><pre>&lt;ul&gt;
-{% subcubes musician_cube by name, instrument as m_subcube %}
+{% subcubes musician_cube by , dim1 "instrument" as m_subcube %}
         &lt;li&gt; {{ m_subcube|getconstraint:"instrument" }}
         &lt;ul&gt;
-            {% subcubes m_subcube by name as i_subcube %}
+            {% subcubes m_subcube by "name" as i_subcube %}
             &lt;li&gt;{{ i_subcube|getconstraint:"name" }} : {{ i_subcube.measure }}&lt;/li&gt;
             {% endfor %}
         &lt;/ul&gt;
@@ -523,6 +592,17 @@
 * Saxophone
     - Jean-michel : 10
     ...</pre>
+</div>
+</dd></dl>
+
+<dl class="function">
+<dt id="cube.templatetags.cube_templatetags.do_tablefromcube">
+<tt class="descclassname">cube.templatetags.cube_templatetags.</tt><tt class="descname">do_tablefromcube</tt><big>(</big><em>parser</em>, <em>token</em><big>)</big><a class="headerlink" href="#cube.templatetags.cube_templatetags.do_tablefromcube" title="Permalink to this definition">¶</a></dt>
+<dd><p>Inclusion tag to render a table using a defined template. Usage :</p>
+<div class="highlight-python"><pre>{% tablefromcube &lt;cube&gt; by &lt;dimension1&gt;, &lt;dimension2&gt; using &lt;template_name&gt; %}</pre>
+</div>
+<p>For example :</p>
+<div class="highlight-python"><pre>{% tablefromcube my_cube by some_dimension, "some_other_dimension" using "mytable.html" %}</pre>
 </div>
 </dd></dl>
 
@@ -562,6 +642,7 @@
 <li><a class="reference external" href="#template-tags">Template tags</a><ul>
 <li><a class="reference external" href="#id1">Iterating over cube&#8217;s subcubes</a></li>
 <li><a class="reference external" href="#get-a-constraint-value">Get a constraint value</a></li>
+<li><a class="reference external" href="#insert-a-table">Insert a table</a></li>
 </ul>
 </li>
 </ul>

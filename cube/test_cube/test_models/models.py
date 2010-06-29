@@ -338,28 +338,27 @@ Here's how to use the template tag *subcubes* to iterate over subcubes :
 
     >>> context = Context({'my_cube': c, 'dim1': 'firstname'})
     >>> template = Template(
-    ... '{% load cube_templatetags %}'
-    ... '{% subcubes my_cube by dim1, "instrument__name" as subcube1 %}'
-    ... '   {{ subcube1 }}:{{ subcube1.measure }}'
-    ... '   {% subcubes subcube1 by "lastname" as subcube2 %}'
-    ... '      {{ subcube2 }}:{{ subcube2.measure }}'
-    ... '   {% endsubcubes %}'
-    ... '{% endsubcubes %}'
+    ...     '{% load cube_templatetags %}'
+    ...     '{% subcubes my_cube by dim1, "instrument__name" as subcube1 %}'
+    ...         '{{ subcube1 }}:{{ subcube1.measure }}'
+    ...         '{% subcubes subcube1 by "lastname" as subcube2 %}'
+    ...             '{{ subcube2 }}:{{ subcube2.measure }}'
+    ...         '{% endsubcubes %}'
+    ...     '{% endsubcubes %}'
     ... )
 
 Here is what the rendering gives :
 
-    >>> awaited = re.sub(' ', '', ''
-    ... '   Cube(lastname, firstname=Miles, instrument__name=piano):0'
-    ... '      Cube(firstname=Miles, instrument__name=piano, lastname=Davis):0'
-    ... '      Cube(firstname=Miles, instrument__name=piano, lastname=Evans):0'
-    ... '   Cube(lastname, firstname=Miles, instrument__name=trumpet):1'
-    ... '      Cube(firstname=Miles, instrument__name=trumpet, lastname=Davis):1'
-    ... '      Cube(firstname=Miles, instrument__name=trumpet, lastname=Evans):0'
-    ... )
+    >>> awaited = ''\\
+    ...     'Cube(lastname, firstname=Miles, instrument__name=piano):0'\\
+    ...         'Cube(firstname=Miles, instrument__name=piano, lastname=Davis):0'\\
+    ...         'Cube(firstname=Miles, instrument__name=piano, lastname=Evans):0'\\
+    ...     'Cube(lastname, firstname=Miles, instrument__name=trumpet):1'\\
+    ...         'Cube(firstname=Miles, instrument__name=trumpet, lastname=Davis):1'\\
+    ...         'Cube(firstname=Miles, instrument__name=trumpet, lastname=Evans):0'
 
 ..
-    >>> awaited == re.sub(' ', '', template.render(context))
+    >>> awaited == template.render(context)
     True
 
 
@@ -377,6 +376,74 @@ Get a constraint value
     ... )
     >>> template.render(context)
     u'>FUNKY<sax>FUNKY<'
+
+
+Insert a table
+----------------
+
+Let's create a cube
+
+    >>> c = Cube(['firstname', 'lastname', 'instrument__name'], Musician.objects.all(), len, sample_space={
+    ...     'firstname': ['Miles'],
+    ...     'instrument__name': ['trumpet', 'piano'],
+    ...     'lastname': ['Davis', 'Evans']
+    ... })
+
+..
+    >>> node = cube_templatetags.TableFromCubeNode(1, 2, 3)
+    >>> node.build_context(c, ['firstname', 'instrument__name']) == {
+    ...     'col_names': ['Miles'],
+    ...     'cols': [{'name': 'Miles', 'values': [0, 1], 'overall': 1}],
+    ...     'col_overalls': [1],
+    ...     'row_names': ['piano', 'trumpet'],
+    ...     'rows': [{'name': 'piano', 'values': [0], 'overall': 3}, {'name': 'trumpet', 'values': [1], 'overall': 2}],
+    ...     'row_overalls': [3, 2],
+    ...     'overall': 6
+    ...     }
+    True
+
+Here's how to use the inclusion tag *tablefromcube* to insert a table in your template :
+
+    >>> context = Context({'my_cube': c, 'dim1': 'firstname', 'template_name': 'tablefromcube.html'})
+    >>> template = Template(
+    ... '{% load cube_templatetags %}'
+    ... '{% tablefromcube my_cube by dim1, "instrument__name" using template_name %}'
+    ... )
+
+    >>> awaited = ''\\
+    ... '<table>'\\
+    ...     '<theader>'\\
+    ...         '<tr>'\\
+    ...             '<th></th>'\\
+    ...             '<th>Miles</th>'\\
+    ...             '<th>OVERALL</th>'\\
+    ...         '</tr>'\\
+    ...     '</theader>'\\
+    ...     '<tbody>'\\
+    ...         '<tr>'\\
+    ...             '<th>piano</th>'\\
+    ...             '<td>0</td>'\\
+    ...             '<td>3</td>'\\
+    ...         '</tr>'\\
+    ...         '<tr>'\\
+    ...             '<th>trumpet</th>'\\
+    ...             '<td>1</td>'\\
+    ...             '<td>2</td>'\\
+    ...         '</tr>'\\
+    ...     '</tbody>'\\
+    ...     '<tfooter>'\\
+    ...         '<tr>'\\
+    ...             '<th>OVERALL</th>'\\
+    ...             '<td>1</td>'\\
+    ...             '<td>6</td>'\\
+    ...         '</tr>'\\
+    ...     '</tfooter>'\\
+    ... '</table>'
+
+..
+    >>> awaited == re.sub(' |\\n', '', template.render(context))
+    True
+
 """
 
 from django.db import models
