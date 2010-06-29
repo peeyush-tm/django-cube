@@ -1,6 +1,6 @@
 import re
 
-from django.template import Node, NodeList, TemplateSyntaxError, Library
+from django.template import Node, NodeList, TemplateSyntaxError, Library, Variable
 
 register = Library()
 
@@ -21,39 +21,28 @@ class SubcubesNode(Node):
             yield node
 
     def render(self, context):
-        if 'subcubeloop' in context:
-            parentloop = context['subcubeloop']
-        else:
-            parentloop = {}
-        context.push()
-        
         #resolve cube from context
         try:
             cube = self.cube.resolve(context, False)
         except VariableDoesNotExist:
             return ''
 
-        nodelist = NodeList()
-        # Create a subcubeloop value in the context.  We'll update counters on each
-        # iteration just below.
-        loop_dict = context['subcubeloop'] = {'parentloop': parentloop}
-        #for i, subcube in enumerate(cube):
-        for subcube in cube.subcubes(*self.dimensions):
-            # Shortcuts for current loop iteration number.
-            #loop_dict['counter0'] = i
-            #loop_dict['counter'] = i+1
-            # Reverse counter iteration numbers.
-            #loop_dict['revcounter'] = len_values - i
-            #loop_dict['revcounter0'] = len_values - i - 1
-            # Boolean values designating first and last times through loop.
-            #loop_dict['first'] = (i == 0)
-            #loop_dict['last'] = (i == len_values - 1)
+        #resolve dimensions
+        dimensions = []
+        for dimension in self.dimensions:
+            matched = re.match('(?P<quote>"|\')(?P<literal>\w+)(?P=quote)', dimension)
+            if matched:
+                dimensions.append(matched.group('literal'))
+            else:
+                dimensions.append(Variable(dimension).resolve(context))
 
+        #loop subcubes and render nodes
+        nodelist = NodeList()
+        for subcube in cube.subcubes(*dimensions):
             context[self.subcube_var] = subcube
             for node in self.nodelist:
                 nodelist.append(node.render(context))
 
-        context.pop()
         return nodelist.render(context)
 
 
@@ -139,9 +128,5 @@ def get_constraint(cube, dimension):
 
 register.filter('getconstraint', get_constraint)
 
-def inspect_object(obj):
-    return obj.measure()
-    #return '///'.join([memb + " %s" % type(getattr(obj, memb)) for memb in dir(obj)])
 
-register.filter('my_super_unique_inspect', inspect_object)
 
