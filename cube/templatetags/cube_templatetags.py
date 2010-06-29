@@ -5,6 +5,13 @@ from django.template import Node, NodeList, TemplateSyntaxError, Library, Variab
 register = Library()
 
 
+class PlaneNode(Node):
+    def __init__(self):
+        pass
+    
+    def render(self):
+        pass
+
 class SubcubesNode(Node):
 
     def __init__(self, cube, dimensions, subcube_var, nodelist):
@@ -45,6 +52,11 @@ class SubcubesNode(Node):
 
         return nodelist.render(context)
 
+def do_plane(parser, token):
+    """
+    {% plane <cube> by <dimension1> <dimension2> as <my_plane> %}
+    {{  }}
+    """
 
 def do_subcubes(parser, token):
     """
@@ -57,10 +69,10 @@ def do_subcubes(parser, token):
     Example : ::
 
         <ul>
-        {% subcubes musician_cube by name, instrument as m_subcube %}
+        {% subcubes musician_cube by , dim1 "instrument" as m_subcube %}
                 <li> {{ m_subcube|getconstraint:"instrument" }}
                 <ul>
-                    {% subcubes m_subcube by name as i_subcube %}
+                    {% subcubes m_subcube by "name" as i_subcube %}
                     <li>{{ i_subcube|getconstraint:"name" }} : {{ i_subcube.measure }}</li>
                     {% endfor %}
                 </ul>

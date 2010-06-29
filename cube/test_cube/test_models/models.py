@@ -169,20 +169,28 @@ First let's resample the cube created before, to limit the number of iterations 
 Then, let's iterate over the cube's subcubes, calculating the measures for all subcube possible :
 
     >>> c.measure_dict('firstname', 'instrument__name') == {
-    ...     'Bill': {
-    ...         'piano': {'measure': 1},
-    ...         'trumpet': {'measure': 0},
-    ...         'measure': 2
-    ...     },
-    ...     'Miles': {
-    ...         'piano': {'measure': 0},
-    ...         'trumpet': {'measure': 1},
-    ...         'measure': 1
-    ...     },
-    ...     'Philly': {
-    ...         'piano': {'measure': 0},
-    ...         'trumpet': {'measure': 0},
-    ...         'measure': 0
+    ...     'subcubes': {
+    ...         'Bill': {
+    ...             'subcubes': {
+    ...                 'piano': {'measure': 1},
+    ...                 'trumpet': {'measure': 0},
+    ...             },
+    ...             'measure': 2
+    ...         },
+    ...         'Miles': {
+    ...             'subcubes': {
+    ...                 'piano': {'measure': 0},
+    ...                 'trumpet': {'measure': 1},
+    ...             },
+    ...             'measure': 1
+    ...         },
+    ...         'Philly': {
+    ...             'subcubes': {
+    ...                 'piano': {'measure': 0},
+    ...                 'trumpet': {'measure': 0},
+    ...             },
+    ...             'measure': 0
+    ...         }
     ...     },
     ...     'measure': 6
     ... }

@@ -140,15 +140,19 @@ class BaseCube(object):
         Returns a multidimensionnal dictionnary of measures from the cube, structured following *free_dimensions*. For example :
 
             >>> cube(['dim1', 'dim2']).measures_dict('dim2', 'dim1') == {
-            ...     dim2_val1: {
-            ...         dim1_val1: {'measure': measure1_1},
+            ...     'subcubes': {
+            ...         dim2_val1: {
+            ...             'subcubes': {
+            ...                 dim1_val1: {'measure': measure1_1},
             ...
-            ...         dim1_valN: {'measure': measure1_N},
-            ...         'measure': measure1
-            ...     },
+            ...                 dim1_valN: {'measure': measure1_N},
+            ...             },
+            ...             'measure': measure1
+            ...         },
             ... 
-            ...     dim2_valN: {
+            ...         dim2_valN: {
             ...
+            ...         },
             ...     },
             ...     'measure': measure
             ... }
@@ -167,7 +171,6 @@ class BaseCube(object):
             ...     },
             ... }
 
-        .. todo:: if key 'measure' is already in the dict ?
         """
         full = kwargs.setdefault('full', True)
         returned_dict = {}
@@ -175,11 +178,15 @@ class BaseCube(object):
         if free_dimensions:
             free_dimensions = list(free_dimensions)
             fixed_dimension = free_dimensions.pop(0)
+            subcubes_dict = {}
             for subcube in self.subcubes(fixed_dimension):
                 dim_value = subcube.constraint[fixed_dimension]
-                returned_dict[dim_value] = subcube.measure_dict(*free_dimensions, **kwargs)
+                subcubes_dict[dim_value] = subcube.measure_dict(*free_dimensions, **kwargs)
             if full:
                 returned_dict['measure'] = self.measure()
+                returned_dict['subcubes'] = subcubes_dict
+            else:
+                returned_dict = subcubes_dict
         else:
             returned_dict['measure'] = self.measure()
         return returned_dict
