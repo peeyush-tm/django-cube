@@ -1,6 +1,6 @@
 import re
 
-from django.template import Node, NodeList, TemplateSyntaxError, Library, Variable, Context
+from django.template import Node, NodeList, TemplateSyntaxError, Library, Variable, Context, VariableDoesNotExist
 from django.template.loader  import get_template
 from django.conf import settings
 
@@ -20,6 +20,8 @@ class TableFromCubeNode(Node):
         rows = []
         row_overalls = []
         col_overalls = []
+        col_dimension = dimensions[0]
+        row_dimension = dimensions[1]
         overall = None
 
         coltable_dict = cube.measure_dict(dimensions[0], dimensions[1])
@@ -49,6 +51,8 @@ class TableFromCubeNode(Node):
             'rows': rows,
             'row_overalls': row_overalls,
             'col_overalls': col_overalls,
+            'col_dimension': col_dimension,
+            'row_dimension': row_dimension,
             'overall': cube.measure()
         }
 
@@ -122,6 +126,18 @@ def do_tablefromcube(parser, token):
     For example : ::
     
         {% tablefromcube my_cube by some_dimension, "some_other_dimension" using "mytable.html" %}
+
+    The context with which this template is rendered contains the variables :
+
+        - col_names: list of column names
+        - row_names: list of row names
+        - cols: list of columns, as *[{'name': col_name, 'values': [measure1, measure2, , measureN], 'overall': col_overall}]*
+        - rows: list of columns, as *[{'name': row_name, 'values': [measure1, measure2, , measureN], 'overall': row_overall}]*
+        - row_overalls: list of measure on whole rows, therefore the measure is taken on the row dimension, with *row_name* as value
+        - col_overalls: list of measure on whole columns, therefore the measure is taken on the column dimension, with *col_name* as value
+        - col_dimension: the dimension on which the columns are calculated
+        - row_dimension: the dimension on which the rows are calculated
+        - overall: measure on the whole cube
     """
     bits = token.contents.split()
 

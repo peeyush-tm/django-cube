@@ -398,6 +398,8 @@ Let's create a cube
     ...     'row_names': ['piano', 'trumpet'],
     ...     'rows': [{'name': 'piano', 'values': [0], 'overall': 3}, {'name': 'trumpet', 'values': [1], 'overall': 2}],
     ...     'row_overalls': [3, 2],
+    ...     'col_dimension': 'firstname',
+    ...     'row_dimension': 'instrument__name',
     ...     'overall': 6
     ...     }
     True
