@@ -1,4 +1,5 @@
 import re
+import copy
 
 from django.template import Node, NodeList, TemplateSyntaxError, Library, Variable, Context, VariableDoesNotExist
 from django.template.loader  import get_template
@@ -97,7 +98,7 @@ class TableFromCubeNode(Node):
 
         #build context
         try:
-            context_dict = self.build_context(cube, dimensions)
+            extra_context = self.build_context(cube, dimensions)
         except ValueError as e:
             if settings.DEBUG:
                 return "[%s]" % e
@@ -106,8 +107,10 @@ class TableFromCubeNode(Node):
 
         #rendering template
         try:
+            new_context = copy.copy(context)
+            new_context.update(extra_context)
             t = get_template(filepath)
-            c = Context(context_dict)
+            c = Context(new_context)
             return t.render(c)
         except TemplateSyntaxError, e:
             if settings.TEMPLATE_DEBUG:
