@@ -433,13 +433,13 @@ Here's how to use the inclusion tag *tablefromcube* to insert a table in your te
     ...             '<td>2</td>'\\
     ...         '</tr>'\\
     ...     '</tbody>'\\
-    ...     '<tfooter>'\\
+    ...     '<tfoot>'\\
     ...         '<tr>'\\
     ...             '<th>OVERALL</th>'\\
     ...             '<td>1</td>'\\
     ...             '<td>6</td>'\\
     ...         '</tr>'\\
-    ...     '</tfooter>'\\
+    ...     '</tfoot>'\\
     ... '</table>'
 
 ..

@@ -256,7 +256,7 @@ class Cube(BaseCube):
     """
     A cube that calculates measures on a Django queryset.
     """
-    def __init__(self, dimensions, queryset, aggregation, constraint={}, sample_space={}, measure_none=0.0):
+    def __init__(self, dimensions, queryset, aggregation, constraint={}, sample_space={}, measure_none=0):
         """
         :param dimensions: a list of attribute names which represent the free dimensions of the cube. All Django nested field lookups are allowed. For example on a model `Person`, a possible dimension would be `mother__birth_date__in`, where `mother` would (why not?!) be foreign key to another person. You can also use two special lookups: *absmonth* and *absday* which both take :class:`datetime` or :class:`date`, and represent absolute months or days. E.g. To search for November 1986, you would have to use *'date__month=11, date__year=1986'*, instead you can just use *'date__absmonth=date(1986, 11, 1)'*.
         :param queryset: the base queryset from which the cube's sample space will be extracted.
