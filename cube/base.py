@@ -177,7 +177,7 @@ class BaseCube(object):
         if free_dimensions:
             free_dimensions = list(free_dimensions)
             fixed_dimension = free_dimensions.pop(0)
-            subcubes_dict = {}
+            subcubes_dict = odict()
             for subcube in self.subcubes(fixed_dimension):
                 dim_value = subcube.constraint[fixed_dimension]
                 subcubes_dict[dim_value] = subcube.measure_dict(*free_dimensions, **kwargs)
