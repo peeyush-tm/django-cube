@@ -27,7 +27,7 @@ from django.core.exceptions import FieldError
 from django.db.models import ForeignKey
 from django.db.models.sql import constants
 
-from collections import defaultdict
+from .utils import odict
 
 
 class BaseCube(object):
@@ -137,7 +137,7 @@ class BaseCube(object):
 
     def measure_dict(self, *free_dimensions, **kwargs):
         """
-        Returns a multidimensionnal dictionnary of measures from the cube, structured following *free_dimensions*. For example :
+        Returns an ordered dictionnary of measures from the cube, structured following *free_dimensions*. For example :
 
             >>> cube(['dim1', 'dim2']).measures_dict('dim2', 'dim1') == {
             ...     'subcubes': {
@@ -172,7 +172,7 @@ class BaseCube(object):
             ... }
         """
         full = kwargs.setdefault('full', True)
-        returned_dict = {}
+        returned_dict = odict()
         #if free dimensions, we have to fix one, and iterate over the subcubes. 
         if free_dimensions:
             free_dimensions = list(free_dimensions)
