@@ -24,7 +24,7 @@ import copy
 from datetime import date, datetime
 
 from django.core.exceptions import FieldError
-from django.db.models import ForeignKey
+from django.db.models import ForeignKey, FieldDoesNotExist
 from django.db.models.sql import constants
 
 from .utils import odict
@@ -302,12 +302,17 @@ class Cube(BaseCube):
         lookup_list = re.split('__', dimension)
 
         if len(lookup_list) == 1:
-            field = self.queryset.model._meta.get_field_by_name(lookup_list[0])[0]
+            key = lookup_list[0]
+            try:
+                field = self.queryset.model._meta.get_field_by_name(key)[0]
+            except FieldDoesNotExist:
+                raise ValueError("invalid dimension '%s', because '%s' is an invalid field name for %s"\
+                    % (dimension, key, self.queryset.model))
             #if ForeignKey, we get all distinct objects of foreign model
             if type(field) == ForeignKey:
                 sample_space = field.related.parent_model.objects.distinct()
             else:
-                sample_space = self.queryset.values_list(lookup_list[0], flat=True).distinct()
+                sample_space = self.queryset.values_list(key, flat=True).distinct()
 
         else:
             queryset = self.queryset
@@ -333,7 +338,11 @@ class Cube(BaseCube):
                         sample_space.append(date)
                     break 
                 else:
-                    field = queryset.model._meta.get_field_by_name(key)[0]
+                    try:
+                        field = queryset.model._meta.get_field_by_name(key)[0]
+                    except FieldDoesNotExist:
+                        raise ValueError("invalid dimension %s, because %s is an invalid field name for %s"\
+                            % (dimension, key, queryset.model))
                     #if ForeignKey, we get all distinct objects of foreign model
                     if type(field) == ForeignKey:
                         sample_space = queryset.values_list(key, flat=True).distinct()
