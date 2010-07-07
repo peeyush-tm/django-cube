@@ -195,11 +195,11 @@ class BaseCube(object):
         Returns a multidimensionnal list of measures from the cube, structured following *free_dimensions*. For example : ::
 
             >>> cube(['dim1', 'dim2']).measures_list('dim2', 'dim1') == [
-            ...     [measure_11_21, measure_11_22, , measure_11_2N],]
-            ...     [measure_12_21, measure_12_22, , measure_12_2N],]
+            ...     [measure_11_21, measure_11_22, , measure_11_2N],
+            ...     [measure_12_21, measure_12_22, , measure_12_2N],
             ... 
-            ...     [measure_1N_21, measure_1N_22, , measure_1N_2N],]
-            ... ] # Where <measure_AB_CD> means measure of cube with dimA=B and dimC=D
+            ...     [measure_1N_21, measure_1N_22, , measure_1N_2N]
+            ... ] # Where <measure_AB_CD> means measure of cube with dimA=valB and dimC=valD
         """
         returned_list = []
         if free_dimensions:
