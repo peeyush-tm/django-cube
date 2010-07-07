@@ -224,6 +224,18 @@ Multidimensionnal list of measures
     ... ]
     True
 
+    >>> other_c = Cube(['firstname', 'instrument__name', 'lastname'], Musician.objects.all(), count_qs, sample_space={
+    ...     'firstname': ['Philly', 'Bill', 'Miles'],
+    ...     'lastname': ['Davis', 'Evans'],
+    ...     'instrument__name': ['trumpet', 'piano']
+    ... })
+    >>> other_c.measure_list('firstname', 'instrument__name', 'lastname') == [
+    ...     [[0, 1], [0, 0]],
+    ...     [[0, 0], [1, 0]],
+    ...     [[0, 0], [0, 0]],
+    ... ]
+    True
+
 Getting a subcube
 ------------------
 
