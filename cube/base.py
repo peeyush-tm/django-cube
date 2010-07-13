@@ -28,10 +28,18 @@ class BaseDimension(object):
     def __init__(self, sample_space=[]):
         self._name = None
         self.sample_space = sample_space
+        self._constraint = None
 
     @property
     def name(self):
         return self._name
+
+    @property
+    def constraint(self):
+        return self._constraint
+
+    def constrain(self, value):
+        self._constraint = value
 
     def _sort_sample_space(self, sspace):
         """
@@ -88,11 +96,9 @@ class BaseCube(object):
         
         return new_cube
 
-    def __init__(self, constraint={}):
+    def __init__(self):
         """
-        :param constraint: {*dimension*: *value*} -- a constraint that reduces the sample space of the cube.
         """
-        self.constraint = constraint
         self.dimensions = copy.copy(self.dimensions)
      
     def subcubes(self, *dim_names):
@@ -129,7 +135,6 @@ class BaseCube(object):
                 extra_constraint = {fixed_dim_name: value}
                 #constrained subcube
                 subcube = self.constrain(**extra_constraint)
-                subcube_constraint = copy.copy(subcube.constraint)
                 #we yield all the measures for the constrained cube
                 for subsubcube in subcube.subcubes(*dim_names):
                     yield subsubcube
@@ -144,12 +149,19 @@ class BaseCube(object):
         """
         Merges the calling cube's constraint with *extra_constraint*.
 
-        :returns: Cube -- a subcube of the calling cube. 
+        :returns: Cube -- a subcube of the calling cube.
+
+        .. todo:: remove in the future ?
         """
-        constraint = copy.copy(self.constraint)
-        constraint.update(extra_constraint)
+        dimensions = copy.deepcopy(self.dimensions)
+        for dim_name, value in extra_constraint.iteritems():
+            try:
+                dimensions[dim_name].constrain(value)
+            except KeyError:
+                raise ValueError("invalid dimension %s" % dim_name)
+                
         cube_copy = copy.copy(self)
-        cube_copy.constraint = constraint
+        cube_copy.dimensions = dimensions
         return cube_copy
 
     def measure(self, **coordinates):
@@ -248,13 +260,22 @@ class BaseCube(object):
         """
         return self.dimensions[dim_name].get_sample_space()
 
+    @property
+    def constraint(self):
+        """
+        """
+        constraint_dict = {}
+        for dimension in self.dimensions.values():
+            if dimension.constraint:
+                constraint_dict[dimension.name] = dimension.constraint
+        return constraint_dict
+
     def __copy__(self):
         """
         Returns a shallow copy of the cube.
         """
-        constraint = copy.copy(self.constraint)
         dimensions = copy.copy(self.dimensions)
-        cube_copy = self.__class__(constraint=constraint)
+        cube_copy = self.__class__()
         cube_copy.dimensions = dimensions
         return cube_copy
 

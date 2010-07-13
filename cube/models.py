@@ -163,13 +163,12 @@ class Cube(BaseCube):
 
         return new_cube
 
-    def __init__(self, queryset, constraint={}, measure_none=0):
+    def __init__(self, queryset, measure_none=0):
         """
         :param queryset: the base queryset from which the cube's sample space will be extracted.
-        :param constraint: {*dimension*: *value*} -- a constraint that reduces the sample space of the cube.
         :param measure_none: the value that the measure should actually return if the calculation returned *None*
         """
-        super(Cube, self).__init__(constraint)
+        super(Cube, self).__init__()
         self.queryset = queryset
         self.measure_none = measure_none
 
@@ -179,9 +178,9 @@ class Cube(BaseCube):
         #we check the coordinates passed
         for dim_name, value in coordinates.iteritems():
             if not dim_name in self.dimensions:
-                raise ValueError("invalid dimension %s" % dim_name)
+                raise ValueError("invalid dimension '%s'" % dim_name)
             if dim_name in self.constraint:
-                raise ValueError("dimension %s is constrained" % dim_name)
+                raise ValueError("dimension '%s' is constrained" % dim_name)
 
         #calculate the filter to apply to queryset
         constraint.update(coordinates)
@@ -204,6 +203,7 @@ class Cube(BaseCube):
         Returns a shallow copy of the cube.
         """
         queryset = copy.copy(self.queryset)
-        constraint = copy.copy(self.constraint)
-        cube_copy = self.__class__(queryset, constraint=constraint)
+        dimensions = copy.deepcopy(self.dimensions)
+        cube_copy = self.__class__(queryset)
+        cube_copy.dimensions = dimensions
         return cube_copy
