@@ -170,8 +170,7 @@ Some simple cubes
     True
     >>> set(c_copy.dimensions.keys()) == set(c.dimensions.keys())
     True
-    >>> id(c_copy.constraint) != id(c.constraint) ; c_copy.constraint == c.constraint
-    True
+    >>> c_copy.constraint == c.constraint
     True
     >>> id(c_copy.queryset) != id(c.queryset) ; list(c_copy.queryset) == list(c.queryset)
     True
@@ -461,14 +460,14 @@ Here is what the rendering gives :
 Get a constraint value
 ------------------------
 
-    >>> c = MusicianCube(Musician.objects.all(), constraint={
-    ...     'firstname': 'John',
-    ...     'instrument__name': 'sax',
-    ... })
+    >>> c = MusicianCube(Musician.objects.all()).constrain(
+    ...     firstname='John',
+    ...     instrument_name='sax',
+    ... )
     >>> context = Context({'my_cube': c})
     >>> template = Template(
     ... '{% load cube_templatetags %}'
-    ... '>FUNKY<{{ my_cube|getconstraint:\\'instrument__name\\' }}>FUNKY<'
+    ... '>FUNKY<{{ my_cube|getconstraint:\\'instrument_name\\' }}>FUNKY<'
     ... )
     >>> template.render(context)
     u'>FUNKY<sax>FUNKY<'
