@@ -30,25 +30,48 @@ from django.db.models.sql import constants
 from .utils import odict
 
 
+class BaseDimension(object):
+    def __init__(self):
+        self._name = None
+
+    @property
+    def name(self):
+        return self._name
+
+class BaseCubeMetaclass(type):
+    """
+    """
+    def __new__(cls, name, bases, attrs):
+        #dictionnary containing dimensions
+        dimensions = {}
+        attrs_copy = copy.copy(attrs)
+        for attr_name, attr_value in attrs_copy.iteritems():
+            if isinstance(attr_value, BaseDimension):
+                dimensions[attr_name] = attr_value
+                attr_value._name = attr_name
+                del attrs[attr_name]
+        attrs['dimensions'] = dimensions
+
+        return super(BaseCubeMetaclass, cls).__new__(cls, name, bases, attrs)
+        
 class BaseCube(object):
     """
     The base class for a cube.
     """
-    def __init__(self, dimensions, aggregation, constraint={}, sample_space={}):
+
+    __metaclass__ = BaseCubeMetaclass
+
+    def __init__(self, constraint={}, sample_space={}):
         """
-        :param dimensions: a list of attribute names which represent the free dimensions of the cube. All Django nested field lookups are allowed. For example on a model `Person`, a possible dimension would be `mother__birth_date__in`, where `mother` would (why not?!) be foreign key to another person. You can also use two special lookups: *absmonth* and *absday* which both take :class:`datetime` or :class:`date`, and represent absolute months or days. E.g. To search for November 1986, you would have to use *'date__month=11, date__year=1986'*, instead you can just use *'date__absmonth=date(1986, 11, 1)'*.
-        :param aggregation: an aggregation function. must have the following signature `def agg_func(queryset)`, and return a measure on the queryset.
         :param constraint: {*dimension*: *value*} -- a constraint that reduces the sample space of the cube.
         :param sample_space: {*dimension*: *sample_space*} -- specifies the sample space of *dimension*. If it is not specified, then default sample space is all the values that the dimension takes on the queryset.  
         """
         self.sample_space = sample_space
         self.constraint = constraint
-        self.dimensions = set(dimensions)
-        self.aggregation = aggregation
      
-    def subcubes(self, *dimensions):
+    def subcubes(self, *dim_names):
         """
-        Return an ordered list of all the sucubes of the calling cube, with *dimensions* constrained to all the possible values in their sample spaces. For example :
+        Return an ordered list of all the sucubes of the calling cube, dimensions with names in *dim_names* constrained to all the possible values in their sample spaces. For example :
 
             >>> sample_space = {
             ...     'name': ['John', 'Jack'],
@@ -58,32 +81,32 @@ class BaseCube(object):
             >>> Cube(['name', 'instrument', 'age'], len, sample_space=sample_space).subcubes('name', 'instrument')
             [Cube(age, name='John', instrument='Trumpet'), Cube(age, name='Jack', instrument='Trumpet')]
 
-        If one of the *dimensions* passed as parameter is already constrained in the calling cube, it is not considered as an error. The sample space taken for this dimension will merely be a singleton : the constraint value. 
+        If one of the dimensions passed as parameter is already constrained in the calling cube, it is not considered as an error. The sample space taken for this dimension will merely be a singleton : the constraint value. 
         """
-        dimensions = list(copy.copy(dimensions))
+        dim_names = list(copy.copy(dim_names))
 
-        for index, dimension in enumerate(dimensions):
-            if dimension not in self.dimensions:
-                raise ValueError("invalid dimension %s" % dimension)
+        for index, dim_name in enumerate(dim_names):
+            if dim_name not in self.dimensions:
+                raise ValueError("invalid dimension %s" % dim_name)
             #if dimension is constrained we don't need to iterate for it.
-            if dimension in self.constraint:
-                dimensions.pop(index)
+            if dim_name in self.constraint:
+                dim_names.pop(index)
 
-        if len(dimensions):
+        if len(dim_names):
             #we fix a dimension,
-            fixed_dimension = dimensions.pop()
+            fixed_dim_name = dim_names.pop()
             #and create a subcube with the remaining free dimensions,
             #one for each value in the fixed dimension's sample space.
-            #Every one of these cubes is constrained *fixed_dimension=value*
-            sample_space = self.get_sample_space(fixed_dimension)
+            #Every one of these cubes is constrained *fixed_dim_name=value*
+            sample_space = self.get_sample_space(fixed_dim_name)
             for value in sample_space:
                 #subcube_constraint = cube_constraint + extra_constraint
-                extra_constraint = {fixed_dimension: value}
+                extra_constraint = {fixed_dim_name: value}
                 #constrained subcube
                 subcube = self.constrain(**extra_constraint)
                 subcube_constraint = copy.copy(subcube.constraint)
                 #we yield all the measures for the constrained cube
-                for subsubcube in subcube.subcubes(*dimensions):
+                for subsubcube in subcube.subcubes(*dim_names):
                     yield subsubcube
             raise StopIteration
 
@@ -135,9 +158,9 @@ class BaseCube(object):
         """
         raise NotImplementedError
 
-    def measure_dict(self, *free_dimensions, **kwargs):
+    def measure_dict(self, *free_dim_names, **kwargs):
         """
-        Returns an ordered dictionnary of measures from the cube, structured following *free_dimensions*. For example :
+        Returns an ordered dictionnary of measures from the cube, structured following *free_dim_names*. For example :
 
             >>> cube(['dim1', 'dim2']).measures_dict('dim2', 'dim1') == {
             ...     'subcubes': {
@@ -157,7 +180,7 @@ class BaseCube(object):
             ...     'measure': measure
             ... }
 
-        If *full=False*, only the measures for which all dimensions in *free_dimensions* are fixed will be returned. For example : ::
+        If *full=False*, only the measures for which all dimensions in *free_dim_names* are fixed will be returned. For example : ::
 
             >>> cube(['dim1', 'dim2']).measures_dict('dim2', 'dim1', full=False) == {
             ...     dim2_val1: {
@@ -173,14 +196,14 @@ class BaseCube(object):
         """
         full = kwargs.setdefault('full', True)
         returned_dict = odict()
-        #if free dimensions, we have to fix one, and iterate over the subcubes. 
-        if free_dimensions:
-            free_dimensions = list(free_dimensions)
-            fixed_dimension = free_dimensions.pop(0)
+        #if free dim_names, we have to fix one, and iterate over the subcubes. 
+        if free_dim_names:
+            free_dim_names = list(free_dim_names)
+            fixed_dimension = free_dim_names.pop(0)
             subcubes_dict = odict()
             for subcube in self.subcubes(fixed_dimension):
                 dim_value = subcube.constraint[fixed_dimension]
-                subcubes_dict[dim_value] = subcube.measure_dict(*free_dimensions, **kwargs)
+                subcubes_dict[dim_value] = subcube.measure_dict(*free_dim_names, **kwargs)
             if full:
                 returned_dict['measure'] = self.measure()
                 returned_dict['subcubes'] = subcubes_dict
@@ -190,9 +213,9 @@ class BaseCube(object):
             returned_dict['measure'] = self.measure()
         return returned_dict
 
-    def measure_list(self, *free_dimensions):
+    def measure_list(self, *free_dim_names):
         """
-        Returns a multidimensionnal list of measures from the cube, structured following *free_dimensions*. For example : ::
+        Returns a multidimensionnal list of measures from the cube, structured following *free_dim_names*. For example : ::
 
             >>> cube(['dim1', 'dim2']).measures_list('dim2', 'dim1') == [
             ...     [measure_11_21, measure_11_22, , measure_11_2N],
@@ -202,20 +225,19 @@ class BaseCube(object):
             ... ] # Where <measure_AB_CD> means measure of cube with dimA=valB and dimC=valD
         """
         returned_list = []
-        if free_dimensions:
-            free_dimensions = list(free_dimensions)
-            fixed_dimension = free_dimensions.pop(0)
+        if free_dim_names:
+            free_dim_names = list(free_dim_names)
+            fixed_dimension = free_dim_names.pop(0)
         else:
             return [self.measure()]
          
-        if free_dimensions:
+        if free_dim_names:
             for subcube in self.subcubes(fixed_dimension):
-                returned_list.append(subcube.measure_list(*free_dimensions))
+                returned_list.append(subcube.measure_list(*free_dim_names))
         else:
             for subcube in self.subcubes(fixed_dimension):
                 returned_list.append(subcube.measure())
         return returned_list
-        
 
     def _sort_sample_space(self, sspace):
         """
@@ -239,33 +261,36 @@ class BaseCube(object):
         """
         Returns a shallow copy of the cube.
         """
-        dimensions = copy.copy(self.dimensions)
         sample_space = copy.copy(self.sample_space)
         constraint = copy.copy(self.constraint)
-        aggregation = self.aggregation
-        return Cube(dimensions, aggregation, constraint=constraint, sample_space=sample_space)
+        dimensions = copy.copy(self.dimensions)
+        cube_copy = self.__class__(constraint=constraint, sample_space=sample_space)
+        cube_copy.dimensions = dimensions
+        return cube_copy
 
     def __repr__(self):
         constr_dimensions = sorted(["%s=%s" % (dim, value) for dim, value in self.constraint.iteritems()])
-        free_dimensions = sorted(list(self.dimensions - set(self.constraint.keys())))
+        free_dimensions = sorted(list(set(self.dimensions) - set(self.constraint)))
 
         return 'Cube(%s)' % ", ".join(free_dimensions + constr_dimensions)
 
+class Dimension(BaseDimension):
+    """
+    """
+    pass
 
 class Cube(BaseCube):
     """
     A cube that calculates measures on a Django queryset.
     """
-    def __init__(self, dimensions, queryset, aggregation, constraint={}, sample_space={}, measure_none=0):
+    def __init__(self, queryset, constraint={}, sample_space={}, measure_none=0):
         """
-        :param dimensions: a list of attribute names which represent the free dimensions of the cube. All Django nested field lookups are allowed. For example on a model `Person`, a possible dimension would be `mother__birth_date__in`, where `mother` would (why not?!) be foreign key to another person. You can also use two special lookups: *absmonth* and *absday* which both take :class:`datetime` or :class:`date`, and represent absolute months or days. E.g. To search for November 1986, you would have to use *'date__month=11, date__year=1986'*, instead you can just use *'date__absmonth=date(1986, 11, 1)'*.
         :param queryset: the base queryset from which the cube's sample space will be extracted.
-        :param aggregation: an aggregation function. must have the following signature `def agg_func(queryset)`, and return a measure on the queryset.
         :param constraint: {*dimension*: *value*} -- a constraint that reduces the sample space of the cube.
         :param sample_space: {*dimension*: *sample_space*} -- specifies the sample space of *dimension*. If it is not specified, then default sample space is all the values that the dimension takes on the queryset.
         :param measure_none: the value that the measure should actually return if the calculation returned *None*
         """
-        super(Cube, self).__init__(dimensions, aggregation, constraint, sample_space)
+        super(Cube, self).__init__(constraint, sample_space)
         self.queryset = queryset
         self.measure_none = measure_none
 
@@ -273,11 +298,11 @@ class Cube(BaseCube):
         constraint = copy.copy(self.constraint)
 
         #we check the coordinates passed
-        for dimension, value in coordinates.iteritems():
-            if not dimension in self.dimensions:
-                raise ValueError("invalid dimension %s" % dimension)
-            if dimension in self.constraint:
-                raise ValueError("dimension %s is constrained" % dimension)
+        for dim_name, value in coordinates.iteritems():
+            if not dim_name in self.dimensions:
+                raise ValueError("invalid dimension %s" % dim_name)
+            if dim_name in self.constraint:
+                raise ValueError("dimension %s is constrained" % dim_name)
 
         #calculate the total constraint
         constraint.update(coordinates)
@@ -292,14 +317,14 @@ class Cube(BaseCube):
         cube_copy.queryset = new_queryset
         return cube_copy
 
-    def _default_sample_space(self, dimension):
+    def _default_sample_space(self, dim_name):
         """
-        Returns the default sample space for *dimension*, which is all the values taken by *dimension* in the cube's queryset.
+        Returns the default sample space for *dim_name*, which is all the values taken by *dim_name* in the cube's queryset.
         
         .. todo:: rewrite prettier
         """
         sample_space = []
-        lookup_list = re.split('__', dimension)
+        lookup_list = re.split('__', dim_name)
 
         if len(lookup_list) == 1:
             key = lookup_list[0]
@@ -307,7 +332,7 @@ class Cube(BaseCube):
                 field = self.queryset.model._meta.get_field_by_name(key)[0]
             except FieldDoesNotExist:
                 raise ValueError("invalid dimension '%s', because '%s' is an invalid field name for %s"\
-                    % (dimension, key, self.queryset.model))
+                    % (dim_name, key, self.queryset.model))
             #if ForeignKey, we get all distinct objects of foreign model
             if type(field) == ForeignKey:
                 sample_space = field.related.parent_model.objects.distinct()
@@ -342,7 +367,7 @@ class Cube(BaseCube):
                         field = queryset.model._meta.get_field_by_name(key)[0]
                     except FieldDoesNotExist:
                         raise ValueError("invalid dimension %s, because %s is an invalid field name for %s"\
-                            % (dimension, key, queryset.model))
+                            % (dim_name, key, queryset.model))
                     #if ForeignKey, we get all distinct objects of foreign model
                     if type(field) == ForeignKey:
                         sample_space = queryset.values_list(key, flat=True).distinct()
@@ -367,19 +392,19 @@ class Cube(BaseCube):
         Formats a dictionnary of constraint to make them Django-orm-compatible 
         """
         constraint_copy = copy.copy(constraint)
-        for dimension, value in constraint.iteritems():
-            lookup_list = re.split('__', dimension)
+        for dim_name, value in constraint.iteritems():
+            lookup_list = re.split('__', dim_name)
             if (isinstance(value, date) or isinstance(value, datetime)) and lookup_list[-1] in ['absmonth', 'absday']:
                 base_lookup = ''
                 for lookup_value in lookup_list[:-1]:
                     base_lookup += lookup_value + '__'
 
                 if lookup_list[-1] == 'absmonth':
-                    del constraint_copy[dimension]
+                    del constraint_copy[dim_name]
                     constraint_copy[base_lookup + 'month'] = value.month
                     constraint_copy[base_lookup + 'year'] = value.year
                 elif lookup_list[-1] == 'absday':
-                    del constraint_copy[dimension]
+                    del constraint_copy[dim_name]
                     constraint_copy[base_lookup + 'day'] = value.day
                     constraint_copy[base_lookup + 'month'] = value.month
                     constraint_copy[base_lookup + 'year'] = value.year
@@ -390,15 +415,10 @@ class Cube(BaseCube):
         """
         Returns a shallow copy of the cube.
         """
-        dimensions = copy.copy(self.dimensions)
         queryset = copy.copy(self.queryset)
         sample_space = copy.copy(self.sample_space)
         constraint = copy.copy(self.constraint)
-        aggregation = self.aggregation
-        return Cube(dimensions, queryset, aggregation, constraint=constraint, sample_space=sample_space)
-
-class BaseDimension(object):
-    pass
-    
-        
-        
+        dimensions = copy.copy(self.dimensions)
+        cube_copy = self.__class__(queryset, constraint=constraint, sample_space=sample_space)
+        cube_copy.dimensions = dimensions
+        return cube_copy
