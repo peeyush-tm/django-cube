@@ -147,6 +147,22 @@ class Cube(BaseCube):
     """
     A cube that calculates measures on a Django queryset.
     """
+    def __new__(cls, queryset, **kwargs):
+        """
+        Used to give the instance local copies of the dimensions declared at the class level.
+        """
+        new_cube = super(Cube, cls).__new__(cls, queryset, **kwargs)
+        
+        #overrides the dimensions from the class with local copies 
+        new_cube.dimensions = {}
+        for dim_name, dimension in cls.dimensions.iteritems():
+            dim_copy = copy.copy(dimension)
+            new_cube.dimensions[dim_name] = dim_copy
+            if not dim_copy.queryset:
+                dim_copy.queryset = queryset
+
+        return new_cube
+
     def __init__(self, queryset, constraint={}, measure_none=0):
         """
         :param queryset: the base queryset from which the cube's sample space will be extracted.
@@ -156,11 +172,6 @@ class Cube(BaseCube):
         super(Cube, self).__init__(constraint)
         self.queryset = queryset
         self.measure_none = measure_none
-        for dim_name, dimension in self.dimensions.iteritems():
-            dim_copy = copy.copy(dimension)
-            self.dimensions[dim_name] = dim_copy
-            if not dim_copy.queryset:
-                dim_copy.queryset = queryset
 
     def measure(self, **coordinates):
         constraint = copy.copy(self.constraint)

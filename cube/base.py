@@ -74,6 +74,20 @@ class BaseCube(object):
 
     __metaclass__ = BaseCubeMetaclass
 
+    def __new__(cls, *args, **kwargs):
+        """
+        Used to give the instance local copies of the dimensions declared at the class level.
+        """
+        new_cube = super(BaseCube, cls).__new__(cls)
+        
+        #overrides the dimensions from the class with local copies 
+        new_cube.dimensions = {}
+        for dim_name, dimension in cls.dimensions.iteritems():
+            dim_copy = copy.copy(dimension)
+            new_cube.dimensions[dim_name] = dim_copy
+        
+        return new_cube
+
     def __init__(self, constraint={}):
         """
         :param constraint: {*dimension*: *value*} -- a constraint that reduces the sample space of the cube.
