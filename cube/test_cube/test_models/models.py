@@ -1,49 +1,9 @@
 """
 .. 
-    >>> from cube.base import Cube, BaseDimension, Dimension
+    >>> from datetime import datetime, date
+    >>> from cube.models import Cube, Dimension
     >>> import copy
     
-    Metaclass
-    -----------
-    >>> class MyCube(Cube):
-    ...     dim1 = BaseDimension()
-    ...     dim2 = BaseDimension()
-    >>> set([dim.name for dim in MyCube.dimensions.values()]) == set(['dim1', 'dim2'])
-    True
-
-
-Cube
-======
-
-..
-    >>> from datetime import datetime, date
-
-Some simple cubes
-
-    >>> class SongCube(Cube):
-    ...     author = Dimension()
-    ...     author__lastname = Dimension()
-    ...     release_date = Dimension()
-    ...     release_date__absmonth = Dimension()
-    ...     release_date__month = Dimension()
-    ...     release_date__year = Dimension()
-    ...     
-    ...     @staticmethod
-    ...     def aggregation(queryset):
-    ...         return queryset.count()
-
-    >>> class MusicianCube(Cube):
-    ...     instrument__name = Dimension()
-    ...     instrument__name__in = Dimension()
-    ...     instrument = Dimension()
-    ...     firstname = Dimension()
-    ...     lastname = Dimension()
-    ...     
-    ...     @staticmethod
-    ...     def aggregation(queryset):
-    ...         return queryset.count()    
-
-
 Some instruments
 
     >>> trumpet = Instrument(name='trumpet')
@@ -77,59 +37,138 @@ Some songs
 ..
     >>> so_what.save() ; all_blues.save() ; blue_in_green.save() ; south_street_stroll.save() ; well_you_neednt.save() ; blue_monk.save()
 
+Dimension
+===========
+..
+    ----- Shallow copy
+    >>> d = Dimension(field='attribute__date__absmonth', queryset=[1, 2, 3], sample_space=[89, 99])
+    >>> d_copy = copy.copy(d)
 
-Getting sample space of a dimension
---------------------------------------
+    >>> id(d_copy) != id(d)
+    True
+    >>> d_copy.field == d.field
+    True
+    >>> id(d_copy.sample_space) != id(d.sample_space) ; d_copy.sample_space == d.sample_space
+    True
+    True
+    >>> id(d_copy.queryset) != id(d.queryset) ; d_copy.queryset == d.queryset
+    True
+    True
 
-    >>> c = SongCube(Song.objects.all())
+    ----- Formatting datetimes constraint
+    >>> d = Dimension(field='attribute__date__absmonth')
+    >>> d.to_queryset_filter(date(3000, 7, 1)) == {'attribute__date__month': 7, 'attribute__date__year': 3000}
+    True
+    >>> d = Dimension(field='attribute__date__absday')
+    >>> d.to_queryset_filter(datetime(1990, 8, 23, 0, 0, 0)) == {'attribute__date__day': 23, 'attribute__date__month': 8, 'attribute__date__year': 1990}
+    True
+    >>> d = Dimension()
+    >>> d._name = 'myname'
+    >>> d.to_queryset_filter('coucou') == {'myname': 'coucou'}
+    True
+
+Getting default sample space of a dimension
+-----------------------------------------------
 
 Let's get the sample spaces of some dimensions    
 
-    >>> c.get_sample_space('title') == sorted(set([
+    >>> d = Dimension(field='title', queryset=Song.objects.all())
+    >>> d.get_sample_space() == sorted(set([
     ...     'So What', 'All Blues', 'Blue In Green',
     ...     'South Street Stroll', 'Well You Needn\\'t', 'Blue Monk'
     ... ]))
     True
-    >>> c.get_sample_space('release_date__year') == sorted(set([1944, 1969, 1959, 1945]))
+
+    >>> d = Dimension(field='release_date__year', queryset=Song.objects.all())
+    >>> d.get_sample_space() == sorted(set([1944, 1969, 1959, 1945]))
     True
-    >>> c.get_sample_space('release_date__absmonth') == sorted(set([
+
+    >>> d = Dimension(field='release_date__absmonth', queryset=Song.objects.all())
+    >>> d.get_sample_space() == sorted(set([
     ...     datetime(1969, 1, 1, 0, 0), datetime(1945, 2, 1, 0, 0),
     ...     datetime(1944, 2, 1, 0, 0), datetime(1959, 8, 1, 0, 0)
     ... ]))
     True
-    >>> c.get_sample_space('release_date__absday') == sorted(set([
+
+    >>> d = Dimension(field='release_date__absday', queryset=Song.objects.all())
+    >>> d.get_sample_space() == sorted(set([
     ...     datetime(1969, 1, 21, 0, 0), datetime(1945, 2, 1, 0, 0),
     ...     datetime(1944, 2, 1, 0, 0), datetime(1959, 8, 17, 0, 0)
     ... ]))
     True
-    >>> c.get_sample_space('author__instrument__name') == sorted(['piano', 'trumpet'])
+
+    >>> d = Dimension(field='author__instrument__name', queryset=Song.objects.all())
+    >>> d.get_sample_space() == sorted(['piano', 'trumpet'])
     True
-    >>> set(c.get_sample_space('author__instrument')) == set([piano, trumpet])
+
+    >>> d = Dimension(field='author__instrument', queryset=Song.objects.all())
+    >>> set(d.get_sample_space()) == set([piano, trumpet])
     True
-    >>> c.get_sample_space('author__firstname') == sorted(['Bill', 'Miles', 'Thelonious', 'Freddie'])
+
+    >>> d = Dimension(field='author__firstname', queryset=Song.objects.all())
+    >>> d.get_sample_space() == sorted(['Bill', 'Miles', 'Thelonious', 'Freddie'])
     True
-    >>> set(c.get_sample_space('author')) == set([
+
+    >>> d = Dimension(field='author', queryset=Song.objects.all())
+    >>> set(d.get_sample_space()) == set([
     ...     miles_davis, freddie_hubbard, erroll_garner,
     ...     bill_evans_p, thelonious_monk, bill_evans_s
     ... ])
     True
 
-..
-    ----- Formatting datetimes constraint
+Explicitely give the dimensions's sample space
+-----------------------------------------
 
-    >>> c._format_constraint({'attribute__date__absmonth': date(3000, 7, 1)}) == {'attribute__date__month': 7, 'attribute__date__year': 3000}
+    >>> d = Dimension(field='instrument__name', sample_space=['trumpet', 'piano'])
+    >>> d.get_sample_space() == sorted(['trumpet', 'piano'])
     True
-    >>> c._format_constraint({'attribute__date__absday': datetime(1990, 8, 23, 0, 0, 0)}) == {'attribute__date__day': 23, 'attribute__date__month': 8, 'attribute__date__year': 1990}
+
+Cube
+======
+
+..
+    Metaclass
+    -----------
+    >>> class MyCube(Cube):
+    ...     dim1 = Dimension()
+    ...     dim2 = Dimension()
+    >>> set([dim.name for dim in MyCube.dimensions.values()]) == set(['dim1', 'dim2'])
     True
+
+Some simple cubes
+
+    >>> class SongCube(Cube):
+    ...     author = Dimension()
+    ...     auth_name = Dimension(field='author__lastname')
+    ...     date = Dimension(field='release_date')
+    ...     date_absmonth = Dimension(field='release_date__absmonth')
+    ...     date_month = Dimension(field='release_date__month')
+    ...     date_year = Dimension(field='release_date__year')
+    ...     
+    ...     @staticmethod
+    ...     def aggregation(queryset):
+    ...         return queryset.count()
+
+    >>> class MusicianCube(Cube):
+    ...     instrument_name = Dimension(field='instrument__name')
+    ...     instrument_cat = Dimension(field='instrument__name__in',
+    ...         sample_space=[('trumpet', 'piano'), ('trumpet', 'sax'), ('sax', 'piano')])
+    ...     instrument = Dimension()
+    ...     firstname = Dimension()
+    ...     lastname = Dimension()
+    ...     
+    ...     @staticmethod
+    ...     def aggregation(queryset):
+    ...         return queryset.count()
+
+..
 
     ----- Shallow copy
+    >>> c = MusicianCube(Musician.objects.all())
     >>> c_copy = copy.copy(c)
     >>> id(c_copy) != id(c)
     True
-    >>> c_copy.dimensions == c.dimensions
-    True
-    >>> id(c_copy.sample_space) != id(c.sample_space) ; c_copy.sample_space == c.sample_space
-    True
+    >>> set(c_copy.dimensions.keys()) == set(c.dimensions.keys())
     True
     >>> id(c_copy.constraint) != id(c.constraint) ; c_copy.constraint == c.constraint
     True
@@ -138,25 +177,8 @@ Let's get the sample spaces of some dimensions
     True
     True
 
-Explicitely give the cube's sample space
------------------------------------------
-
-    >>> c = MusicianCube(Musician.objects.all(),
-    ...     sample_space={'instrument__name': ['trumpet', 'piano']})
-    >>> c.get_sample_space('instrument__name') == sorted(['trumpet', 'piano'])
-    True
-
-Resample the sample space of a cube's dimension
--------------------------------------------------
-
-    >>> c = SongCube(Song.objects.all())
-    >>> set(c.get_sample_space('release_date__absmonth')) == set([
-    ...     datetime(1969, 1, 1, 0, 0), datetime(1945, 2, 1, 0, 0),
-    ...     datetime(1944, 2, 1, 0, 0), datetime(1959, 8, 1, 0, 0)
-    ... ])
-    True
-    >>> c = c.resample('release_date__absmonth', lbound=datetime(1945, 1, 1), ubound=datetime(1960, 11, 1))
-    >>> set(c.get_sample_space('release_date__absmonth')) == set([datetime(1959, 8, 1, 0, 0), datetime(1945, 2, 1, 0, 0)])
+    ----- get_sample_space
+    >>> set(c.get_sample_space('firstname')) == set(['Miles', 'Erroll', 'Bill', 'Thelonious', 'Freddie'])
     True
 
 Getting a measure from the cube
@@ -167,9 +189,9 @@ Getting a measure from the cube
     1
     >>> c.measure(firstname='Bill')
     2
-    >>> c.measure(firstname='Miles', instrument__name='trumpet')
+    >>> c.measure(firstname='Miles', instrument_name='trumpet')
     1
-    >>> c.measure(firstname='Miles', instrument__name='piano')
+    >>> c.measure(firstname='Miles', instrument_name='piano')
     0
     >>> c.measure()
     6
@@ -178,31 +200,29 @@ Iterating over cube's subcubes
 ---------------------------------
 
     >>> ['%s' % subcube for subcube in c.subcubes('firstname')] == [
-    ...     'Cube(instrument, instrument__name, instrument__name__in, lastname, firstname=Bill)',
-    ...     'Cube(instrument, instrument__name, instrument__name__in, lastname, firstname=Erroll)',
-    ...     'Cube(instrument, instrument__name, instrument__name__in, lastname, firstname=Freddie)',
-    ...     'Cube(instrument, instrument__name, instrument__name__in, lastname, firstname=Miles)',
-    ...     'Cube(instrument, instrument__name, instrument__name__in, lastname, firstname=Thelonious)'
+    ...     'Cube(instrument, instrument_cat, instrument_name, lastname, firstname=Bill)',
+    ...     'Cube(instrument, instrument_cat, instrument_name, lastname, firstname=Erroll)',
+    ...     'Cube(instrument, instrument_cat, instrument_name, lastname, firstname=Freddie)',
+    ...     'Cube(instrument, instrument_cat, instrument_name, lastname, firstname=Miles)',
+    ...     'Cube(instrument, instrument_cat, instrument_name, lastname, firstname=Thelonious)'
     ... ]
     True
 
 Multidimensionnal dictionnary of measures
 -------------------------------------------
 
-First let's resample the cube created before, to limit the number of iterations :
-
-    >>> c = c.resample('instrument__name', space=['piano', 'trumpet']).resample('firstname', space=['Philly', 'Bill', 'Miles'])
+    >>> c = MusicianCube(Musician.objects.filter(instrument__name__in=['piano', 'trumpet']))
 
 Then, let's iterate over the cube's subcubes, calculating the measures for all subcube possible :
 
-    >>> c.measure_dict('firstname', 'instrument__name') == {
+    >>> c.measure_dict('firstname', 'instrument_name') == {
     ...     'subcubes': {
     ...         'Bill': {
     ...             'subcubes': {
     ...                 'piano': {'measure': 1},
     ...                 'trumpet': {'measure': 0},
     ...             },
-    ...             'measure': 2
+    ...             'measure': 1
     ...         },
     ...         'Miles': {
     ...             'subcubes': {
@@ -211,21 +231,35 @@ Then, let's iterate over the cube's subcubes, calculating the measures for all s
     ...             },
     ...             'measure': 1
     ...         },
-    ...         'Philly': {
+    ...         'Thelonious': {
     ...             'subcubes': {
-    ...                 'piano': {'measure': 0},
+    ...                 'piano': {'measure': 1},
     ...                 'trumpet': {'measure': 0},
     ...             },
-    ...             'measure': 0
-    ...         }
+    ...             'measure': 1
+    ...         },
+    ...         'Freddie': {
+    ...             'subcubes': {
+    ...                 'piano': {'measure': 0},
+    ...                 'trumpet': {'measure': 1},
+    ...             },
+    ...             'measure': 1
+    ...         },
+    ...         'Erroll': {
+    ...             'subcubes': {
+    ...                 'piano': {'measure': 1},
+    ...                 'trumpet': {'measure': 0},
+    ...             },
+    ...             'measure': 1
+    ...         },
     ...     },
-    ...     'measure': 6
+    ...     'measure': 5
     ... }
     True
 
 Let's now do the same thing, but calculating only the measures for the subcubes whose dimensions passed to :meth:`measure_dict` are all fixed.
 
-    >>> c.measure_dict('firstname', 'instrument__name', full=False) == {
+    >>> c.measure_dict('firstname', 'instrument_name', full=False) == {
     ...     'Bill': {
     ...         'piano': {'measure': 1},
     ...         'trumpet': {'measure': 0},
@@ -234,8 +268,16 @@ Let's now do the same thing, but calculating only the measures for the subcubes 
     ...         'piano': {'measure': 0},
     ...         'trumpet': {'measure': 1},
     ...     },
-    ...     'Philly': {
+    ...     'Thelonious': {
+    ...         'piano': {'measure': 1},
+    ...         'trumpet': {'measure': 0},
+    ...     },
+    ...     'Freddie': {
     ...         'piano': {'measure': 0},
+    ...         'trumpet': {'measure': 1},
+    ...     },
+    ...     'Erroll': {
+    ...         'piano': {'measure': 1},
     ...         'trumpet': {'measure': 0},
     ...     },
     ... }
@@ -244,22 +286,20 @@ Let's now do the same thing, but calculating only the measures for the subcubes 
 Multidimensionnal list of measures
 ------------------------------------
 
-    >>> c.measure_list('firstname', 'instrument__name') == [
-    ...     [1, 0],
-    ...     [0, 1],
-    ...     [0, 0],
+    >>> c.measure_list('firstname', 'instrument_name') == [
+    ...     [1, 0], #Bill: piano, trumpet
+    ...     [1, 0], #Erroll ...
+    ...     [0, 1], #Freddie ...
+    ...     [0, 1], #Miles ...
+    ...     [1, 0], #Thelonious ...
     ... ]
     True
 
-    >>> other_c = MusicianCube(Musician.objects.all(), sample_space={
-    ...     'firstname': ['Philly', 'Bill', 'Miles'],
-    ...     'lastname': ['Davis', 'Evans'],
-    ...     'instrument__name': ['trumpet', 'piano']
-    ... })
-    >>> other_c.measure_list('firstname', 'instrument__name', 'lastname') == [
-    ...     [[0, 1], [0, 0]],
-    ...     [[0, 0], [1, 0]],
-    ...     [[0, 0], [0, 0]],
+    >>> other_c = MusicianCube(Musician.objects.filter(instrument__name__in=['piano']))
+    >>> other_c.measure_list('firstname', 'instrument_name', 'lastname') == [
+    ...     [[1, 0, 0]], #Bill: piano: Evans, Garner, Monk
+    ...     [[0, 1, 0]], #Erroll ...
+    ...     [[0, 0, 1]], #Thelonious ...
     ... ]
     True
 
@@ -268,15 +308,21 @@ Getting a subcube
 
 By constraining the cube
 
-    >>> subcube = c.constrain(instrument__name='trumpet')
-    >>> subcube.measure_dict('firstname', 'instrument__name', full=False) == {
+    >>> subcube = c.constrain(instrument_name='trumpet')
+    >>> subcube.measure_dict('firstname', 'instrument_name', full=False) == {
     ...     'Miles': {
     ...         'trumpet': {'measure': 1},
     ...     },
     ...     'Bill': {
     ...         'trumpet': {'measure': 0},
     ...     },
-    ...     'Philly': {
+    ...     'Thelonious': {
+    ...         'trumpet': {'measure': 0},
+    ...     },
+    ...     'Freddie': {
+    ...         'trumpet': {'measure': 1},
+    ...     },
+    ...     'Erroll': {
     ...         'trumpet': {'measure': 0},
     ...     },
     ... }
@@ -286,8 +332,8 @@ By constraining the cube
 It is also possible to use Django field-lookup syntax for date dimensions :
 
     >>> c = SongCube(Song.objects.all())
-    >>> subcube = c.constrain(release_date__month=2)
-    >>> subcube.measure_dict('release_date__month', 'release_date__year', 'author__lastname', full=False) == {
+    >>> subcube = c.constrain(date_month=2)
+    >>> subcube.measure_dict('date_month', 'date_year', 'auth_name', full=False) == {
     ...     2: {
     ...         1945: {
     ...             'Davis': {'measure': 0},
@@ -325,25 +371,28 @@ Ordering the results
 Use django field lookup syntax in dimensions
 -----------------------------------------------
 
-    >>> c = MusicianCube(Musician.objects.all(), sample_space={
-    ...     'instrument__name__in': [('trumpet', 'piano'), ('trumpet', 'sax'), ('sax', 'piano')],
-    ...     'firstname': ['Miles', 'Erroll', 'Bill']
-    ... })
-    >>> c.measure_dict('instrument__name__in', 'firstname', full=False) == {
+    >>> c = MusicianCube(Musician.objects.all())
+    >>> c.measure_dict('instrument_cat', 'firstname', full=False) == {
     ...     ('trumpet', 'piano'): {
     ...         'Bill': {'measure': 1},
     ...         'Erroll': {'measure': 1},
     ...         'Miles': {'measure': 1},
+    ...         'Freddie': {'measure': 1},
+    ...         'Thelonious': {'measure': 1},
     ...     },
     ...     ('trumpet', 'sax'): {
     ...         'Bill': {'measure': 1},
     ...         'Erroll': {'measure': 0},
     ...         'Miles': {'measure': 1},
+    ...         'Freddie': {'measure': 1},
+    ...         'Thelonious': {'measure': 0},
     ...     },
     ...     ('sax', 'piano'): {
     ...         'Bill': {'measure': 2},
     ...         'Erroll': {'measure': 1},
     ...         'Miles': {'measure': 0},
+    ...         'Freddie': {'measure': 0},
+    ...         'Thelonious': {'measure': 1},
     ...     },
     ... }
     True
@@ -367,18 +416,14 @@ Iterating over cube's subcubes
 
 Let's create a cube
 
-    >>> c = MusicianCube(Musician.objects.all(), sample_space={
-    ...     'firstname': ['Miles'],
-    ...     'instrument__name': ['trumpet', 'piano'],
-    ...     'lastname': ['Davis', 'Evans']
-    ... })
+    >>> c = MusicianCube(Musician.objects.filter(firstname__in=['Bill', 'Miles']))
 
 Here's how to use the template tag *subcubes* to iterate over subcubes :
 
     >>> context = Context({'my_cube': c, 'dim1': 'firstname'})
     >>> template = Template(
     ...     '{% load cube_templatetags %}'
-    ...     '{% subcubes my_cube by dim1, "instrument__name" as subcube1 %}'
+    ...     '{% subcubes my_cube by dim1, "instrument_name" as subcube1 %}'
     ...         '{{ subcube1 }}:{{ subcube1.measure }}'
     ...         '{% subcubes subcube1 by "lastname" as subcube2 %}'
     ...             '{{ subcube2 }}:{{ subcube2.measure }}'
@@ -389,12 +434,24 @@ Here's how to use the template tag *subcubes* to iterate over subcubes :
 Here is what the rendering gives :
 
     >>> awaited = ''\\
-    ...     'Cube(instrument, instrument__name__in, lastname, firstname=Miles, instrument__name=piano):0'\\
-    ...         'Cube(instrument, instrument__name__in, firstname=Miles, instrument__name=piano, lastname=Davis):0'\\
-    ...         'Cube(instrument, instrument__name__in, firstname=Miles, instrument__name=piano, lastname=Evans):0'\\
-    ...     'Cube(instrument, instrument__name__in, lastname, firstname=Miles, instrument__name=trumpet):1'\\
-    ...         'Cube(instrument, instrument__name__in, firstname=Miles, instrument__name=trumpet, lastname=Davis):1'\\
-    ...         'Cube(instrument, instrument__name__in, firstname=Miles, instrument__name=trumpet, lastname=Evans):0'
+    ...     'Cube(instrument, instrument_cat, lastname, firstname=Bill, instrument_name=piano):1'\\
+    ...         'Cube(instrument, instrument_cat, firstname=Bill, instrument_name=piano, lastname=Davis):0'\\
+    ...         'Cube(instrument, instrument_cat, firstname=Bill, instrument_name=piano, lastname=Evans):1'\\
+    ...     'Cube(instrument, instrument_cat, lastname, firstname=Miles, instrument_name=piano):0'\\
+    ...         'Cube(instrument, instrument_cat, firstname=Miles, instrument_name=piano, lastname=Davis):0'\\
+    ...         'Cube(instrument, instrument_cat, firstname=Miles, instrument_name=piano, lastname=Evans):0'\\
+    ...     'Cube(instrument, instrument_cat, lastname, firstname=Bill, instrument_name=sax):1'\\
+    ...         'Cube(instrument, instrument_cat, firstname=Bill, instrument_name=sax, lastname=Davis):0'\\
+    ...         'Cube(instrument, instrument_cat, firstname=Bill, instrument_name=sax, lastname=Evans):1'\\
+    ...     'Cube(instrument, instrument_cat, lastname, firstname=Miles, instrument_name=sax):0'\\
+    ...         'Cube(instrument, instrument_cat, firstname=Miles, instrument_name=sax, lastname=Davis):0'\\
+    ...         'Cube(instrument, instrument_cat, firstname=Miles, instrument_name=sax, lastname=Evans):0'\\
+    ...     'Cube(instrument, instrument_cat, lastname, firstname=Bill, instrument_name=trumpet):0'\\
+    ...         'Cube(instrument, instrument_cat, firstname=Bill, instrument_name=trumpet, lastname=Davis):0'\\
+    ...         'Cube(instrument, instrument_cat, firstname=Bill, instrument_name=trumpet, lastname=Evans):0'\\
+    ...     'Cube(instrument, instrument_cat, lastname, firstname=Miles, instrument_name=trumpet):1'\\
+    ...         'Cube(instrument, instrument_cat, firstname=Miles, instrument_name=trumpet, lastname=Davis):1'\\
+    ...         'Cube(instrument, instrument_cat, firstname=Miles, instrument_name=trumpet, lastname=Evans):0'\\
 
 ..
     >>> awaited == template.render(context)
@@ -422,23 +479,29 @@ Insert a table
 
 Let's create a cube
 
-    >>> c = MusicianCube(Musician.objects.all(), sample_space={
-    ...     'firstname': ['Miles'],
-    ...     'instrument__name': ['trumpet', 'piano'],
-    ...     'lastname': ['Davis', 'Evans']
-    ... })
+    >>> c = MusicianCube(Musician.objects.all())
 
 ..
-    >>> node = cube_templatetags.TableFromCubeNode(1, 2, 3)
-    >>> node.build_context(c, ['firstname', 'instrument__name']) == {
-    ...     'col_names': ['Miles'],
-    ...     'cols': [{'name': 'Miles', 'values': [0, 1], 'overall': 1}],
-    ...     'col_overalls': [1],
-    ...     'row_names': ['piano', 'trumpet'],
-    ...     'rows': [{'name': 'piano', 'values': [0], 'overall': 3}, {'name': 'trumpet', 'values': [1], 'overall': 2}],
-    ...     'row_overalls': [3, 2],
+    >>> node = cube_templatetags.TableFromCubeNode('dum1', 'dum2', 'dum3')
+    >>> node.build_context(c, ['firstname', 'instrument_name']) == {
+    ...     'col_names': ['Bill', 'Erroll', 'Freddie', 'Miles', 'Thelonious'],
+    ...     'cols': [
+    ...         {'name': 'Bill', 'values': [1, 1, 0], 'overall': 2},
+    ...         {'name': 'Erroll', 'values': [1, 0, 0], 'overall': 1},
+    ...         {'name': 'Freddie', 'values': [0, 0, 1], 'overall': 1},
+    ...         {'name': 'Miles', 'values': [0, 0, 1], 'overall': 1},
+    ...         {'name': 'Thelonious', 'values': [1, 0, 0], 'overall': 1}
+    ...     ],
+    ...     'col_overalls': [2, 1, 1, 1, 1],
+    ...     'row_names': ['piano', 'sax', 'trumpet'],
+    ...     'rows': [
+    ...         {'name': 'piano', 'values': [1, 1, 0, 0, 1], 'overall': 3},
+    ...         {'name': 'sax', 'values': [1, 0, 0, 0, 0], 'overall': 1},
+    ...         {'name': 'trumpet', 'values': [0, 0, 1, 1, 0], 'overall': 2}
+    ...     ],
+    ...     'row_overalls': [3, 1, 2],
     ...     'col_dimension': 'firstname',
-    ...     'row_dimension': 'instrument__name',
+    ...     'row_dimension': 'instrument_name',
     ...     'overall': 6
     ...     }
     True
@@ -448,7 +511,7 @@ Here's how to use the inclusion tag *tablefromcube* to insert a table in your te
     >>> context = Context({'my_cube': c, 'dim1': 'firstname', 'template_name': 'tablefromcube.html'})
     >>> template = Template(
     ... '{% load cube_templatetags %}'
-    ... '{% tablefromcube my_cube by dim1, "instrument__name" using template_name %}'
+    ... '{% tablefromcube my_cube by dim1, "instrument_name" using template_name %}'
     ... )
 
     >>> awaited = ''\\
@@ -456,25 +519,50 @@ Here's how to use the inclusion tag *tablefromcube* to insert a table in your te
     ...     '<theader>'\\
     ...         '<tr>'\\
     ...             '<th></th>'\\
+    ...             '<th>Bill</th>'\\
+    ...             '<th>Erroll</th>'\\
+    ...             '<th>Freddie</th>'\\
     ...             '<th>Miles</th>'\\
+    ...             '<th>Thelonious</th>'\\
     ...             '<th>OVERALL</th>'\\
     ...         '</tr>'\\
     ...     '</theader>'\\
     ...     '<tbody>'\\
     ...         '<tr>'\\
     ...             '<th>piano</th>'\\
+    ...             '<td>1</td>'\\
+    ...             '<td>1</td>'\\
     ...             '<td>0</td>'\\
+    ...             '<td>0</td>'\\
+    ...             '<td>1</td>'\\
     ...             '<td>3</td>'\\
     ...         '</tr>'\\
     ...         '<tr>'\\
-    ...             '<th>trumpet</th>'\\
+    ...             '<th>sax</th>'\\
     ...             '<td>1</td>'\\
+    ...             '<td>0</td>'\\
+    ...             '<td>0</td>'\\
+    ...             '<td>0</td>'\\
+    ...             '<td>0</td>'\\
+    ...             '<td>1</td>'\\
+    ...         '</tr>'\\
+    ...         '<tr>'\\
+    ...             '<th>trumpet</th>'\\
+    ...             '<td>0</td>'\\
+    ...             '<td>0</td>'\\
+    ...             '<td>1</td>'\\
+    ...             '<td>1</td>'\\
+    ...             '<td>0</td>'\\
     ...             '<td>2</td>'\\
     ...         '</tr>'\\
     ...     '</tbody>'\\
     ...     '<tfoot>'\\
     ...         '<tr>'\\
     ...             '<th>OVERALL</th>'\\
+    ...             '<td>2</td>'\\
+    ...             '<td>1</td>'\\
+    ...             '<td>1</td>'\\
+    ...             '<td>1</td>'\\
     ...             '<td>1</td>'\\
     ...             '<td>6</td>'\\
     ...         '</tr>'\\
