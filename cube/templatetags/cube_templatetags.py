@@ -21,8 +21,8 @@ class TableFromCubeNode(Node):
         rows = []
         row_overalls = []
         col_overalls = []
-        col_dim_name = dimensions[0]
-        row_dim_name = dimensions[1]
+        col_dim_name = str(dimensions[0])
+        row_dim_name = str(dimensions[1])
         overall = None
 
         #columns variables in the context
@@ -222,10 +222,10 @@ class SubcubesNode(Node):
         for dimension in self.dimensions:
             matched = re.match('(?P<quote>"|\')(?P<literal>\w+)(?P=quote)', dimension)
             if matched:
-                dimensions.append(matched.group('literal'))
+                dimensions.append(str(matched.group('literal')))
             else:
                 try:
-                    dimensions.append(Variable(dimension).resolve(context))
+                    dimensions.append(str(Variable(dimension).resolve(context)))
                 except VariableDoesNotExist:
                     return ''
 
