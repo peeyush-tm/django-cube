@@ -21,29 +21,50 @@ class TableFromCubeNode(Node):
         rows = []
         row_overalls = []
         col_overalls = []
-        col_dimension = dimensions[0]
-        row_dimension = dimensions[1]
+        col_dim_name = dimensions[0]
+        row_dim_name = dimensions[1]
         overall = None
 
-        coltable_dict = cube.measure_dict(dimensions[0], dimensions[1])
-        rowtable_dict = cube.measure_dict(dimensions[1], dimensions[0])
-
         #columns variables in the context
-        for col_name, col_dict in coltable_dict['subcubes'].iteritems():
-            col_names.append(col_name)
-            col_overalls.append(col_dict['measure'])
-            col = {'values': [], 'overall': col_dict['measure'], 'name': col_name}
-            for row_name, cell_dict in col_dict['subcubes'].iteritems():
-                col['values'].append(cell_dict['measure'])
+        for col_subcube in cube.subcubes(col_dim_name):
+            col_dimension = col_subcube.dimensions[col_dim_name]
+            #column level variables
+            col_names.append((
+                col_dimension.constraint,
+                col_dimension.pretty_constraint
+            ))
+            col_overalls.append(col_subcube.measure())
+            col = {
+                'values': [],
+                'overall': col_subcube.measure(),
+                'name': col_dimension.constraint, 
+                'pretty_name': col_dimension.pretty_constraint,
+            }
+            #cell level variables
+            for cell_subcube in col_subcube.subcubes(row_dim_name):
+                col['values'].append(cell_subcube.measure())
             cols.append(col)
+
         #rows variables in the context
-        for row_name, row_dict in rowtable_dict['subcubes'].iteritems():
-            row_names.append(row_name)
-            row_overalls.append(row_dict['measure'])
-            row = {'values': [], 'overall': row_dict['measure'], 'name': row_name}
-            for col_name, cell_dict in row_dict['subcubes'].iteritems():
-                row['values'].append(cell_dict['measure'])
+        for row_subcube in cube.subcubes(row_dim_name):
+            row_dimension = row_subcube.dimensions[row_dim_name]
+            #row level variables
+            row_names.append((
+                row_dimension.constraint,
+                row_dimension.pretty_constraint
+            ))
+            row_overalls.append(row_subcube.measure())
+            row = {
+                'values': [],
+                'overall': row_subcube.measure(),
+                'name': row_dimension.constraint, 
+                'pretty_name': row_dimension.pretty_constraint,
+            }
+            #cell level variables
+            for cell_subcube in row_subcube.subcubes(col_dim_name):
+                row['values'].append(cell_subcube.measure())
             rows.append(row)
+
         #context dict
         return {
             'col_names': col_names,
@@ -52,9 +73,10 @@ class TableFromCubeNode(Node):
             'rows': rows,
             'row_overalls': row_overalls,
             'col_overalls': col_overalls,
-            'col_dimension': col_dimension,
-            'row_dimension': row_dimension,
-            'overall': cube.measure()
+            'col_dim_name': col_dim_name,
+            'row_dim_name': row_dim_name,
+            'overall': cube.measure(),
+            'cube': cube
         }
 
     def render(self, context):
@@ -132,15 +154,18 @@ def do_tablefromcube(parser, token):
 
     The context with which this template is rendered contains the variables :
 
-        - col_names: list of column names
-        - row_names: list of row names
-        - cols: list of columns, as *[{'name': col_name, 'values': [measure1, measure2, , measureN], 'overall': col_overall}]*
-        - rows: list of columns, as *[{'name': row_name, 'values': [measure1, measure2, , measureN], 'overall': row_overall}]*
+        - col_names: list of tuples *(<column name>, <column pretty name>)*
+        - row_names: list of tuples *(<row name>, <row pretty name>)*
+        - cols: list of columns, as *[{'name': col_name, 'pretty_name': col_pretty_name,
+            'values': [measure1, measure2, , measureN], 'overall': col_overall}]*
+        - rows: list of columns, as *[{'name': row_name, 'pretty_name': row_pretty_name,
+            'values': [measure1, measure2, , measureN], 'overall': row_overall}]*
         - row_overalls: list of measure on whole rows, therefore the measure is taken on the row dimension, with *row_name* as value
         - col_overalls: list of measure on whole columns, therefore the measure is taken on the column dimension, with *col_name* as value
-        - col_dimension: the dimension on which the columns are calculated
-        - row_dimension: the dimension on which the rows are calculated
+        - col_dim_name: the dimension on which the columns are calculated
+        - row_dim_name: the dimension on which the rows are calculated
         - overall: measure on the whole cube
+        - cube: the cube passed as a parameter to the tag.
     """
     bits = token.contents.split()
 
@@ -226,10 +251,10 @@ def do_subcubes(parser, token):
 
         <ul>
         {% subcubes musician_cube by , dim1 "instrument" as m_subcube %}
-                <li> {{ m_subcube|getconstraint:"instrument" }}
+                <li> {{ m_subcube|prettyconstraint:"instrument" }}
                 <ul>
                     {% subcubes m_subcube by "name" as i_subcube %}
-                    <li>{{ i_subcube|getconstraint:"name" }} : {{ i_subcube.measure }}</li>
+                    <li>{{ i_subcube|prettyconstraint:"name" }} : {{ i_subcube.measure }}</li>
                     {% endfor %}
                 </ul>
                 </li>
