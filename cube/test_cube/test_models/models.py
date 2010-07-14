@@ -126,6 +126,21 @@ Explicitely give the dimensions's sample space
     >>> d.get_sample_space() == sorted(['trumpet', 'piano'])
     True
 
+Give dimension's sample space as a callable
+---------------------------------------------
+
+    >>> def select_contains_s(queryset):
+    ...     #This function returns all musicians that wrote a song
+    ...     #and whose last name contains at least one 's'
+    ...     s_queryset = queryset.filter(author__lastname__icontains='s').distinct().select_related()
+    ...     m_queryset = Musician.objects.filter(pk__in=s_queryset.values_list('author', flat=True))
+    ...     return list(m_queryset)
+    >>> d = Dimension(field='author', queryset=Song.objects.all(), sample_space=select_contains_s)
+    >>> d.get_sample_space() == [
+    ...     miles_davis, bill_evans_p
+    ... ]
+    True
+
 Cube
 ======
 
