@@ -35,8 +35,8 @@ class Dimension(BaseDimension):
     def __init__(self, field=None, queryset=None, sample_space=[]):
         """
         :param field: str -- The model field this dimension refers to. 
-        :param queryset: Queryset -- A queryset to take the default sample space from. Usefull if the parameter *sample_space* is not given.
-        :param sample_space: list -- The sample space for this dimension.
+        :param queryset: Queryset -- A queryset to take the default sample space from. Usefull if the parameter *sample_space* is not given. Defaults to the dimension's cube's queryset if not given.
+        :param sample_space: list|callable -- The sample space for this dimension. Can be any iterable, or any callable. If this parameter is a callable, it will receive the dimension's base queryset as only parameter, and must return a list.
         """
         super(Dimension, self).__init__(sample_space=sample_space)
         self._field = field
@@ -53,7 +53,20 @@ class Dimension(BaseDimension):
         """
         :returns: list -- The sorted sample space of the calling dimension. 
         """
-        sample_space = self.sample_space or self._default_sample_space()
+        #if sample_space is given... 
+        if self.sample_space:
+            #... is it iterable ?
+            try:
+                sample_space = list(self.sample_space)
+            except TypeError:
+                #... it is callable ?
+                if hasattr(self.sample_space, '__call__'):
+                    sample_space = self.sample_space(self.queryset)
+                else:
+                    raise TypeError('\'%s\' unvalid \'sample_space\' attribute, because it is not iterable nor callable')
+        else:
+            sample_space = self._default_sample_space()
+
         return self._sort_sample_space(sample_space)
 
     def to_queryset_filter(self):
@@ -216,6 +229,13 @@ class Cube(BaseCube):
             for dim_name, dimension in self.dimensions.iteritems():
                 filters_dict.update(dimension.to_queryset_filter())
             return self.aggregation(self.queryset.filter(**filters_dict)) or self.measure_none
+
+    @staticmethod
+    def aggregation(queryset):
+        """
+        Abstract static method to override in order to calculate a the cube's aggregation on *queryset*.
+        """
+        raise NotImplementedError
 
     def __copy__(self):
         queryset = copy.copy(self.queryset)
