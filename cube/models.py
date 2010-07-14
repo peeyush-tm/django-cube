@@ -111,7 +111,9 @@ class Dimension(BaseDimension):
                     % (self.field, key, self.queryset.model))
             #if ForeignKey, we get all distinct objects of foreign model
             if type(field) == ForeignKey:
-                sample_space = field.related.parent_model.objects.distinct()
+                sample_space = self.queryset.values_list(key, flat=True).distinct()
+                filter_dict = {'%s__in' % field.rel.field_name: sample_space}
+                sample_space = field.related.parent_model.objects.filter(**filter_dict)
             else:
                 sample_space = self.queryset.values_list(key, flat=True).distinct()
 

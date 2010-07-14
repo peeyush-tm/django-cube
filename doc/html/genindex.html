@@ -10,7 +10,7 @@
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    '#',
+        URL_ROOT:    '',
         VERSION:     '0.1',
         COLLAPSE_MODINDEX: false,
         FILE_SUFFIX: '.html',
@@ -26,7 +26,7 @@
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
-          <a href="#" title="General Index"
+          <a href="" title="General Index"
              accesskey="I">index</a></li>
         <li class="right" >
           <a href="modindex.html" title="Global Module Index"
@@ -43,7 +43,7 @@
 
    <h1 id="index">Index</h1>
 
-   <a href="#B"><strong>B</strong></a> | <a href="#C"><strong>C</strong></a> | <a href="#D"><strong>D</strong></a> | <a href="#G"><strong>G</strong></a> | <a href="#M"><strong>M</strong></a> | <a href="#R"><strong>R</strong></a> | <a href="#S"><strong>S</strong></a> 
+   <a href="#B"><strong>B</strong></a> | <a href="#C"><strong>C</strong></a> | <a href="#D"><strong>D</strong></a> | <a href="#G"><strong>G</strong></a> | <a href="#M"><strong>M</strong></a> | <a href="#N"><strong>N</strong></a> | <a href="#P"><strong>P</strong></a> | <a href="#S"><strong>S</strong></a> 
 
    <hr />
 
@@ -52,7 +52,10 @@
 <table width="100%" class="indextable"><tr><td width="33%" valign="top">
 <dl>
 
-<dt><a href="index.html#cube.base.BaseCube">BaseCube (class in cube.base)</a></dt></dl></td><td width="33%" valign="top"><dl>
+<dt><a href="index.html#cube.base.BaseCube">BaseCube (class in cube.base)</a></dt>
+<dt><a href="index.html#cube.base.BaseCubeMetaclass">BaseCubeMetaclass (class in cube.base)</a></dt>
+<dt><a href="index.html#cube.base.BaseCubeOptions">BaseCubeOptions (class in cube.base)</a></dt></dl></td><td width="33%" valign="top"><dl>
+<dt><a href="index.html#cube.base.BaseDimension">BaseDimension (class in cube.base)</a></dt>
 </dl></td></tr></table>
 
 <h2 id="C">C</h2>
@@ -60,7 +63,10 @@
 <dl>
 
 <dt><a href="index.html#cube.base.BaseCube.constrain">constrain() (cube.base.BaseCube method)</a></dt>
-<dt><a href="index.html#cube.base.Cube">Cube (class in cube.base)</a></dt>
+<dt><a href="index.html#cube.base.BaseCube.constraint">constraint (cube.base.BaseCube attribute)</a></dt>
+  <dd><dl>
+    <dt><a href="index.html#cube.base.BaseDimension.constraint">(cube.base.BaseDimension attribute)</a></dt>
+  </dl></dd>
 <dt><a href="index.html#module-cube.base">cube.base (module)</a></dt></dl></td><td width="33%" valign="top"><dl>
 <dt><a href="index.html#module-cube.templatetags.cube_templatetags">cube.templatetags.cube_templatetags (module)</a></dt>
 <dt><a href="index.html#module-cube.test_cube.test_models.models">cube.test_cube.test_models.models (module)</a></dt>
@@ -78,8 +84,10 @@
 <table width="100%" class="indextable"><tr><td width="33%" valign="top">
 <dl>
 
-<dt><a href="index.html#cube.templatetags.cube_templatetags.get_constraint">get_constraint() (in module cube.templatetags.cube_templatetags)</a></dt>
-<dt><a href="index.html#cube.base.BaseCube.get_sample_space">get_sample_space() (cube.base.BaseCube method)</a></dt></dl></td><td width="33%" valign="top"><dl>
+<dt><a href="index.html#cube.base.BaseCube.get_sample_space">get_sample_space() (cube.base.BaseCube method)</a></dt>
+  <dd><dl>
+    <dt><a href="index.html#cube.base.BaseDimension.get_sample_space">(cube.base.BaseDimension method)</a></dt>
+  </dl></dd></dl></td><td width="33%" valign="top"><dl>
 </dl></td></tr></table>
 
 <h2 id="M">M</h2>
@@ -91,12 +99,19 @@
 <dt><a href="index.html#cube.base.BaseCube.measure_list">measure_list() (cube.base.BaseCube method)</a></dt>
 </dl></td></tr></table>
 
-<h2 id="R">R</h2>
+<h2 id="N">N</h2>
 <table width="100%" class="indextable"><tr><td width="33%" valign="top">
 <dl>
 
-<dt><a href="index.html#cube.base.BaseCube.resample">resample() (cube.base.BaseCube method)</a></dt>
-<dt><a href="index.html#cube.base.Cube.reset_queryset">reset_queryset() (cube.base.Cube method)</a></dt></dl></td><td width="33%" valign="top"><dl>
+<dt><a href="index.html#cube.base.BaseDimension.name">name (cube.base.BaseDimension attribute)</a></dt></dl></td><td width="33%" valign="top"><dl>
+</dl></td></tr></table>
+
+<h2 id="P">P</h2>
+<table width="100%" class="indextable"><tr><td width="33%" valign="top">
+<dl>
+
+<dt><a href="index.html#cube.base.BaseDimension.pretty_constraint">pretty_constraint (cube.base.BaseDimension attribute)</a></dt>
+<dt><a href="index.html#cube.templatetags.cube_templatetags.prettyconstraint">prettyconstraint() (in module cube.templatetags.cube_templatetags)</a></dt></dl></td><td width="33%" valign="top"><dl>
 </dl></td></tr></table>
 
 <h2 id="S">S</h2>
@@ -137,7 +152,7 @@
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
-          <a href="#" title="General Index"
+          <a href="" title="General Index"
              >index</a></li>
         <li class="right" >
           <a href="modindex.html" title="Global Module Index"
@@ -147,7 +162,7 @@
     </div>
     <div class="footer">
       &copy; Copyright 2010, Sébastien Piquemal.
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.4.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.2.
     </div>
   </body>
 </html>
