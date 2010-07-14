@@ -72,9 +72,6 @@ class BaseDimension(object):
         return sorted(list(sspace))
 
     def __copy__(self):
-        """
-        Realizes a shallow copy of the dimension.
-        """
         sample_space = copy.copy(self.sample_space)
         dimension_copy = Dimension(sample_space=sample_space)
         dimension_copy._name = self._name
@@ -307,9 +304,6 @@ class BaseCube(object):
         return None
 
     def __copy__(self):
-        """
-        Returns a shallow copy of the cube.
-        """
         dimensions = copy.copy(self.dimensions)
         cube_copy = self.__class__()
         cube_copy.dimensions = dimensions
