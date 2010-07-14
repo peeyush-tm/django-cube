@@ -116,7 +116,8 @@ class BaseCubeMetaclass(type):
                 del attrs[attr_name]
 
         #Inherited attributes from the parent cube class
-        parent_dimensions = parent_cube_class._meta.dimensions if parent_cube_class else {}
+        parent_dimensions = copy.deepcopy(parent_cube_class._meta.dimensions)\
+            if parent_cube_class else {}
         parent_dimensions.update(dimensions)
         dimensions = parent_dimensions
 
