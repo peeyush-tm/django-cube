@@ -132,7 +132,7 @@ Cube
     >>> class MyCube(Cube):
     ...     dim1 = Dimension()
     ...     dim2 = Dimension()
-    >>> set([dim.name for dim in MyCube.dimensions.values()]) == set(['dim1', 'dim2'])
+    >>> set([dim.name for dim in MyCube._meta.dimensions.values()]) == set(['dim1', 'dim2'])
     True
 
 Some simple cubes
@@ -198,12 +198,32 @@ Getting a measure from the cube
 Iterating over cube's subcubes
 ---------------------------------
 
+    With free dimensions
+
+    >>> ['%s' % subcube for subcube in c.subcubes('firstname', 'instrument_name')] == [
+    ...     'Cube(instrument, instrument_cat, lastname, firstname=Bill, instrument_name=piano)',
+    ...     'Cube(instrument, instrument_cat, lastname, firstname=Bill, instrument_name=sax)',
+    ...     'Cube(instrument, instrument_cat, lastname, firstname=Bill, instrument_name=trumpet)',
+    ...     'Cube(instrument, instrument_cat, lastname, firstname=Erroll, instrument_name=piano)',
+    ...     'Cube(instrument, instrument_cat, lastname, firstname=Erroll, instrument_name=sax)',
+    ...     'Cube(instrument, instrument_cat, lastname, firstname=Erroll, instrument_name=trumpet)',
+    ...     'Cube(instrument, instrument_cat, lastname, firstname=Freddie, instrument_name=piano)',
+    ...     'Cube(instrument, instrument_cat, lastname, firstname=Freddie, instrument_name=sax)',
+    ...     'Cube(instrument, instrument_cat, lastname, firstname=Freddie, instrument_name=trumpet)',
+    ...     'Cube(instrument, instrument_cat, lastname, firstname=Miles, instrument_name=piano)',
+    ...     'Cube(instrument, instrument_cat, lastname, firstname=Miles, instrument_name=sax)',
+    ...     'Cube(instrument, instrument_cat, lastname, firstname=Miles, instrument_name=trumpet)',
+    ...     'Cube(instrument, instrument_cat, lastname, firstname=Thelonious, instrument_name=piano)',
+    ...     'Cube(instrument, instrument_cat, lastname, firstname=Thelonious, instrument_name=sax)',
+    ...     'Cube(instrument, instrument_cat, lastname, firstname=Thelonious, instrument_name=trumpet)'
+    ... ]
+    True
+
+    With a dimension already constrained 
+
+    >>> c = MusicianCube(Musician.objects.all()).constrain(firstname='Miles')
     >>> ['%s' % subcube for subcube in c.subcubes('firstname')] == [
-    ...     'Cube(instrument, instrument_cat, instrument_name, lastname, firstname=Bill)',
-    ...     'Cube(instrument, instrument_cat, instrument_name, lastname, firstname=Erroll)',
-    ...     'Cube(instrument, instrument_cat, instrument_name, lastname, firstname=Freddie)',
     ...     'Cube(instrument, instrument_cat, instrument_name, lastname, firstname=Miles)',
-    ...     'Cube(instrument, instrument_cat, instrument_name, lastname, firstname=Thelonious)'
     ... ]
     True
 
@@ -309,19 +329,19 @@ By constraining the cube
 
     >>> subcube = c.constrain(instrument_name='trumpet')
     >>> subcube.measure_dict('firstname', 'instrument_name', full=False) == {
-    ...     'Miles': {
-    ...         'trumpet': {'measure': 1},
-    ...     },
     ...     'Bill': {
     ...         'trumpet': {'measure': 0},
     ...     },
-    ...     'Thelonious': {
+    ...     'Erroll': {
     ...         'trumpet': {'measure': 0},
     ...     },
     ...     'Freddie': {
     ...         'trumpet': {'measure': 1},
     ...     },
-    ...     'Erroll': {
+    ...     'Miles': {
+    ...         'trumpet': {'measure': 1},
+    ...     },
+    ...     'Thelonious': {
     ...         'trumpet': {'measure': 0},
     ...     },
     ... }
@@ -436,18 +456,18 @@ Here is what the rendering gives :
     ...     'Cube(instrument, instrument_cat, lastname, firstname=Bill, instrument_name=piano):1'\\
     ...         'Cube(instrument, instrument_cat, firstname=Bill, instrument_name=piano, lastname=Davis):0'\\
     ...         'Cube(instrument, instrument_cat, firstname=Bill, instrument_name=piano, lastname=Evans):1'\\
-    ...     'Cube(instrument, instrument_cat, lastname, firstname=Miles, instrument_name=piano):0'\\
-    ...         'Cube(instrument, instrument_cat, firstname=Miles, instrument_name=piano, lastname=Davis):0'\\
-    ...         'Cube(instrument, instrument_cat, firstname=Miles, instrument_name=piano, lastname=Evans):0'\\
     ...     'Cube(instrument, instrument_cat, lastname, firstname=Bill, instrument_name=sax):1'\\
     ...         'Cube(instrument, instrument_cat, firstname=Bill, instrument_name=sax, lastname=Davis):0'\\
     ...         'Cube(instrument, instrument_cat, firstname=Bill, instrument_name=sax, lastname=Evans):1'\\
-    ...     'Cube(instrument, instrument_cat, lastname, firstname=Miles, instrument_name=sax):0'\\
-    ...         'Cube(instrument, instrument_cat, firstname=Miles, instrument_name=sax, lastname=Davis):0'\\
-    ...         'Cube(instrument, instrument_cat, firstname=Miles, instrument_name=sax, lastname=Evans):0'\\
     ...     'Cube(instrument, instrument_cat, lastname, firstname=Bill, instrument_name=trumpet):0'\\
     ...         'Cube(instrument, instrument_cat, firstname=Bill, instrument_name=trumpet, lastname=Davis):0'\\
     ...         'Cube(instrument, instrument_cat, firstname=Bill, instrument_name=trumpet, lastname=Evans):0'\\
+    ...     'Cube(instrument, instrument_cat, lastname, firstname=Miles, instrument_name=piano):0'\\
+    ...         'Cube(instrument, instrument_cat, firstname=Miles, instrument_name=piano, lastname=Davis):0'\\
+    ...         'Cube(instrument, instrument_cat, firstname=Miles, instrument_name=piano, lastname=Evans):0'\\
+    ...     'Cube(instrument, instrument_cat, lastname, firstname=Miles, instrument_name=sax):0'\\
+    ...         'Cube(instrument, instrument_cat, firstname=Miles, instrument_name=sax, lastname=Davis):0'\\
+    ...         'Cube(instrument, instrument_cat, firstname=Miles, instrument_name=sax, lastname=Evans):0'\\
     ...     'Cube(instrument, instrument_cat, lastname, firstname=Miles, instrument_name=trumpet):1'\\
     ...         'Cube(instrument, instrument_cat, firstname=Miles, instrument_name=trumpet, lastname=Davis):1'\\
     ...         'Cube(instrument, instrument_cat, firstname=Miles, instrument_name=trumpet, lastname=Evans):0'\\

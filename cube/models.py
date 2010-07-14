@@ -155,7 +155,7 @@ class Cube(BaseCube):
         
         #overrides the dimensions from the class with local copies 
         new_cube.dimensions = {}
-        for dim_name, dimension in cls.dimensions.iteritems():
+        for dim_name, dimension in cls._meta.dimensions.iteritems():
             dim_copy = copy.copy(dimension)
             new_cube.dimensions[dim_name] = dim_copy
             if not dim_copy.queryset:
