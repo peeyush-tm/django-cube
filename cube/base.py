@@ -93,10 +93,17 @@ class BaseCubeOptions(object):
 class BaseCubeMetaclass(type):
     """
     Metaclass for :class:`BaseCube`.
+
+    .. todo:: some ugly hacks in there ...
     """
     def __new__(cls, name, bases, attrs):
         #meta informations on a cube class
         attrs['_meta'] = BaseCubeOptions()
+        #We get the parent that inherit from BaseCube. UGLY
+        if name == 'BaseCube':
+            parent_cube_class = None
+        else:
+            parent_cube_class = filter(lambda base: issubclass(base, BaseCube), bases)[0]
 
         #We gather in *dimensions* all the dimensions found in *attrs*
         dimensions = {}
@@ -107,6 +114,11 @@ class BaseCubeMetaclass(type):
                 attr_value._name = attr_name
                 #we don't want the dimension to be an attribute of *BaseCube*
                 del attrs[attr_name]
+
+        #Inherited attributes from the parent cube class
+        parent_dimensions = parent_cube_class._meta.dimensions if parent_cube_class else {}
+        parent_dimensions.update(dimensions)
+        dimensions = parent_dimensions
 
         attrs['_meta'].dimensions = dimensions
         return super(BaseCubeMetaclass, cls).__new__(cls, name, bases, attrs)
