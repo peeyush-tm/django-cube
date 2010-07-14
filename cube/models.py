@@ -23,7 +23,7 @@ import copy
 from datetime import date, datetime
 
 from django.core.exceptions import FieldError
-from django.db.models import ForeignKey, FieldDoesNotExist
+from django.db.models import ForeignKey, FieldDoesNotExist, Model
 from django.db.models.sql import constants
 
 from base import BaseDimension, BaseCube
@@ -149,10 +149,19 @@ class Dimension(BaseDimension):
 
         return sample_space
     
+    def _sort_sample_space(self, sample_space):
+        """
+        override the parent method, in order to sort the list of django models by their *pk*.
+        """
+        if sample_space and isinstance(sample_space[0], Model):
+            return sorted(sample_space, key=lambda item: item.pk)
+        else:
+            return super(Dimension, self)._sort_sample_space(sample_space)
+
     def __copy__(self):
         sample_space = copy.copy(self.sample_space)
         queryset = copy.copy(self.queryset)
-        dimension_copy = Dimension(sample_space=sample_space, field=self.field, queryset=queryset)
+        dimension_copy = self.__class__(sample_space=sample_space, field=self.field, queryset=queryset)
         dimension_copy._name = self._name
         return dimension_copy
 

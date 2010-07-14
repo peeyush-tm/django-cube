@@ -79,7 +79,7 @@ class BaseDimension(object):
 
     def __copy__(self):
         sample_space = copy.copy(self.sample_space)
-        dimension_copy = Dimension(sample_space=sample_space)
+        dimension_copy = self.__class__(sample_space=sample_space)
         dimension_copy._name = self._name
         return dimension_copy
 

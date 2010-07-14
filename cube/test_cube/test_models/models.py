@@ -113,10 +113,10 @@ Let's get the sample spaces of some dimensions
     True
 
     >>> d = Dimension(field='author', queryset=Song.objects.all())
-    >>> set(d.get_sample_space()) == set([
+    >>> d.get_sample_space() == [
     ...     miles_davis, freddie_hubbard, erroll_garner,
     ...     bill_evans_p, thelonious_monk, bill_evans_s
-    ... ])
+    ... ]
     True
 
 Explicitely give the dimensions's sample space
@@ -143,7 +143,7 @@ Some simple cubes
     >>> class InstrumentDimension(Dimension):
     ...     @property
     ...     def pretty_constraint(self):
-    ...         return self.constraint.name
+    ...         return self.constraint.name.capitalize()
 
     >>> class SongCube(Cube):
     ...     author = Dimension()
@@ -498,7 +498,7 @@ Get the pretty string for a dimension's constraint
     ... '>FUNKY<{{ my_cube|prettyconstraint:\\'instrument\\' }}>FUNKY<'
     ... )
     >>> template.render(context)
-    u'>FUNKY<sax>FUNKY<'
+    u'>FUNKY<Sax>FUNKY<'
 
 
 Insert a table
@@ -510,32 +510,43 @@ Let's create a cube
 
 ..
     >>> node = cube_templatetags.TableFromCubeNode('dum1', 'dum2', 'dum3')
-    >>> node.build_context(c, ['firstname', 'instrument_name']) == {
-    ...     'col_names': ['Bill', 'Erroll', 'Freddie', 'Miles', 'Thelonious'],
+    >>> node.build_context(c, ['firstname', 'instrument']) == {
+    ...     'col_names': [
+    ...         ('Bill', 'Bill'),
+    ...         ('Erroll', 'Erroll'),
+    ...         ('Freddie', 'Freddie'),
+    ...         ('Miles', 'Miles'),
+    ...         ('Thelonious', 'Thelonious'),
+    ...     ],
     ...     'cols': [
-    ...         {'name': 'Bill', 'values': [1, 1, 0], 'overall': 2},
-    ...         {'name': 'Erroll', 'values': [1, 0, 0], 'overall': 1},
-    ...         {'name': 'Freddie', 'values': [0, 0, 1], 'overall': 1},
-    ...         {'name': 'Miles', 'values': [0, 0, 1], 'overall': 1},
-    ...         {'name': 'Thelonious', 'values': [1, 0, 0], 'overall': 1}
+    ...         {'name': 'Bill', 'pretty_name': 'Bill', 'values': [0, 1, 1], 'overall': 2},
+    ...         {'name': 'Erroll', 'pretty_name': 'Erroll', 'values': [0, 1, 0], 'overall': 1},
+    ...         {'name': 'Freddie', 'pretty_name': 'Freddie', 'values': [1, 0, 0], 'overall': 1},
+    ...         {'name': 'Miles', 'pretty_name': 'Miles', 'values': [1, 0, 0], 'overall': 1},
+    ...         {'name': 'Thelonious', 'pretty_name': 'Thelonious', 'values': [0, 1, 0], 'overall': 1}
     ...     ],
     ...     'col_overalls': [2, 1, 1, 1, 1],
-    ...     'row_names': ['piano', 'sax', 'trumpet'],
-    ...     'rows': [
-    ...         {'name': 'piano', 'values': [1, 1, 0, 0, 1], 'overall': 3},
-    ...         {'name': 'sax', 'values': [1, 0, 0, 0, 0], 'overall': 1},
-    ...         {'name': 'trumpet', 'values': [0, 0, 1, 1, 0], 'overall': 2}
+    ...     'row_names': [
+    ...         (trumpet, 'Trumpet'),
+    ...         (piano, 'Piano'),
+    ...         (sax, 'Sax'),
     ...     ],
-    ...     'row_overalls': [3, 1, 2],
-    ...     'col_dimension': 'firstname',
-    ...     'row_dimension': 'instrument_name',
-    ...     'overall': 6
-    ...     }
+    ...     'rows': [
+    ...         {'name': trumpet, 'pretty_name': 'Trumpet', 'values': [0, 0, 1, 1, 0], 'overall': 2},
+    ...         {'name': piano, 'pretty_name': 'Piano', 'values': [1, 1, 0, 0, 1], 'overall': 3},
+    ...         {'name': sax, 'pretty_name': 'Sax', 'values': [1, 0, 0, 0, 0], 'overall': 1},
+    ...     ],
+    ...     'row_overalls': [2, 3, 1],
+    ...     'col_dim_name': 'firstname',
+    ...     'row_dim_name': 'instrument',
+    ...     'overall': 6,
+    ...     'cube': c
+    ... }
     True
 
 Here's how to use the inclusion tag *tablefromcube* to insert a table in your template :
 
-    >>> context = Context({'my_cube': c, 'dim1': 'firstname', 'template_name': 'tablefromcube.html'})
+    >>> context = Context({'my_cube': c, 'dim1': 'firstname', 'template_name': 'table_from_cube.html'})
     >>> template = Template(
     ... '{% load cube_templatetags %}'
     ... '{% tablefromcube my_cube by dim1, "instrument_name" using template_name %}'
