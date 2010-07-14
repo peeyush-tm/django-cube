@@ -18,7 +18,6 @@
 #along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 """
-from collections import MutableMapping
 import copy
 
 from .utils import odict
@@ -33,7 +32,7 @@ class BaseDimension(object):
         """
         :param sample_space: The sample space of the dimension to create.
         """
-        self._name = None
+        self._name = ""
         self.sample_space = sample_space
         self._constraint = None
 
@@ -57,6 +56,13 @@ class BaseDimension(object):
         Setter for the property :meth:`constraint`.
         """
         self._constraint = value
+
+    @property
+    def pretty_constraint(self):
+        """
+        str -- A pretty string representation of the constraint's value 
+        """
+        return self.constraint
 
     def get_sample_space(self):
         """

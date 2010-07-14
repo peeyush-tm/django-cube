@@ -286,15 +286,15 @@ def do_subcubes(parser, token):
 do_subcubes = register.tag("subcubes", do_subcubes)
 
 
-def get_constraint(cube, dimension):
+def prettyconstraint(cube, dim_name):
     """
     Filter to get the value of the constraint for a dimension. Use it as : ::
         
-        {{ <cube>|getconstraint:'<dimension>' }}
+        {{ cube|prettyconstraint:'dimension_name' }}
     """
-    return cube.constraint[dimension]
+    return cube.dimensions[dim_name].pretty_constraint
 
-register.filter('getconstraint', get_constraint)
+register.filter('prettyconstraint', prettyconstraint)
 
 
 

@@ -140,6 +140,11 @@ Cube
 
 Some simple cubes
 
+    >>> class InstrumentDimension(Dimension):
+    ...     @property
+    ...     def pretty_constraint(self):
+    ...         return self.constraint.name
+
     >>> class SongCube(Cube):
     ...     author = Dimension()
     ...     auth_name = Dimension(field='author__lastname')
@@ -156,7 +161,7 @@ Some simple cubes
     ...     instrument_name = Dimension(field='instrument__name')
     ...     instrument_cat = Dimension(field='instrument__name__in',
     ...         sample_space=[('trumpet', 'piano'), ('trumpet', 'sax'), ('sax', 'piano')])
-    ...     instrument = Dimension()
+    ...     instrument = InstrumentDimension()
     ...     firstname = Dimension()
     ...     lastname = Dimension()
     ...     
@@ -480,17 +485,17 @@ Here is what the rendering gives :
     True
 
 
-Get a constraint value
-------------------------
+Get the pretty string for a dimension's constraint
+----------------------------------------------------
 
     >>> c = MusicianCube(Musician.objects.all()).constrain(
     ...     firstname='John',
-    ...     instrument_name='sax',
+    ...     instrument=sax,
     ... )
     >>> context = Context({'my_cube': c})
     >>> template = Template(
     ... '{% load cube_templatetags %}'
-    ... '>FUNKY<{{ my_cube|getconstraint:\\'instrument_name\\' }}>FUNKY<'
+    ... '>FUNKY<{{ my_cube|prettyconstraint:\\'instrument\\' }}>FUNKY<'
     ... )
     >>> template.render(context)
     u'>FUNKY<sax>FUNKY<'
