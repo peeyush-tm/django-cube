@@ -3,7 +3,9 @@
     >>> from datetime import datetime, date
     >>> from cube.models import Cube, Dimension
     >>> import copy
-    
+
+Here are some fixtures for the examples.
+
 Some instruments
 
     >>> trumpet = Instrument(name='trumpet')
@@ -73,61 +75,76 @@ Dimension
 Getting default sample space of a dimension
 -----------------------------------------------
 
-Let's get the sample spaces of some dimensions    
+If you didn't set explicitely the sample space of a dimension, the method :meth:`get_sample_space` will return a default sample space taken from the queryset.    
 
     >>> d = Dimension(field='title', queryset=Song.objects.all())
-    >>> d.get_sample_space() == sorted(set([
+    >>> d.get_sample_space() == sorted([
     ...     'So What', 'All Blues', 'Blue In Green',
     ...     'South Street Stroll', 'Well You Needn\\'t', 'Blue Monk'
-    ... ]))
+    ... ])
     True
+
+It works also with field names that use django field-lookup syntax
 
     >>> d = Dimension(field='release_date__year', queryset=Song.objects.all())
-    >>> d.get_sample_space() == sorted(set([1944, 1969, 1959, 1945]))
+    >>> d.get_sample_space() == sorted([1944, 1969, 1959, 1945])
     True
+
+And you can also use the special "field-lookups" *absmonth* or *absday*
 
     >>> d = Dimension(field='release_date__absmonth', queryset=Song.objects.all())
-    >>> d.get_sample_space() == sorted(set([
+    >>> d.get_sample_space() == sorted([
     ...     datetime(1969, 1, 1, 0, 0), datetime(1945, 2, 1, 0, 0),
     ...     datetime(1944, 2, 1, 0, 0), datetime(1959, 8, 1, 0, 0)
-    ... ]))
+    ... ])
     True
-
     >>> d = Dimension(field='release_date__absday', queryset=Song.objects.all())
-    >>> d.get_sample_space() == sorted(set([
+    >>> d.get_sample_space() == sorted([
     ...     datetime(1969, 1, 21, 0, 0), datetime(1945, 2, 1, 0, 0),
     ...     datetime(1944, 2, 1, 0, 0), datetime(1959, 8, 17, 0, 0)
-    ... ]))
+    ... ])
     True
 
-    >>> d = Dimension(field='author__instrument__name', queryset=Song.objects.all())
-    >>> d.get_sample_space() == sorted(['piano', 'trumpet'])
-    True
-
-    >>> d = Dimension(field='author__instrument', queryset=Song.objects.all())
-    >>> set(d.get_sample_space()) == set([piano, trumpet])
-    True
+You can traverse foreign keys
 
     >>> d = Dimension(field='author__firstname', queryset=Song.objects.all())
     >>> d.get_sample_space() == sorted(['Bill', 'Miles', 'Thelonious', 'Freddie'])
     True
+    >>> d = Dimension(field='author__instrument__name', queryset=Song.objects.all())
+    >>> d.get_sample_space() == sorted(['piano', 'trumpet'])
+    True
 
+, and refer to any type of field, even a django object
+
+    >>> d = Dimension(field='author__instrument', queryset=Song.objects.all())
+    >>> d.get_sample_space() == [trumpet, piano] # django objects are ordered by their pk
+    True
     >>> d = Dimension(field='author', queryset=Song.objects.all())
     >>> d.get_sample_space() == [
-    ...     miles_davis, freddie_hubbard, erroll_garner,
-    ...     bill_evans_p, thelonious_monk, bill_evans_s
+    ...     miles_davis, freddie_hubbard,
+    ...     bill_evans_p, thelonious_monk,
     ... ]
     True
 
 Explicitely give the dimensions's sample space
------------------------------------------
+-------------------------------------------------
+
+You can set explicitely the sample space for a dimension, by passing to the constructor a keyword *sample_space* that is an iterable. It works with lists :
 
     >>> d = Dimension(field='instrument__name', sample_space=['trumpet', 'piano'])
     >>> d.get_sample_space() == sorted(['trumpet', 'piano'])
     True
 
+But also with querysets (any iterable):
+
+    >>> d = Dimension(field='instrument', sample_space=Instrument.objects.filter(name__contains='a').order_by('name'))
+    >>> d.get_sample_space() == [piano, sax]
+    True
+
 Give dimension's sample space as a callable
 ---------------------------------------------
+
+You can pass a callable to the dimension's constructor to set its sample space. This callable takes a queryset as parameter, and returns the sample space. For example :
 
     >>> def select_contains_s(queryset):
     ...     #This function returns all musicians that wrote a song

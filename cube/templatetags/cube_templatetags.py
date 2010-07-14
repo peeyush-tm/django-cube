@@ -156,10 +156,8 @@ def do_tablefromcube(parser, token):
 
         - col_names: list of tuples *(<column name>, <column pretty name>)*
         - row_names: list of tuples *(<row name>, <row pretty name>)*
-        - cols: list of columns, as *[{'name': col_name, 'pretty_name': col_pretty_name,
-            'values': [measure1, measure2, , measureN], 'overall': col_overall}]*
-        - rows: list of columns, as *[{'name': row_name, 'pretty_name': row_pretty_name,
-            'values': [measure1, measure2, , measureN], 'overall': row_overall}]*
+        - cols: list of columns, as *[{'name': col_name, 'pretty_name': col_pretty_name, 'values': [measure1, measure2, , measureN], 'overall': col_overall}]*
+        - rows: list of columns, as *[{'name': row_name, 'pretty_name': row_pretty_name, 'values': [measure1, measure2, , measureN], 'overall': row_overall}]*
         - row_overalls: list of measure on whole rows, therefore the measure is taken on the row dimension, with *row_name* as value
         - col_overalls: list of measure on whole columns, therefore the measure is taken on the column dimension, with *col_name* as value
         - col_dim_name: the dimension on which the columns are calculated
