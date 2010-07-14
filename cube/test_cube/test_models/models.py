@@ -57,14 +57,17 @@ Dimension
 
     ----- Formatting datetimes constraint
     >>> d = Dimension(field='attribute__date__absmonth')
-    >>> d.to_queryset_filter(date(3000, 7, 1)) == {'attribute__date__month': 7, 'attribute__date__year': 3000}
+    >>> d.constraint = date(3000, 7, 1)
+    >>> d.to_queryset_filter() == {'attribute__date__month': 7, 'attribute__date__year': 3000}
     True
     >>> d = Dimension(field='attribute__date__absday')
-    >>> d.to_queryset_filter(datetime(1990, 8, 23, 0, 0, 0)) == {'attribute__date__day': 23, 'attribute__date__month': 8, 'attribute__date__year': 1990}
+    >>> d.constraint = datetime(1990, 8, 23, 0, 0, 0)
+    >>> d.to_queryset_filter() == {'attribute__date__day': 23, 'attribute__date__month': 8, 'attribute__date__year': 1990}
     True
     >>> d = Dimension()
     >>> d._name = 'myname'
-    >>> d.to_queryset_filter('coucou') == {'myname': 'coucou'}
+    >>> d.constraint = 'coucou'
+    >>> d.to_queryset_filter() == {'myname': 'coucou'}
     True
 
 Getting default sample space of a dimension
