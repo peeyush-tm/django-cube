@@ -77,12 +77,6 @@ class BaseDimension(object):
         """
         return sorted(list(sspace))
 
-    def __copy__(self):
-        sample_space = copy.copy(self.sample_space)
-        dimension_copy = self.__class__(sample_space=sample_space)
-        dimension_copy._name = self._name
-        return dimension_copy
-
 class BaseCubeOptions(object):
     """
     'Container' object for meta informations on a cube class. 
@@ -173,7 +167,7 @@ class BaseCube(object):
 
         #There is no free dimension, so we can yield the measure.
         else:
-            yield copy.copy(self)
+            yield copy.deepcopy(self)
             raise StopIteration
 
     def constrain(self, **extra_constraint):
@@ -182,7 +176,7 @@ class BaseCube(object):
 
         :returns: Cube -- a subcube of the calling cube, with the new constraint.
         """
-        cube_copy = copy.copy(self)
+        cube_copy = copy.deepcopy(self)
         dimensions = cube_copy.dimensions
 
         for dim_name, value in extra_constraint.iteritems():
@@ -321,12 +315,6 @@ class BaseCube(object):
             else:
                 return dim_names.pop(index)
         return None
-
-    def __copy__(self):
-        dimensions = copy.copy(self.dimensions)
-        cube_copy = self.__class__()
-        cube_copy.dimensions = dimensions
-        return cube_copy
 
     def __repr__(self):
         constr_dimensions = sorted(["%s=%s" % (dim, value) for dim, value in self.constraint.iteritems()])

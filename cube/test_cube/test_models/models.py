@@ -42,9 +42,9 @@ Some songs
 Dimension
 ===========
 ..
-    ----- Shallow copy
+    ----- Deep copy
     >>> d = Dimension(field='attribute__date__absmonth', queryset=[1, 2, 3], sample_space=[89, 99])
-    >>> d_copy = copy.copy(d)
+    >>> d_copy = copy.deepcopy(d)
 
     >>> id(d_copy) != id(d)
     True
@@ -203,9 +203,9 @@ Some simple cubes
 
 ..
 
-    ----- Shallow copy
+    ----- Deep copy
     >>> c = MusicianCube(Musician.objects.all())
-    >>> c_copy = copy.copy(c)
+    >>> c_copy = copy.deepcopy(c)
     >>> id(c_copy) != id(c)
     True
     >>> set(c_copy.dimensions.keys()) == set(c.dimensions.keys())
