@@ -5,7 +5,7 @@ import os
 
 sys.path.append(os.path.abspath("../.."))
 
-#TEST_RUNNER = 'doctest_runner.runner.run_tests_until_fail'
+TEST_RUNNER = 'doctest_runner.runner.run_tests_until_fail'
 
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG

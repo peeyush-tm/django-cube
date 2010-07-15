@@ -173,32 +173,10 @@ class Dimension(BaseDimension):
         else:
             return super(Dimension, self)._sort_sample_space(sample_space)
 
-    def __copy__(self):
-        sample_space = copy.copy(self.sample_space)
-        queryset = copy.copy(self.queryset)
-        dimension_copy = self.__class__(sample_space=sample_space, field=self.field, queryset=queryset)
-        dimension_copy._name = self._name
-        return dimension_copy
-
 class Cube(BaseCube):
     """
     A cube that calculates measures on a Django queryset.
     """
-    def __new__(cls, queryset, **kwargs):
-        """
-        Provides the instance with local copies of the dimensions declared at the class level.
-        """
-        new_cube = super(Cube, cls).__new__(cls, queryset, **kwargs)
-        
-        #overrides the dimensions from the class with local copy of dimensions dict.
-        new_cube.dimensions = {}
-        for dim_name, dimension in cls._meta.dimensions.iteritems():
-            dim_copy = copy.copy(dimension)
-            new_cube.dimensions[dim_name] = dim_copy
-            if not dim_copy.queryset:
-                dim_copy.queryset = queryset
-
-        return new_cube
 
     def __init__(self, queryset, measure_none=0):
         """
@@ -208,6 +186,10 @@ class Cube(BaseCube):
         super(Cube, self).__init__()
         self.queryset = queryset
         self.measure_none = measure_none
+
+        #give all the dimensions a default queryset if they don't already have one.
+        for dim_name, dimension in self.dimensions.iteritems():
+            dimension.queryset = dimension.queryset or queryset
 
     def measure(self, **coordinates):
         if coordinates:
@@ -238,10 +220,3 @@ class Cube(BaseCube):
         Abstract static method to override in order to calculate a the cube's aggregation on *queryset*.
         """
         raise NotImplementedError
-
-    def __copy__(self):
-        queryset = copy.copy(self.queryset)
-        dimensions = copy.deepcopy(self.dimensions)
-        cube_copy = self.__class__(queryset)
-        cube_copy.dimensions = dimensions
-        return cube_copy
