@@ -1,16 +1,16 @@
-Examples of use
-=================
+Django-cube documentation
+============================
 
-.. automodule:: cube.test_cube.test_models.models
+.. toctree::
+   :maxdepth: 2
+   
+   snippets
+   api_doc
+   tags_filters
 
-Members -- :mod:`cube.base`
-==============================
+Indices and tables
+==================
 
-.. automodule:: cube.base
-    :members:
-
-Template tags -- :mod:`cube.templatetags.cube_filters`
-=========================================================
-
-.. automodule:: cube.templatetags.cube_templatetags
-    :members:
+* :ref:`genindex`
+* :ref:`modindex`
+* :ref:`search`

@@ -1,0 +1,168 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Template tags and filters – cube.templatetags.cube_templatetags &mdash; django-cube v0.3 documentation</title>
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '#',
+        VERSION:     '0.3',
+        COLLAPSE_MODINDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="django-cube v0.3 documentation" href="index.html" />
+    <link rel="prev" title="API documentation" href="api_doc.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="modindex.html" title="Global Module Index"
+             accesskey="M">modules</a> |</li>
+        <li class="right" >
+          <a href="api_doc.html" title="API documentation"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">django-cube v0.3 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="module-cube.templatetags.cube_templatetags">
+<h1>Template tags and filters &#8211; <tt class="xref docutils literal"><span class="pre">cube.templatetags.cube_templatetags</span></tt><a class="headerlink" href="#module-cube.templatetags.cube_templatetags" title="Permalink to this headline">¶</a></h1>
+<dl class="function">
+<dt id="cube.templatetags.cube_templatetags.do_subcubes">
+<tt class="descclassname">cube.templatetags.cube_templatetags.</tt><tt class="descname">do_subcubes</tt><big>(</big><em>parser</em>, <em>token</em><big>)</big><a class="headerlink" href="#cube.templatetags.cube_templatetags.do_subcubes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Use the <em>subcubes</em> template tag to loop over the subcubes of a cube. The syntax is :</p>
+<div class="highlight-python"><pre>{% subcubes &lt;cube&gt; by &lt;dimension1&gt;[, &lt;dimensionN&gt;] as &lt;subcube&gt; %}
+    ...
+{% endsubcubes %}</pre>
+</div>
+<p>Example :</p>
+<div class="highlight-python"><pre>&lt;ul&gt;
+{% subcubes musician_cube by , dim1 "instrument" as m_subcube %}
+        &lt;li&gt; {{ m_subcube|prettyconstraint:"instrument" }}
+        &lt;ul&gt;
+            {% subcubes m_subcube by "name" as i_subcube %}
+            &lt;li&gt;{{ i_subcube|prettyconstraint:"name" }} : {{ i_subcube.measure }}&lt;/li&gt;
+            {% endfor %}
+        &lt;/ul&gt;
+        &lt;/li&gt;
+{% endsubcubes %}
+&lt;/ul&gt;</pre>
+</div>
+<p>Would for example output :</p>
+<div class="highlight-python"><pre>* Trumpet
+    - John : 9
+    - Jack : 67
+    - Miles : 1
+* Saxophone
+    - Jean-michel : 10
+    ...</pre>
+</div>
+</dd></dl>
+
+<dl class="function">
+<dt id="cube.templatetags.cube_templatetags.do_tablefromcube">
+<tt class="descclassname">cube.templatetags.cube_templatetags.</tt><tt class="descname">do_tablefromcube</tt><big>(</big><em>parser</em>, <em>token</em><big>)</big><a class="headerlink" href="#cube.templatetags.cube_templatetags.do_tablefromcube" title="Permalink to this definition">¶</a></dt>
+<dd><p>Inclusion tag to render a table using a defined template. Usage :</p>
+<div class="highlight-python"><pre>{% tablefromcube &lt;cube&gt; by &lt;dimension1&gt;, &lt;dimension2&gt; using &lt;template_name&gt; %}</pre>
+</div>
+<p>For example :</p>
+<div class="highlight-python"><pre>{% tablefromcube my_cube by some_dimension, "some_other_dimension" using "mytable.html" %}</pre>
+</div>
+<p>The context with which this template is rendered contains the variables :</p>
+<blockquote>
+<ul class="simple">
+<li>col_names: list of tuples <em>(&lt;column name&gt;, &lt;column pretty name&gt;)</em></li>
+<li>row_names: list of tuples <em>(&lt;row name&gt;, &lt;row pretty name&gt;)</em></li>
+<li>cols: list of columns, as <em>[{&#8216;name&#8217;: col_name, &#8216;pretty_name&#8217;: col_pretty_name, &#8216;values&#8217;: [measure1, measure2, , measureN], &#8216;overall&#8217;: col_overall}]</em></li>
+<li>rows: list of columns, as <em>[{&#8216;name&#8217;: row_name, &#8216;pretty_name&#8217;: row_pretty_name, &#8216;values&#8217;: [measure1, measure2, , measureN], &#8216;overall&#8217;: row_overall}]</em></li>
+<li>row_overalls: list of measure on whole rows, therefore the measure is taken on the row dimension, with <em>row_name</em> as value</li>
+<li>col_overalls: list of measure on whole columns, therefore the measure is taken on the column dimension, with <em>col_name</em> as value</li>
+<li>col_dim_name: the dimension on which the columns are calculated</li>
+<li>row_dim_name: the dimension on which the rows are calculated</li>
+<li>overall: measure on the whole cube</li>
+<li>cube: the cube passed as a parameter to the tag.</li>
+</ul>
+</blockquote>
+</dd></dl>
+
+<dl class="function">
+<dt id="cube.templatetags.cube_templatetags.prettyconstraint">
+<tt class="descclassname">cube.templatetags.cube_templatetags.</tt><tt class="descname">prettyconstraint</tt><big>(</big><em>cube</em>, <em>dim_name</em><big>)</big><a class="headerlink" href="#cube.templatetags.cube_templatetags.prettyconstraint" title="Permalink to this definition">¶</a></dt>
+<dd><p>Filter to get the value of the constraint for a dimension. Use it as :</p>
+<div class="highlight-python"><pre>{{ cube|prettyconstraint:'dimension_name' }}</pre>
+</div>
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <h4>Previous topic</h4>
+            <p class="topless"><a href="api_doc.html"
+                                  title="previous chapter">API documentation</a></p>
+            <h3>This Page</h3>
+            <ul class="this-page-menu">
+              <li><a href="_sources/tags_filters.txt"
+                     rel="nofollow">Show Source</a></li>
+            </ul>
+          <div id="searchbox" style="display: none">
+            <h3>Quick search</h3>
+              <form class="search" action="search.html" method="get">
+                <input type="text" name="q" size="18" />
+                <input type="submit" value="Go" />
+                <input type="hidden" name="check_keywords" value="yes" />
+                <input type="hidden" name="area" value="default" />
+              </form>
+              <p class="searchtip" style="font-size: 90%">
+              Enter search terms or a module, class or function name.
+              </p>
+          </div>
+          <script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="modindex.html" title="Global Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="api_doc.html" title="API documentation"
+             >previous</a> |</li>
+        <li><a href="index.html">django-cube v0.3 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+      &copy; Copyright 2010, Sébastien Piquemal.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.4.
+    </div>
+  </body>
+</html>
