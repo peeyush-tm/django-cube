@@ -105,7 +105,7 @@ And you can also use the special "field-lookups" *absmonth* or *absday*
     ... ])
     True
 
-You can traverse foreign keys
+You can traverse foreign keys,
 
     >>> d = Dimension(field='author__firstname', queryset=Song.objects.all())
     >>> d.get_sample_space() == sorted(['Bill', 'Miles', 'Thelonious', 'Freddie'])
@@ -114,7 +114,7 @@ You can traverse foreign keys
     >>> d.get_sample_space() == sorted(['piano', 'trumpet'])
     True
 
-, and refer to any type of field, even a django object
+and refer to any type of field, even a django object
 
     >>> d = Dimension(field='author__instrument', queryset=Song.objects.all())
     >>> d.get_sample_space() == [trumpet, piano] # django objects are ordered by their pk
@@ -158,6 +158,16 @@ You can pass a callable to the dimension's constructor to set its sample space. 
     ... ]
     True
 
+Override the display for a dimension
+--------------------------------------
+
+The property :meth:`Dimension.pretty_constraint` provides a pretty display for the dimension's constraint. If you want to customize this display, just declare a new sub-class of :class:`Dimension`, and override the :meth:`pretty_constraint` property. For example, this displays an instrument object as its name, with a capital letter first : 
+
+    >>> class InstrumentDimension(Dimension):
+    ...     @property
+    ...     def pretty_constraint(self):
+    ...         return self.constraint.name.capitalize()
+
 Cube
 ======
 
@@ -170,12 +180,10 @@ Cube
     >>> set([dim.name for dim in MyCube._meta.dimensions.values()]) == set(['dim1', 'dim2'])
     True
 
-Some simple cubes
+Declaring cubes 
+-----------------
 
-    >>> class InstrumentDimension(Dimension):
-    ...     @property
-    ...     def pretty_constraint(self):
-    ...         return self.constraint.name.capitalize()
+Declaring a cube is done in a similar manner to declaring Django models, dimensions instead of fields. 
 
     >>> class SongCube(Cube):
     ...     author = Dimension()
@@ -188,7 +196,7 @@ Some simple cubes
     ...     @staticmethod
     ...     def aggregation(queryset):
     ...         return queryset.count()
-
+    ... 
     >>> class MusicianCube(Cube):
     ...     instrument_name = Dimension(field='instrument__name')
     ...     instrument_cat = Dimension(field='instrument__name__in',
@@ -201,8 +209,7 @@ Some simple cubes
     ...     def aggregation(queryset):
     ...         return queryset.count()
 
-..
-
+.. 
     ----- Deep copy
     >>> c = MusicianCube(Musician.objects.all())
     >>> c_copy = copy.deepcopy(c)
@@ -223,6 +230,8 @@ Some simple cubes
 Getting a measure from the cube
 --------------------------------
 
+Once you instantiated a cube with a base queryset, you can access a measure at any valid coordinates. 
+
     >>> c = MusicianCube(Musician.objects.all())
     >>> c.measure(firstname='Miles')
     1
@@ -238,7 +247,7 @@ Getting a measure from the cube
 Iterating over cube's subcubes
 ---------------------------------
 
-    With free dimensions
+If your cube has no constrained dimension, querying its subcubes will yield as many subcubes as there are combinations of elements from the dimensions' sample spaces. For example : 
 
     >>> ['%s' % subcube for subcube in c.subcubes('firstname', 'instrument_name')] == [
     ...     'Cube(instrument, instrument_cat, lastname, firstname=Bill, instrument_name=piano)',
@@ -259,7 +268,7 @@ Iterating over cube's subcubes
     ... ]
     True
 
-    With a dimension already constrained 
+On the other hand, if your cube is constrained, all the subcubes yielded will be constrained as well : 
 
     >>> c = MusicianCube(Musician.objects.all()).constrain(firstname='Miles')
     >>> ['%s' % subcube for subcube in c.subcubes('firstname')] == [
@@ -270,10 +279,9 @@ Iterating over cube's subcubes
 Multidimensionnal dictionnary of measures
 -------------------------------------------
 
+Using :meth:`Cube.measure_dict`, you can get a dictionnary of all the measures, organized by dimensions : 
+
     >>> c = MusicianCube(Musician.objects.filter(instrument__name__in=['piano', 'trumpet']))
-
-Then, let's iterate over the cube's subcubes, calculating the measures for all subcube possible :
-
     >>> c.measure_dict('firstname', 'instrument_name') == {
     ...     'subcubes': {
     ...         'Bill': {
@@ -316,7 +324,7 @@ Then, let's iterate over the cube's subcubes, calculating the measures for all s
     ... }
     True
 
-Let's now do the same thing, but calculating only the measures for the subcubes whose dimensions passed to :meth:`measure_dict` are all fixed.
+You can do the same thing, but calculating only the measures for the subcubes whose dimensions passed to :meth:`measure_dict` are all fixed.
 
     >>> c.measure_dict('firstname', 'instrument_name', full=False) == {
     ...     'Bill': {
@@ -345,6 +353,8 @@ Let's now do the same thing, but calculating only the measures for the subcubes 
 Multidimensionnal list of measures
 ------------------------------------
 
+Using :meth:`Cube.measure_list`, you can get a list of measures organized by dimension :
+
     >>> c.measure_list('firstname', 'instrument_name') == [
     ...     [1, 0], #Bill: piano, trumpet
     ...     [1, 0], #Erroll ...
@@ -353,7 +363,6 @@ Multidimensionnal list of measures
     ...     [1, 0], #Thelonious ...
     ... ]
     True
-
     >>> other_c = MusicianCube(Musician.objects.filter(instrument__name__in=['piano']))
     >>> other_c.measure_list('firstname', 'instrument_name', 'lastname') == [
     ...     [[1, 0, 0]], #Bill: piano: Evans, Garner, Monk
@@ -365,7 +374,7 @@ Multidimensionnal list of measures
 Getting a subcube
 ------------------
 
-By constraining the cube
+You can get a subcube of a cube by constraining it :
 
     >>> subcube = c.constrain(instrument_name='trumpet')
     >>> subcube.measure_dict('firstname', 'instrument_name', full=False) == {
@@ -387,8 +396,7 @@ By constraining the cube
     ... }
     True
 
-
-It is also possible to use Django field-lookup syntax for date dimensions :
+Using Django field-lookup syntax for date dimensions (see the dimensions declaration) works pretty well too :
 
     >>> c = SongCube(Song.objects.all())
     >>> subcube = c.constrain(date_month=2)
@@ -422,13 +430,7 @@ It is also possible to use Django field-lookup syntax for date dimensions :
     ... }
     True
 
-Ordering the results
-----------------------
-
-    >>> 
-
-Use django field lookup syntax in dimensions
------------------------------------------------
+As well as using Django field-lookup syntax for relations (see the dimensions declaration) :
 
     >>> c = MusicianCube(Musician.objects.all())
     >>> c.measure_dict('instrument_cat', 'firstname', full=False) == {
@@ -457,14 +459,8 @@ Use django field lookup syntax in dimensions
     True
 
 
-Creating a cube from other cubes + - * /
-------------------------------------------
-
-    >>> 
-
-
-Template tags
-==============
+Template tags and filters
+============================
 ..
     >>> from cube.templatetags import cube_templatetags
     >>> from django.template import Template, Context, Variable
@@ -517,8 +513,10 @@ Here is what the rendering gives :
     True
 
 
-Get the pretty string for a dimension's constraint
+Get a pretty display of a dimension's constraint
 ----------------------------------------------------
+
+In your templates, you can access the pretty value of dimension's constraint by using the filter `prettyconstraint`
 
     >>> c = MusicianCube(Musician.objects.all()).constrain(
     ...     firstname='John',
@@ -584,6 +582,8 @@ Here's how to use the inclusion tag *tablefromcube* to insert a table in your te
     ... '{% tablefromcube my_cube by dim1, "instrument_name" using template_name %}'
     ... )
 
+Here is what the rendering gives :
+
     >>> awaited = ''\\
     ... '<table>'\\
     ...     '<theader>'\\
@@ -642,7 +642,6 @@ Here's how to use the inclusion tag *tablefromcube* to insert a table in your te
 ..
     >>> awaited == re.sub(' |\\n', '', template.render(context))
     True
-
 """
 
 from django.db import models
