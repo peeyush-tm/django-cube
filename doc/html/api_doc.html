@@ -10,7 +10,7 @@
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    '#',
+        URL_ROOT:    '',
         VERSION:     '0.3',
         COLLAPSE_MODINDEX: false,
         FILE_SUFFIX: '.html',
@@ -54,18 +54,21 @@
 <h2>Django cube, dimension &#8211; <tt class="xref docutils literal"><span class="pre">cube.models</span></tt><a class="headerlink" href="#module-cube.models" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="cube.models.Cube">
-<em class="property">class </em><tt class="descclassname">cube.models.</tt><tt class="descname">Cube</tt><big>(</big><em>queryset</em>, <em>measure_none=0</em><big>)</big><a class="headerlink" href="#cube.models.Cube" title="Permalink to this definition">¶</a></dt>
+<em class="property">
+class </em><tt class="descclassname">cube.models.</tt><tt class="descname">Cube</tt><big>(</big><em>queryset</em>, <em>measure_none=0</em><big>)</big><a class="headerlink" href="#cube.models.Cube" title="Permalink to this definition">¶</a></dt>
 <dd><p>A cube that calculates measures on a Django queryset.</p>
 <dl class="staticmethod">
 <dt id="cube.models.Cube.aggregation">
-<em class="property">static </em><tt class="descname">aggregation</tt><big>(</big><em>queryset</em><big>)</big><a class="headerlink" href="#cube.models.Cube.aggregation" title="Permalink to this definition">¶</a></dt>
+<em class="property">
+static </em><tt class="descname">aggregation</tt><big>(</big><em>queryset</em><big>)</big><a class="headerlink" href="#cube.models.Cube.aggregation" title="Permalink to this definition">¶</a></dt>
 <dd>Abstract static method to override in order to calculate a the cube&#8217;s aggregation on <em>queryset</em>.</dd></dl>
 
 </dd></dl>
 
 <dl class="class">
 <dt id="cube.models.Dimension">
-<em class="property">class </em><tt class="descclassname">cube.models.</tt><tt class="descname">Dimension</tt><big>(</big><em>field=None</em>, <em>queryset=None</em>, <em>sample_space=</em><span class="optional">[</span><span class="optional">]</span><big>)</big><a class="headerlink" href="#cube.models.Dimension" title="Permalink to this definition">¶</a></dt>
+<em class="property">
+class </em><tt class="descclassname">cube.models.</tt><tt class="descname">Dimension</tt><big>(</big><em>field=None</em>, <em>queryset=None</em>, <em>sample_space=</em><span class="optional">[</span><span class="optional">]</span><big>)</big><a class="headerlink" href="#cube.models.Dimension" title="Permalink to this definition">¶</a></dt>
 <dd><p>A dimension for a django model field.</p>
 <dl class="attribute">
 <dt id="cube.models.Dimension.field">
@@ -105,7 +108,8 @@
 <h2>Base classes &#8211; <tt class="xref docutils literal"><span class="pre">cube.base</span></tt><a class="headerlink" href="#module-cube.base" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="cube.base.BaseCube">
-<em class="property">class </em><tt class="descclassname">cube.base.</tt><tt class="descname">BaseCube</tt><a class="headerlink" href="#cube.base.BaseCube" title="Permalink to this definition">¶</a></dt>
+<em class="property">
+class </em><tt class="descclassname">cube.base.</tt><tt class="descname">BaseCube</tt><a class="headerlink" href="#cube.base.BaseCube" title="Permalink to this definition">¶</a></dt>
 <dd><p>The base class for a cube.</p>
 <dl class="method">
 <dt id="cube.base.BaseCube.constrain">
@@ -211,7 +215,7 @@
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">class</span> <span class="nc">MyCube</span><span class="p">(</span><span class="n">Cube</span><span class="p">):</span>
 <span class="gp">... </span>    <span class="n">name</span> <span class="o">=</span> <span class="n">Dimension</span><span class="p">(</span><span class="n">sample_space</span><span class="o">=</span><span class="p">[</span><span class="s">&#39;John&#39;</span><span class="p">,</span> <span class="s">&#39;Jack&#39;</span><span class="p">])</span>
 <span class="gp">... </span>    <span class="n">instrument</span> <span class="o">=</span> <span class="n">Dimension</span><span class="p">(</span><span class="n">sample_space</span><span class="o">=</span><span class="p">[</span><span class="s">&#39;Trumpet&#39;</span><span class="p">])</span>
-<span class="gp">... </span>    <span class="n">age</span> <span class="o">=</span> <span class="n">Dimension</span><span class="p">(</span><span class="n">sample_space</span><span class="o">=</span><span class="p">[</span><span class="mi">14</span><span class="p">,</span> <span class="mi">89</span><span class="p">])</span>
+<span class="gp">... </span>    <span class="n">age</span> <span class="o">=</span> <span class="n">Dimension</span><span class="p">(</span><span class="n">sample_space</span><span class="o">=</span><span class="p">[</span><span class="mf">14</span><span class="p">,</span> <span class="mf">89</span><span class="p">])</span>
 </pre></div>
 </div>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="nb">list</span><span class="p">(</span><span class="n">MyCube</span><span class="p">()</span><span class="o">.</span><span class="n">subcubes</span><span class="p">(</span><span class="s">&#39;name&#39;</span><span class="p">,</span> <span class="s">&#39;instrument&#39;</span><span class="p">))</span>
@@ -229,17 +233,20 @@
 
 <dl class="class">
 <dt id="cube.base.BaseCubeMetaclass">
-<em class="property">class </em><tt class="descclassname">cube.base.</tt><tt class="descname">BaseCubeMetaclass</tt><a class="headerlink" href="#cube.base.BaseCubeMetaclass" title="Permalink to this definition">¶</a></dt>
+<em class="property">
+class </em><tt class="descclassname">cube.base.</tt><tt class="descname">BaseCubeMetaclass</tt><a class="headerlink" href="#cube.base.BaseCubeMetaclass" title="Permalink to this definition">¶</a></dt>
 <dd>Metaclass for <a title="cube.base.BaseCube" class="reference internal" href="#cube.base.BaseCube"><tt class="xref docutils literal"><span class="pre">BaseCube</span></tt></a>.</dd></dl>
 
 <dl class="class">
 <dt id="cube.base.BaseCubeOptions">
-<em class="property">class </em><tt class="descclassname">cube.base.</tt><tt class="descname">BaseCubeOptions</tt><a class="headerlink" href="#cube.base.BaseCubeOptions" title="Permalink to this definition">¶</a></dt>
+<em class="property">
+class </em><tt class="descclassname">cube.base.</tt><tt class="descname">BaseCubeOptions</tt><a class="headerlink" href="#cube.base.BaseCubeOptions" title="Permalink to this definition">¶</a></dt>
 <dd>&#8216;Container&#8217; object for meta informations on a cube class.</dd></dl>
 
 <dl class="class">
 <dt id="cube.base.BaseDimension">
-<em class="property">class </em><tt class="descclassname">cube.base.</tt><tt class="descname">BaseDimension</tt><big>(</big><em>sample_space=</em><span class="optional">[</span><span class="optional">]</span><big>)</big><a class="headerlink" href="#cube.base.BaseDimension" title="Permalink to this definition">¶</a></dt>
+<em class="property">
+class </em><tt class="descclassname">cube.base.</tt><tt class="descname">BaseDimension</tt><big>(</big><em>sample_space=</em><span class="optional">[</span><span class="optional">]</span><big>)</big><a class="headerlink" href="#cube.base.BaseDimension" title="Permalink to this definition">¶</a></dt>
 <dd><p>The base class for a dimension of a cube.</p>
 <dl class="attribute">
 <dt id="cube.base.BaseDimension.constraint">
@@ -282,7 +289,7 @@
         <div class="sphinxsidebarwrapper">
             <h3><a href="index.html">Table Of Contents</a></h3>
             <ul>
-<li><a class="reference external" href="#">API documentation</a><ul>
+<li><a class="reference external" href="">API documentation</a><ul>
 <li><a class="reference external" href="#module-cube.models">Django cube, dimension &#8211; <tt class="docutils literal"><span class="pre">cube.models</span></tt></a></li>
 <li><a class="reference external" href="#module-cube.base">Base classes &#8211; <tt class="docutils literal"><span class="pre">cube.base</span></tt></a></li>
 </ul>
@@ -337,7 +344,7 @@
     </div>
     <div class="footer">
       &copy; Copyright 2010, Sébastien Piquemal.
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.4.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.2.
     </div>
   </body>
 </html>
