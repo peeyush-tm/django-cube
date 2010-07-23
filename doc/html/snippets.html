@@ -223,7 +223,7 @@
 </div>
 <div class="section" id="getting-a-measure-from-the-cube">
 <h3>Getting a measure from the cube<a class="headerlink" href="#getting-a-measure-from-the-cube" title="Permalink to this headline">¶</a></h3>
-<p>Once you instantiated a cube with a base queryset, you can access a measure at any valid coordinates.</p>
+<p>Once you have instantiated a cube with a base queryset, you can access a measure at any valid coordinates.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">c</span> <span class="o">=</span> <span class="n">MusicianCube</span><span class="p">(</span><span class="n">Musician</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">all</span><span class="p">())</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">c</span><span class="o">.</span><span class="n">measure</span><span class="p">(</span><span class="n">firstname</span><span class="o">=</span><span class="s">&#39;Miles&#39;</span><span class="p">)</span>
 <span class="go">1</span>
@@ -499,7 +499,7 @@
 </div>
 <div class="section" id="get-a-pretty-display-of-a-dimension-s-constraint">
 <h3>Get a pretty display of a dimension&#8217;s constraint<a class="headerlink" href="#get-a-pretty-display-of-a-dimension-s-constraint" title="Permalink to this headline">¶</a></h3>
-<p>In your templates, you can access the pretty value of dimension&#8217;s constraint by using the filter <cite>prettyconstraint</cite></p>
+<p>In your templates, you can access the pretty value of dimension&#8217;s constraint by using the filter <cite>prettyconstraint</cite>. This will call the method <tt class="xref docutils literal"><span class="pre">Dimension.pretty_constraint()</span></tt> on the dimension whose name is passed as argument.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">c</span> <span class="o">=</span> <span class="n">MusicianCube</span><span class="p">(</span><span class="n">Musician</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">all</span><span class="p">())</span><span class="o">.</span><span class="n">constrain</span><span class="p">(</span>
 <span class="gp">... </span>    <span class="n">firstname</span><span class="o">=</span><span class="s">&#39;John&#39;</span><span class="p">,</span>
 <span class="gp">... </span>    <span class="n">instrument</span><span class="o">=</span><span class="n">sax</span><span class="p">,</span>
