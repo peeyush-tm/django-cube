@@ -4,7 +4,23 @@
     >>> from cube.models import Cube, Dimension
     >>> import copy
 
-Here are some fixtures for the examples.
+Some fixtures for the examples ...
+
+Some models
+
+    >>> class Instrument(models.Model):
+    ...     name = models.CharField(max_length=100)
+    ... 
+    >>> class Musician(models.Model):
+    ...     firstname = models.CharField(max_length=100)
+    ...     lastname = models.CharField(max_length=100)
+    ...     instrument = models.ForeignKey(Instrument)
+    ... 
+    >>> class Song(models.Model):
+    ...     title = models.CharField(max_length=100)
+    ...     release_date = models.DateField()
+    ...     author = models.ForeignKey(Musician)
+    ... 
 
 Some instruments
 
@@ -72,10 +88,25 @@ Dimension
     >>> d.to_queryset_filter() == {'myname': 'coucou'}
     True
 
+Set the dimensions's sample space
+----------------------------------
+
+You can set explicitely the sample space for a dimension, by passing to the constructor a keyword *sample_space* that is an iterable. It works with lists :
+
+    >>> d = Dimension(field='instrument__name', sample_space=['trumpet', 'piano'])
+    >>> d.get_sample_space() == sorted(['trumpet', 'piano'])
+    True
+
+But also with querysets (any iterable):
+
+    >>> d = Dimension(field='instrument', sample_space=Instrument.objects.filter(name__contains='a').order_by('name'))
+    >>> d.get_sample_space() == [piano, sax]
+    True
+
 Getting default sample space of a dimension
 -----------------------------------------------
 
-If you didn't set explicitely the sample space of a dimension, the method :meth:`get_sample_space` will return a default sample space taken from the queryset.    
+If you didn't give explicitely the sample space of a dimension, the method :meth:`get_sample_space` will return a default sample space taken from the dimension's queryset.
 
     >>> d = Dimension(field='title', queryset=Song.objects.all())
     >>> d.get_sample_space() == sorted([
@@ -126,21 +157,6 @@ and refer to any type of field, even a django object
     ... ]
     True
 
-Explicitely give the dimensions's sample space
--------------------------------------------------
-
-You can set explicitely the sample space for a dimension, by passing to the constructor a keyword *sample_space* that is an iterable. It works with lists :
-
-    >>> d = Dimension(field='instrument__name', sample_space=['trumpet', 'piano'])
-    >>> d.get_sample_space() == sorted(['trumpet', 'piano'])
-    True
-
-But also with querysets (any iterable):
-
-    >>> d = Dimension(field='instrument', sample_space=Instrument.objects.filter(name__contains='a').order_by('name'))
-    >>> d.get_sample_space() == [piano, sax]
-    True
-
 Give dimension's sample space as a callable
 ---------------------------------------------
 
@@ -183,7 +199,7 @@ Cube
 Declaring cubes 
 -----------------
 
-Declaring a cube is done in a similar manner to declaring Django models, dimensions instead of fields. 
+Declaring a cube is very similar to declaring a Django model, with dimensions instead of fields. Notice that you have to override the static method :meth:`aggregation`, which calculates the aggregation on a given queryset.
 
     >>> class SongCube(Cube):
     ...     author = Dimension()
@@ -230,7 +246,7 @@ Declaring a cube is done in a similar manner to declaring Django models, dimensi
 Getting a measure from the cube
 --------------------------------
 
-Once you instantiated a cube with a base queryset, you can access a measure at any valid coordinates. 
+Once you have instantiated a cube with a base queryset, you can access a measure at any valid coordinates. 
 
     >>> c = MusicianCube(Musician.objects.all())
     >>> c.measure(firstname='Miles')
@@ -516,7 +532,7 @@ Here is what the rendering gives :
 Get a pretty display of a dimension's constraint
 ----------------------------------------------------
 
-In your templates, you can access the pretty value of dimension's constraint by using the filter `prettyconstraint`
+In your templates, you can access the pretty value of dimension's constraint by using the filter `prettyconstraint`. This will call the method :meth:`Dimension.pretty_constraint` on the dimension whose name is passed as argument.
 
     >>> c = MusicianCube(Musician.objects.all()).constrain(
     ...     firstname='John',

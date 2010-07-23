@@ -10,7 +10,7 @@
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    '#',
+        URL_ROOT:    '',
         VERSION:     '0.3',
         COLLAPSE_MODINDEX: false,
         FILE_SUFFIX: '.html',
@@ -50,7 +50,23 @@
             
   <div class="section" id="module-cube.test_cube.test_models.models">
 <h1>Snippets<a class="headerlink" href="#module-cube.test_cube.test_models.models" title="Permalink to this headline">¶</a></h1>
-<p>Here are some fixtures for the examples.</p>
+<p>Some fixtures for the examples ...</p>
+<p>Some models</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">class</span> <span class="nc">Instrument</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">Model</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="n">name</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">max_length</span><span class="o">=</span><span class="mf">100</span><span class="p">)</span>
+<span class="gp">... </span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">class</span> <span class="nc">Musician</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">Model</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="n">firstname</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">max_length</span><span class="o">=</span><span class="mf">100</span><span class="p">)</span>
+<span class="gp">... </span>    <span class="n">lastname</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">max_length</span><span class="o">=</span><span class="mf">100</span><span class="p">)</span>
+<span class="gp">... </span>    <span class="n">instrument</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">ForeignKey</span><span class="p">(</span><span class="n">Instrument</span><span class="p">)</span>
+<span class="gp">... </span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">class</span> <span class="nc">Song</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">Model</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="n">title</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">max_length</span><span class="o">=</span><span class="mf">100</span><span class="p">)</span>
+<span class="gp">... </span>    <span class="n">release_date</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">DateField</span><span class="p">()</span>
+<span class="gp">... </span>    <span class="n">author</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">ForeignKey</span><span class="p">(</span><span class="n">Musician</span><span class="p">)</span>
+<span class="gp">... </span>
+</pre></div>
+</div>
 <p>Some instruments</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">trumpet</span> <span class="o">=</span> <span class="n">Instrument</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s">&#39;trumpet&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">piano</span> <span class="o">=</span> <span class="n">Instrument</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s">&#39;piano&#39;</span><span class="p">)</span>
@@ -67,21 +83,36 @@
 </pre></div>
 </div>
 <p>Some songs</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">so_what</span> <span class="o">=</span> <span class="n">Song</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="s">&#39;So What&#39;</span><span class="p">,</span> <span class="n">author</span><span class="o">=</span><span class="n">miles_davis</span><span class="p">,</span> <span class="n">release_date</span><span class="o">=</span><span class="n">date</span><span class="p">(</span><span class="mi">1959</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">17</span><span class="p">))</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">all_blues</span> <span class="o">=</span> <span class="n">Song</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="s">&#39;All Blues&#39;</span><span class="p">,</span> <span class="n">author</span><span class="o">=</span><span class="n">miles_davis</span><span class="p">,</span> <span class="n">release_date</span><span class="o">=</span><span class="n">date</span><span class="p">(</span><span class="mi">1959</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">17</span><span class="p">))</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">blue_in_green</span> <span class="o">=</span> <span class="n">Song</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="s">&#39;Blue In Green&#39;</span><span class="p">,</span> <span class="n">author</span><span class="o">=</span><span class="n">bill_evans_p</span><span class="p">,</span> <span class="n">release_date</span><span class="o">=</span><span class="n">date</span><span class="p">(</span><span class="mi">1959</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">17</span><span class="p">))</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">south_street_stroll</span> <span class="o">=</span> <span class="n">Song</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="s">&#39;South Street Stroll&#39;</span><span class="p">,</span> <span class="n">author</span><span class="o">=</span><span class="n">freddie_hubbard</span><span class="p">,</span> <span class="n">release_date</span><span class="o">=</span><span class="n">date</span><span class="p">(</span><span class="mi">1969</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">21</span><span class="p">))</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">well_you_neednt</span> <span class="o">=</span> <span class="n">Song</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="s">&#39;Well You Needn</span><span class="se">\&#39;</span><span class="s">t&#39;</span><span class="p">,</span> <span class="n">author</span><span class="o">=</span><span class="n">thelonious_monk</span><span class="p">,</span> <span class="n">release_date</span><span class="o">=</span><span class="n">date</span><span class="p">(</span><span class="mi">1944</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">blue_monk</span> <span class="o">=</span> <span class="n">Song</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="s">&#39;Blue Monk&#39;</span><span class="p">,</span> <span class="n">author</span><span class="o">=</span><span class="n">thelonious_monk</span><span class="p">,</span> <span class="n">release_date</span><span class="o">=</span><span class="n">date</span><span class="p">(</span><span class="mi">1945</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">so_what</span> <span class="o">=</span> <span class="n">Song</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="s">&#39;So What&#39;</span><span class="p">,</span> <span class="n">author</span><span class="o">=</span><span class="n">miles_davis</span><span class="p">,</span> <span class="n">release_date</span><span class="o">=</span><span class="n">date</span><span class="p">(</span><span class="mf">1959</span><span class="p">,</span> <span class="mf">8</span><span class="p">,</span> <span class="mf">17</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">all_blues</span> <span class="o">=</span> <span class="n">Song</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="s">&#39;All Blues&#39;</span><span class="p">,</span> <span class="n">author</span><span class="o">=</span><span class="n">miles_davis</span><span class="p">,</span> <span class="n">release_date</span><span class="o">=</span><span class="n">date</span><span class="p">(</span><span class="mf">1959</span><span class="p">,</span> <span class="mf">8</span><span class="p">,</span> <span class="mf">17</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">blue_in_green</span> <span class="o">=</span> <span class="n">Song</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="s">&#39;Blue In Green&#39;</span><span class="p">,</span> <span class="n">author</span><span class="o">=</span><span class="n">bill_evans_p</span><span class="p">,</span> <span class="n">release_date</span><span class="o">=</span><span class="n">date</span><span class="p">(</span><span class="mf">1959</span><span class="p">,</span> <span class="mf">8</span><span class="p">,</span> <span class="mf">17</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">south_street_stroll</span> <span class="o">=</span> <span class="n">Song</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="s">&#39;South Street Stroll&#39;</span><span class="p">,</span> <span class="n">author</span><span class="o">=</span><span class="n">freddie_hubbard</span><span class="p">,</span> <span class="n">release_date</span><span class="o">=</span><span class="n">date</span><span class="p">(</span><span class="mf">1969</span><span class="p">,</span> <span class="mf">1</span><span class="p">,</span> <span class="mf">21</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">well_you_neednt</span> <span class="o">=</span> <span class="n">Song</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="s">&#39;Well You Needn</span><span class="se">\&#39;</span><span class="s">t&#39;</span><span class="p">,</span> <span class="n">author</span><span class="o">=</span><span class="n">thelonious_monk</span><span class="p">,</span> <span class="n">release_date</span><span class="o">=</span><span class="n">date</span><span class="p">(</span><span class="mf">1944</span><span class="p">,</span> <span class="mf">2</span><span class="p">,</span> <span class="mf">1</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">blue_monk</span> <span class="o">=</span> <span class="n">Song</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="s">&#39;Blue Monk&#39;</span><span class="p">,</span> <span class="n">author</span><span class="o">=</span><span class="n">thelonious_monk</span><span class="p">,</span> <span class="n">release_date</span><span class="o">=</span><span class="n">date</span><span class="p">(</span><span class="mf">1945</span><span class="p">,</span> <span class="mf">2</span><span class="p">,</span> <span class="mf">1</span><span class="p">))</span>
 </pre></div>
 </div>
 <div class="section" id="dimension">
 <h2>Dimension<a class="headerlink" href="#dimension" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="set-the-dimensions-s-sample-space">
+<h3>Set the dimensions&#8217;s sample space<a class="headerlink" href="#set-the-dimensions-s-sample-space" title="Permalink to this headline">¶</a></h3>
+<p>You can set explicitely the sample space for a dimension, by passing to the constructor a keyword <em>sample_space</em> that is an iterable. It works with lists :</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">d</span> <span class="o">=</span> <span class="n">Dimension</span><span class="p">(</span><span class="n">field</span><span class="o">=</span><span class="s">&#39;instrument__name&#39;</span><span class="p">,</span> <span class="n">sample_space</span><span class="o">=</span><span class="p">[</span><span class="s">&#39;trumpet&#39;</span><span class="p">,</span> <span class="s">&#39;piano&#39;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">d</span><span class="o">.</span><span class="n">get_sample_space</span><span class="p">()</span> <span class="o">==</span> <span class="n">sorted</span><span class="p">([</span><span class="s">&#39;trumpet&#39;</span><span class="p">,</span> <span class="s">&#39;piano&#39;</span><span class="p">])</span>
+<span class="go">True</span>
+</pre></div>
+</div>
+<p>But also with querysets (any iterable):</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">d</span> <span class="o">=</span> <span class="n">Dimension</span><span class="p">(</span><span class="n">field</span><span class="o">=</span><span class="s">&#39;instrument&#39;</span><span class="p">,</span> <span class="n">sample_space</span><span class="o">=</span><span class="n">Instrument</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">name__contains</span><span class="o">=</span><span class="s">&#39;a&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">order_by</span><span class="p">(</span><span class="s">&#39;name&#39;</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">d</span><span class="o">.</span><span class="n">get_sample_space</span><span class="p">()</span> <span class="o">==</span> <span class="p">[</span><span class="n">piano</span><span class="p">,</span> <span class="n">sax</span><span class="p">]</span>
+<span class="go">True</span>
+</pre></div>
+</div>
+</div>
 <div class="section" id="getting-default-sample-space-of-a-dimension">
 <h3>Getting default sample space of a dimension<a class="headerlink" href="#getting-default-sample-space-of-a-dimension" title="Permalink to this headline">¶</a></h3>
-<p>If you didn&#8217;t set explicitely the sample space of a dimension, the method <tt class="xref docutils literal"><span class="pre">get_sample_space()</span></tt> will return a default sample space taken from the queryset.</p>
+<p>If you didn&#8217;t give explicitely the sample space of a dimension, the method <tt class="xref docutils literal"><span class="pre">get_sample_space()</span></tt> will return a default sample space taken from the dimension&#8217;s queryset.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">d</span> <span class="o">=</span> <span class="n">Dimension</span><span class="p">(</span><span class="n">field</span><span class="o">=</span><span class="s">&#39;title&#39;</span><span class="p">,</span> <span class="n">queryset</span><span class="o">=</span><span class="n">Song</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">all</span><span class="p">())</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">d</span><span class="o">.</span><span class="n">get_sample_space</span><span class="p">()</span> <span class="o">==</span> <span class="nb">sorted</span><span class="p">([</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">d</span><span class="o">.</span><span class="n">get_sample_space</span><span class="p">()</span> <span class="o">==</span> <span class="n">sorted</span><span class="p">([</span>
 <span class="gp">... </span>    <span class="s">&#39;So What&#39;</span><span class="p">,</span> <span class="s">&#39;All Blues&#39;</span><span class="p">,</span> <span class="s">&#39;Blue In Green&#39;</span><span class="p">,</span>
 <span class="gp">... </span>    <span class="s">&#39;South Street Stroll&#39;</span><span class="p">,</span> <span class="s">&#39;Well You Needn</span><span class="se">\&#39;</span><span class="s">t&#39;</span><span class="p">,</span> <span class="s">&#39;Blue Monk&#39;</span>
 <span class="gp">... </span><span class="p">])</span>
@@ -90,31 +121,31 @@
 </div>
 <p>It works also with field names that use django field-lookup syntax</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">d</span> <span class="o">=</span> <span class="n">Dimension</span><span class="p">(</span><span class="n">field</span><span class="o">=</span><span class="s">&#39;release_date__year&#39;</span><span class="p">,</span> <span class="n">queryset</span><span class="o">=</span><span class="n">Song</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">all</span><span class="p">())</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">d</span><span class="o">.</span><span class="n">get_sample_space</span><span class="p">()</span> <span class="o">==</span> <span class="nb">sorted</span><span class="p">([</span><span class="mi">1944</span><span class="p">,</span> <span class="mi">1969</span><span class="p">,</span> <span class="mi">1959</span><span class="p">,</span> <span class="mi">1945</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">d</span><span class="o">.</span><span class="n">get_sample_space</span><span class="p">()</span> <span class="o">==</span> <span class="n">sorted</span><span class="p">([</span><span class="mf">1944</span><span class="p">,</span> <span class="mf">1969</span><span class="p">,</span> <span class="mf">1959</span><span class="p">,</span> <span class="mf">1945</span><span class="p">])</span>
 <span class="go">True</span>
 </pre></div>
 </div>
 <p>And you can also use the special &#8220;field-lookups&#8221; <em>absmonth</em> or <em>absday</em></p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">d</span> <span class="o">=</span> <span class="n">Dimension</span><span class="p">(</span><span class="n">field</span><span class="o">=</span><span class="s">&#39;release_date__absmonth&#39;</span><span class="p">,</span> <span class="n">queryset</span><span class="o">=</span><span class="n">Song</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">all</span><span class="p">())</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">d</span><span class="o">.</span><span class="n">get_sample_space</span><span class="p">()</span> <span class="o">==</span> <span class="nb">sorted</span><span class="p">([</span>
-<span class="gp">... </span>    <span class="n">datetime</span><span class="p">(</span><span class="mi">1969</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="n">datetime</span><span class="p">(</span><span class="mi">1945</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
-<span class="gp">... </span>    <span class="n">datetime</span><span class="p">(</span><span class="mi">1944</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="n">datetime</span><span class="p">(</span><span class="mi">1959</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">d</span><span class="o">.</span><span class="n">get_sample_space</span><span class="p">()</span> <span class="o">==</span> <span class="n">sorted</span><span class="p">([</span>
+<span class="gp">... </span>    <span class="n">datetime</span><span class="p">(</span><span class="mf">1969</span><span class="p">,</span> <span class="mf">1</span><span class="p">,</span> <span class="mf">1</span><span class="p">,</span> <span class="mf">0</span><span class="p">,</span> <span class="mf">0</span><span class="p">),</span> <span class="n">datetime</span><span class="p">(</span><span class="mf">1945</span><span class="p">,</span> <span class="mf">2</span><span class="p">,</span> <span class="mf">1</span><span class="p">,</span> <span class="mf">0</span><span class="p">,</span> <span class="mf">0</span><span class="p">),</span>
+<span class="gp">... </span>    <span class="n">datetime</span><span class="p">(</span><span class="mf">1944</span><span class="p">,</span> <span class="mf">2</span><span class="p">,</span> <span class="mf">1</span><span class="p">,</span> <span class="mf">0</span><span class="p">,</span> <span class="mf">0</span><span class="p">),</span> <span class="n">datetime</span><span class="p">(</span><span class="mf">1959</span><span class="p">,</span> <span class="mf">8</span><span class="p">,</span> <span class="mf">1</span><span class="p">,</span> <span class="mf">0</span><span class="p">,</span> <span class="mf">0</span><span class="p">)</span>
 <span class="gp">... </span><span class="p">])</span>
 <span class="go">True</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">d</span> <span class="o">=</span> <span class="n">Dimension</span><span class="p">(</span><span class="n">field</span><span class="o">=</span><span class="s">&#39;release_date__absday&#39;</span><span class="p">,</span> <span class="n">queryset</span><span class="o">=</span><span class="n">Song</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">all</span><span class="p">())</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">d</span><span class="o">.</span><span class="n">get_sample_space</span><span class="p">()</span> <span class="o">==</span> <span class="nb">sorted</span><span class="p">([</span>
-<span class="gp">... </span>    <span class="n">datetime</span><span class="p">(</span><span class="mi">1969</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">21</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="n">datetime</span><span class="p">(</span><span class="mi">1945</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
-<span class="gp">... </span>    <span class="n">datetime</span><span class="p">(</span><span class="mi">1944</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="n">datetime</span><span class="p">(</span><span class="mi">1959</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">17</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">d</span><span class="o">.</span><span class="n">get_sample_space</span><span class="p">()</span> <span class="o">==</span> <span class="n">sorted</span><span class="p">([</span>
+<span class="gp">... </span>    <span class="n">datetime</span><span class="p">(</span><span class="mf">1969</span><span class="p">,</span> <span class="mf">1</span><span class="p">,</span> <span class="mf">21</span><span class="p">,</span> <span class="mf">0</span><span class="p">,</span> <span class="mf">0</span><span class="p">),</span> <span class="n">datetime</span><span class="p">(</span><span class="mf">1945</span><span class="p">,</span> <span class="mf">2</span><span class="p">,</span> <span class="mf">1</span><span class="p">,</span> <span class="mf">0</span><span class="p">,</span> <span class="mf">0</span><span class="p">),</span>
+<span class="gp">... </span>    <span class="n">datetime</span><span class="p">(</span><span class="mf">1944</span><span class="p">,</span> <span class="mf">2</span><span class="p">,</span> <span class="mf">1</span><span class="p">,</span> <span class="mf">0</span><span class="p">,</span> <span class="mf">0</span><span class="p">),</span> <span class="n">datetime</span><span class="p">(</span><span class="mf">1959</span><span class="p">,</span> <span class="mf">8</span><span class="p">,</span> <span class="mf">17</span><span class="p">,</span> <span class="mf">0</span><span class="p">,</span> <span class="mf">0</span><span class="p">)</span>
 <span class="gp">... </span><span class="p">])</span>
 <span class="go">True</span>
 </pre></div>
 </div>
 <p>You can traverse foreign keys,</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">d</span> <span class="o">=</span> <span class="n">Dimension</span><span class="p">(</span><span class="n">field</span><span class="o">=</span><span class="s">&#39;author__firstname&#39;</span><span class="p">,</span> <span class="n">queryset</span><span class="o">=</span><span class="n">Song</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">all</span><span class="p">())</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">d</span><span class="o">.</span><span class="n">get_sample_space</span><span class="p">()</span> <span class="o">==</span> <span class="nb">sorted</span><span class="p">([</span><span class="s">&#39;Bill&#39;</span><span class="p">,</span> <span class="s">&#39;Miles&#39;</span><span class="p">,</span> <span class="s">&#39;Thelonious&#39;</span><span class="p">,</span> <span class="s">&#39;Freddie&#39;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">d</span><span class="o">.</span><span class="n">get_sample_space</span><span class="p">()</span> <span class="o">==</span> <span class="n">sorted</span><span class="p">([</span><span class="s">&#39;Bill&#39;</span><span class="p">,</span> <span class="s">&#39;Miles&#39;</span><span class="p">,</span> <span class="s">&#39;Thelonious&#39;</span><span class="p">,</span> <span class="s">&#39;Freddie&#39;</span><span class="p">])</span>
 <span class="go">True</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">d</span> <span class="o">=</span> <span class="n">Dimension</span><span class="p">(</span><span class="n">field</span><span class="o">=</span><span class="s">&#39;author__instrument__name&#39;</span><span class="p">,</span> <span class="n">queryset</span><span class="o">=</span><span class="n">Song</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">all</span><span class="p">())</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">d</span><span class="o">.</span><span class="n">get_sample_space</span><span class="p">()</span> <span class="o">==</span> <span class="nb">sorted</span><span class="p">([</span><span class="s">&#39;piano&#39;</span><span class="p">,</span> <span class="s">&#39;trumpet&#39;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">d</span><span class="o">.</span><span class="n">get_sample_space</span><span class="p">()</span> <span class="o">==</span> <span class="n">sorted</span><span class="p">([</span><span class="s">&#39;piano&#39;</span><span class="p">,</span> <span class="s">&#39;trumpet&#39;</span><span class="p">])</span>
 <span class="go">True</span>
 </pre></div>
 </div>
@@ -127,21 +158,6 @@
 <span class="gp">... </span>    <span class="n">miles_davis</span><span class="p">,</span> <span class="n">freddie_hubbard</span><span class="p">,</span>
 <span class="gp">... </span>    <span class="n">bill_evans_p</span><span class="p">,</span> <span class="n">thelonious_monk</span><span class="p">,</span>
 <span class="gp">... </span><span class="p">]</span>
-<span class="go">True</span>
-</pre></div>
-</div>
-</div>
-<div class="section" id="explicitely-give-the-dimensions-s-sample-space">
-<h3>Explicitely give the dimensions&#8217;s sample space<a class="headerlink" href="#explicitely-give-the-dimensions-s-sample-space" title="Permalink to this headline">¶</a></h3>
-<p>You can set explicitely the sample space for a dimension, by passing to the constructor a keyword <em>sample_space</em> that is an iterable. It works with lists :</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">d</span> <span class="o">=</span> <span class="n">Dimension</span><span class="p">(</span><span class="n">field</span><span class="o">=</span><span class="s">&#39;instrument__name&#39;</span><span class="p">,</span> <span class="n">sample_space</span><span class="o">=</span><span class="p">[</span><span class="s">&#39;trumpet&#39;</span><span class="p">,</span> <span class="s">&#39;piano&#39;</span><span class="p">])</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">d</span><span class="o">.</span><span class="n">get_sample_space</span><span class="p">()</span> <span class="o">==</span> <span class="nb">sorted</span><span class="p">([</span><span class="s">&#39;trumpet&#39;</span><span class="p">,</span> <span class="s">&#39;piano&#39;</span><span class="p">])</span>
-<span class="go">True</span>
-</pre></div>
-</div>
-<p>But also with querysets (any iterable):</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">d</span> <span class="o">=</span> <span class="n">Dimension</span><span class="p">(</span><span class="n">field</span><span class="o">=</span><span class="s">&#39;instrument&#39;</span><span class="p">,</span> <span class="n">sample_space</span><span class="o">=</span><span class="n">Instrument</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">name__contains</span><span class="o">=</span><span class="s">&#39;a&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">order_by</span><span class="p">(</span><span class="s">&#39;name&#39;</span><span class="p">))</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">d</span><span class="o">.</span><span class="n">get_sample_space</span><span class="p">()</span> <span class="o">==</span> <span class="p">[</span><span class="n">piano</span><span class="p">,</span> <span class="n">sax</span><span class="p">]</span>
 <span class="go">True</span>
 </pre></div>
 </div>
@@ -178,7 +194,7 @@
 <h2>Cube<a class="headerlink" href="#cube" title="Permalink to this headline">¶</a></h2>
 <div class="section" id="declaring-cubes">
 <h3>Declaring cubes<a class="headerlink" href="#declaring-cubes" title="Permalink to this headline">¶</a></h3>
-<p>Declaring a cube is done in a similar manner to declaring Django models, dimensions instead of fields.</p>
+<p>Declaring a cube is very similar to declaring a Django model, with dimensions instead of fields. Notice that you have to override the static method <tt class="xref docutils literal"><span class="pre">aggregation()</span></tt>, which calculates the aggregation on a given queryset.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">class</span> <span class="nc">SongCube</span><span class="p">(</span><span class="n">Cube</span><span class="p">):</span>
 <span class="gp">... </span>    <span class="n">author</span> <span class="o">=</span> <span class="n">Dimension</span><span class="p">()</span>
 <span class="gp">... </span>    <span class="n">auth_name</span> <span class="o">=</span> <span class="n">Dimension</span><span class="p">(</span><span class="n">field</span><span class="o">=</span><span class="s">&#39;author__lastname&#39;</span><span class="p">)</span>
@@ -262,41 +278,41 @@
 <span class="gp">... </span>    <span class="s">&#39;subcubes&#39;</span><span class="p">:</span> <span class="p">{</span>
 <span class="gp">... </span>        <span class="s">&#39;Bill&#39;</span><span class="p">:</span> <span class="p">{</span>
 <span class="gp">... </span>            <span class="s">&#39;subcubes&#39;</span><span class="p">:</span> <span class="p">{</span>
-<span class="gp">... </span>                <span class="s">&#39;piano&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s">&#39;measure&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">},</span>
-<span class="gp">... </span>                <span class="s">&#39;trumpet&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s">&#39;measure&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">},</span>
+<span class="gp">... </span>                <span class="s">&#39;piano&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s">&#39;measure&#39;</span><span class="p">:</span> <span class="mf">1</span><span class="p">},</span>
+<span class="gp">... </span>                <span class="s">&#39;trumpet&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s">&#39;measure&#39;</span><span class="p">:</span> <span class="mf">0</span><span class="p">},</span>
 <span class="gp">... </span>            <span class="p">},</span>
-<span class="gp">... </span>            <span class="s">&#39;measure&#39;</span><span class="p">:</span> <span class="mi">1</span>
+<span class="gp">... </span>            <span class="s">&#39;measure&#39;</span><span class="p">:</span> <span class="mf">1</span>
 <span class="gp">... </span>        <span class="p">},</span>
 <span class="gp">... </span>        <span class="s">&#39;Miles&#39;</span><span class="p">:</span> <span class="p">{</span>
 <span class="gp">... </span>            <span class="s">&#39;subcubes&#39;</span><span class="p">:</span> <span class="p">{</span>
-<span class="gp">... </span>                <span class="s">&#39;piano&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s">&#39;measure&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">},</span>
-<span class="gp">... </span>                <span class="s">&#39;trumpet&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s">&#39;measure&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">},</span>
+<span class="gp">... </span>                <span class="s">&#39;piano&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s">&#39;measure&#39;</span><span class="p">:</span> <span class="mf">0</span><span class="p">},</span>
+<span class="gp">... </span>                <span class="s">&#39;trumpet&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s">&#39;measure&#39;</span><span class="p">:</span> <span class="mf">1</span><span class="p">},</span>
 <span class="gp">... </span>            <span class="p">},</span>
-<span class="gp">... </span>            <span class="s">&#39;measure&#39;</span><span class="p">:</span> <span class="mi">1</span>
+<span class="gp">... </span>            <span class="s">&#39;measure&#39;</span><span class="p">:</span> <span class="mf">1</span>
 <span class="gp">... </span>        <span class="p">},</span>
 <span class="gp">... </span>        <span class="s">&#39;Thelonious&#39;</span><span class="p">:</span> <span class="p">{</span>
 <span class="gp">... </span>            <span class="s">&#39;subcubes&#39;</span><span class="p">:</span> <span class="p">{</span>
-<span class="gp">... </span>                <span class="s">&#39;piano&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s">&#39;measure&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">},</span>
-<span class="gp">... </span>                <span class="s">&#39;trumpet&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s">&#39;measure&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">},</span>
+<span class="gp">... </span>                <span class="s">&#39;piano&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s">&#39;measure&#39;</span><span class="p">:</span> <span class="mf">1</span><span class="p">},</span>
+<span class="gp">... </span>                <span class="s">&#39;trumpet&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s">&#39;measure&#39;</span><span class="p">:</span> <span class="mf">0</span><span class="p">},</span>
 <span class="gp">... </span>            <span class="p">},</span>
-<span class="gp">... </span>            <span class="s">&#39;measure&#39;</span><span class="p">:</span> <span class="mi">1</span>
+<span class="gp">... </span>            <span class="s">&#39;measure&#39;</span><span class="p">:</span> <span class="mf">1</span>
 <span class="gp">... </span>        <span class="p">},</span>
 <span class="gp">... </span>        <span class="s">&#39;Freddie&#39;</span><span class="p">:</span> <span class="p">{</span>
 <span class="gp">... </span>            <span class="s">&#39;subcubes&#39;</span><span class="p">:</span> <span class="p">{</span>
-<span class="gp">... </span>                <span class="s">&#39;piano&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s">&#39;measure&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">},</span>
-<span class="gp">... </span>                <span class="s">&#39;trumpet&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s">&#39;measure&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">},</span>
+<span class="gp">... </span>                <span class="s">&#39;piano&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s">&#39;measure&#39;</span><span class="p">:</span> <span class="mf">0</span><span class="p">},</span>
+<span class="gp">... </span>                <span class="s">&#39;trumpet&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s">&#39;measure&#39;</span><span class="p">:</span> <span class="mf">1</span><span class="p">},</span>
 <span class="gp">... </span>            <span class="p">},</span>
-<span class="gp">... </span>            <span class="s">&#39;measure&#39;</span><span class="p">:</span> <span class="mi">1</span>
+<span class="gp">... </span>            <span class="s">&#39;measure&#39;</span><span class="p">:</span> <span class="mf">1</span>
 <span class="gp">... </span>        <span class="p">},</span>
 <span class="gp">... </span>        <span class="s">&#39;Erroll&#39;</span><span class="p">:</span> <span class="p">{</span>
 <span class="gp">... </span>            <span class="s">&#39;subcubes&#39;</span><span class="p">:</span> <span class="p">{</span>
-<span class="gp">... </span>                <span class="s">&#39;piano&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s">&#39;measure&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">},</span>
-<span class="gp">... </span>                <span class="s">&#39;trumpet&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s">&#39;measure&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">},</span>
+<span class="gp">... </span>                <span class="s">&#39;piano&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s">&#39;measure&#39;</span><span class="p">:</span> <span class="mf">1</span><span class="p">},</span>
+<span class="gp">... </span>                <span class="s">&#39;trumpet&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s">&#39;measure&#39;</span><span class="p">:</span> <span class="mf">0</span><span class="p">},</span>
 <span class="gp">... </span>            <span class="p">},</span>
-<span class="gp">... </span>            <span class="s">&#39;measure&#39;</span><span class="p">:</span> <span class="mi">1</span>
+<span class="gp">... </span>            <span class="s">&#39;measure&#39;</span><span class="p">:</span> <span class="mf">1</span>
 <span class="gp">... </span>        <span class="p">},</span>
 <span class="gp">... </span>    <span class="p">},</span>
-<span class="gp">... </span>    <span class="s">&#39;measure&#39;</span><span class="p">:</span> <span class="mi">5</span>
+<span class="gp">... </span>    <span class="s">&#39;measure&#39;</span><span class="p">:</span> <span class="mf">5</span>
 <span class="gp">... </span><span class="p">}</span>
 <span class="go">True</span>
 </pre></div>
@@ -304,24 +320,24 @@
 <p>You can do the same thing, but calculating only the measures for the subcubes whose dimensions passed to <tt class="xref docutils literal"><span class="pre">measure_dict()</span></tt> are all fixed.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">c</span><span class="o">.</span><span class="n">measure_dict</span><span class="p">(</span><span class="s">&#39;firstname&#39;</span><span class="p">,</span> <span class="s">&#39;instrument_name&#39;</span><span class="p">,</span> <span class="n">full</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span> <span class="o">==</span> <span class="p">{</span>
 <span class="gp">... </span>    <span class="s">&#39;Bill&#39;</span><span class="p">:</span> <span class="p">{</span>
-<span class="gp">... </span>        <span class="s">&#39;piano&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s">&#39;measure&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">},</span>
-<span class="gp">... </span>        <span class="s">&#39;trumpet&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s">&#39;measure&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">},</span>
+<span class="gp">... </span>        <span class="s">&#39;piano&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s">&#39;measure&#39;</span><span class="p">:</span> <span class="mf">1</span><span class="p">},</span>
+<span class="gp">... </span>        <span class="s">&#39;trumpet&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s">&#39;measure&#39;</span><span class="p">:</span> <span class="mf">0</span><span class="p">},</span>
 <span class="gp">... </span>    <span class="p">},</span>
 <span class="gp">... </span>    <span class="s">&#39;Miles&#39;</span><span class="p">:</span> <span class="p">{</span>
-<span class="gp">... </span>        <span class="s">&#39;piano&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s">&#39;measure&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">},</span>
-<span class="gp">... </span>        <span class="s">&#39;trumpet&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s">&#39;measure&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">},</span>
+<span class="gp">... </span>        <span class="s">&#39;piano&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s">&#39;measure&#39;</span><span class="p">:</span> <span class="mf">0</span><span class="p">},</span>
+<span class="gp">... </span>        <span class="s">&#39;trumpet&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s">&#39;measure&#39;</span><span class="p">:</span> <span class="mf">1</span><span class="p">},</span>
 <span class="gp">... </span>    <span class="p">},</span>
 <span class="gp">... </span>    <span class="s">&#39;Thelonious&#39;</span><span class="p">:</span> <span class="p">{</span>
-<span class="gp">... </span>        <span class="s">&#39;piano&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s">&#39;measure&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">},</span>
-<span class="gp">... </span>        <span class="s">&#39;trumpet&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s">&#39;measure&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">},</span>
+<span class="gp">... </span>        <span class="s">&#39;piano&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s">&#39;measure&#39;</span><span class="p">:</span> <span class="mf">1</span><span class="p">},</span>
+<span class="gp">... </span>        <span class="s">&#39;trumpet&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s">&#39;measure&#39;</span><span class="p">:</span> <span class="mf">0</span><span class="p">},</span>
 <span class="gp">... </span>    <span class="p">},</span>
 <span class="gp">... </span>    <span class="s">&#39;Freddie&#39;</span><span class="p">:</span> <span class="p">{</span>
-<span class="gp">... </span>        <span class="s">&#39;piano&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s">&#39;measure&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">},</span>
-<span class="gp">... </span>        <span class="s">&#39;trumpet&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s">&#39;measure&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">},</span>
+<span class="gp">... </span>        <span class="s">&#39;piano&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s">&#39;measure&#39;</span><span class="p">:</span> <span class="mf">0</span><span class="p">},</span>
+<span class="gp">... </span>        <span class="s">&#39;trumpet&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s">&#39;measure&#39;</span><span class="p">:</span> <span class="mf">1</span><span class="p">},</span>
 <span class="gp">... </span>    <span class="p">},</span>
 <span class="gp">... </span>    <span class="s">&#39;Erroll&#39;</span><span class="p">:</span> <span class="p">{</span>
-<span class="gp">... </span>        <span class="s">&#39;piano&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s">&#39;measure&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">},</span>
-<span class="gp">... </span>        <span class="s">&#39;trumpet&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s">&#39;measure&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">},</span>
+<span class="gp">... </span>        <span class="s">&#39;piano&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s">&#39;measure&#39;</span><span class="p">:</span> <span class="mf">1</span><span class="p">},</span>
+<span class="gp">... </span>        <span class="s">&#39;trumpet&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s">&#39;measure&#39;</span><span class="p">:</span> <span class="mf">0</span><span class="p">},</span>
 <span class="gp">... </span>    <span class="p">},</span>
 <span class="gp">... </span><span class="p">}</span>
 <span class="go">True</span>
@@ -332,18 +348,18 @@
 <h3>Multidimensionnal list of measures<a class="headerlink" href="#multidimensionnal-list-of-measures" title="Permalink to this headline">¶</a></h3>
 <p>Using <tt class="xref docutils literal"><span class="pre">Cube.measure_list()</span></tt>, you can get a list of measures organized by dimension :</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">c</span><span class="o">.</span><span class="n">measure_list</span><span class="p">(</span><span class="s">&#39;firstname&#39;</span><span class="p">,</span> <span class="s">&#39;instrument_name&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="p">[</span>
-<span class="gp">... </span>    <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="c">#Bill: piano, trumpet</span>
-<span class="gp">... </span>    <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="c">#Erroll ...</span>
-<span class="gp">... </span>    <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="c">#Freddie ...</span>
-<span class="gp">... </span>    <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="c">#Miles ...</span>
-<span class="gp">... </span>    <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="c">#Thelonious ...</span>
+<span class="gp">... </span>    <span class="p">[</span><span class="mf">1</span><span class="p">,</span> <span class="mf">0</span><span class="p">],</span> <span class="c">#Bill: piano, trumpet</span>
+<span class="gp">... </span>    <span class="p">[</span><span class="mf">1</span><span class="p">,</span> <span class="mf">0</span><span class="p">],</span> <span class="c">#Erroll ...</span>
+<span class="gp">... </span>    <span class="p">[</span><span class="mf">0</span><span class="p">,</span> <span class="mf">1</span><span class="p">],</span> <span class="c">#Freddie ...</span>
+<span class="gp">... </span>    <span class="p">[</span><span class="mf">0</span><span class="p">,</span> <span class="mf">1</span><span class="p">],</span> <span class="c">#Miles ...</span>
+<span class="gp">... </span>    <span class="p">[</span><span class="mf">1</span><span class="p">,</span> <span class="mf">0</span><span class="p">],</span> <span class="c">#Thelonious ...</span>
 <span class="gp">... </span><span class="p">]</span>
 <span class="go">True</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">other_c</span> <span class="o">=</span> <span class="n">MusicianCube</span><span class="p">(</span><span class="n">Musician</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">instrument__name__in</span><span class="o">=</span><span class="p">[</span><span class="s">&#39;piano&#39;</span><span class="p">]))</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">other_c</span><span class="o">.</span><span class="n">measure_list</span><span class="p">(</span><span class="s">&#39;firstname&#39;</span><span class="p">,</span> <span class="s">&#39;instrument_name&#39;</span><span class="p">,</span> <span class="s">&#39;lastname&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="p">[</span>
-<span class="gp">... </span>    <span class="p">[[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]],</span> <span class="c">#Bill: piano: Evans, Garner, Monk</span>
-<span class="gp">... </span>    <span class="p">[[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]],</span> <span class="c">#Erroll ...</span>
-<span class="gp">... </span>    <span class="p">[[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]],</span> <span class="c">#Thelonious ...</span>
+<span class="gp">... </span>    <span class="p">[[</span><span class="mf">1</span><span class="p">,</span> <span class="mf">0</span><span class="p">,</span> <span class="mf">0</span><span class="p">]],</span> <span class="c">#Bill: piano: Evans, Garner, Monk</span>
+<span class="gp">... </span>    <span class="p">[[</span><span class="mf">0</span><span class="p">,</span> <span class="mf">1</span><span class="p">,</span> <span class="mf">0</span><span class="p">]],</span> <span class="c">#Erroll ...</span>
+<span class="gp">... </span>    <span class="p">[[</span><span class="mf">0</span><span class="p">,</span> <span class="mf">0</span><span class="p">,</span> <span class="mf">1</span><span class="p">]],</span> <span class="c">#Thelonious ...</span>
 <span class="gp">... </span><span class="p">]</span>
 <span class="go">True</span>
 </pre></div>
@@ -355,19 +371,19 @@
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">subcube</span> <span class="o">=</span> <span class="n">c</span><span class="o">.</span><span class="n">constrain</span><span class="p">(</span><span class="n">instrument_name</span><span class="o">=</span><span class="s">&#39;trumpet&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">subcube</span><span class="o">.</span><span class="n">measure_dict</span><span class="p">(</span><span class="s">&#39;firstname&#39;</span><span class="p">,</span> <span class="s">&#39;instrument_name&#39;</span><span class="p">,</span> <span class="n">full</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span> <span class="o">==</span> <span class="p">{</span>
 <span class="gp">... </span>    <span class="s">&#39;Bill&#39;</span><span class="p">:</span> <span class="p">{</span>
-<span class="gp">... </span>        <span class="s">&#39;trumpet&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s">&#39;measure&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">},</span>
+<span class="gp">... </span>        <span class="s">&#39;trumpet&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s">&#39;measure&#39;</span><span class="p">:</span> <span class="mf">0</span><span class="p">},</span>
 <span class="gp">... </span>    <span class="p">},</span>
 <span class="gp">... </span>    <span class="s">&#39;Erroll&#39;</span><span class="p">:</span> <span class="p">{</span>
-<span class="gp">... </span>        <span class="s">&#39;trumpet&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s">&#39;measure&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">},</span>
+<span class="gp">... </span>        <span class="s">&#39;trumpet&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s">&#39;measure&#39;</span><span class="p">:</span> <span class="mf">0</span><span class="p">},</span>
 <span class="gp">... </span>    <span class="p">},</span>
 <span class="gp">... </span>    <span class="s">&#39;Freddie&#39;</span><span class="p">:</span> <span class="p">{</span>
-<span class="gp">... </span>        <span class="s">&#39;trumpet&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s">&#39;measure&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">},</span>
+<span class="gp">... </span>        <span class="s">&#39;trumpet&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s">&#39;measure&#39;</span><span class="p">:</span> <span class="mf">1</span><span class="p">},</span>
 <span class="gp">... </span>    <span class="p">},</span>
 <span class="gp">... </span>    <span class="s">&#39;Miles&#39;</span><span class="p">:</span> <span class="p">{</span>
-<span class="gp">... </span>        <span class="s">&#39;trumpet&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s">&#39;measure&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">},</span>
+<span class="gp">... </span>        <span class="s">&#39;trumpet&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s">&#39;measure&#39;</span><span class="p">:</span> <span class="mf">1</span><span class="p">},</span>
 <span class="gp">... </span>    <span class="p">},</span>
 <span class="gp">... </span>    <span class="s">&#39;Thelonious&#39;</span><span class="p">:</span> <span class="p">{</span>
-<span class="gp">... </span>        <span class="s">&#39;trumpet&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s">&#39;measure&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">},</span>
+<span class="gp">... </span>        <span class="s">&#39;trumpet&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s">&#39;measure&#39;</span><span class="p">:</span> <span class="mf">0</span><span class="p">},</span>
 <span class="gp">... </span>    <span class="p">},</span>
 <span class="gp">... </span><span class="p">}</span>
 <span class="go">True</span>
@@ -375,32 +391,32 @@
 </div>
 <p>Using Django field-lookup syntax for date dimensions (see the dimensions declaration) works pretty well too :</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">c</span> <span class="o">=</span> <span class="n">SongCube</span><span class="p">(</span><span class="n">Song</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">all</span><span class="p">())</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">subcube</span> <span class="o">=</span> <span class="n">c</span><span class="o">.</span><span class="n">constrain</span><span class="p">(</span><span class="n">date_month</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">subcube</span> <span class="o">=</span> <span class="n">c</span><span class="o">.</span><span class="n">constrain</span><span class="p">(</span><span class="n">date_month</span><span class="o">=</span><span class="mf">2</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">subcube</span><span class="o">.</span><span class="n">measure_dict</span><span class="p">(</span><span class="s">&#39;date_month&#39;</span><span class="p">,</span> <span class="s">&#39;date_year&#39;</span><span class="p">,</span> <span class="s">&#39;auth_name&#39;</span><span class="p">,</span> <span class="n">full</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span> <span class="o">==</span> <span class="p">{</span>
-<span class="gp">... </span>    <span class="mi">2</span><span class="p">:</span> <span class="p">{</span>
-<span class="gp">... </span>        <span class="mi">1945</span><span class="p">:</span> <span class="p">{</span>
-<span class="gp">... </span>            <span class="s">&#39;Davis&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s">&#39;measure&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">},</span>
-<span class="gp">... </span>            <span class="s">&#39;Hubbard&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s">&#39;measure&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">},</span>
-<span class="gp">... </span>            <span class="s">&#39;Evans&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s">&#39;measure&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">},</span>
-<span class="gp">... </span>            <span class="s">&#39;Monk&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s">&#39;measure&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">}</span>
+<span class="gp">... </span>    <span class="mf">2</span><span class="p">:</span> <span class="p">{</span>
+<span class="gp">... </span>        <span class="mf">1945</span><span class="p">:</span> <span class="p">{</span>
+<span class="gp">... </span>            <span class="s">&#39;Davis&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s">&#39;measure&#39;</span><span class="p">:</span> <span class="mf">0</span><span class="p">},</span>
+<span class="gp">... </span>            <span class="s">&#39;Hubbard&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s">&#39;measure&#39;</span><span class="p">:</span> <span class="mf">0</span><span class="p">},</span>
+<span class="gp">... </span>            <span class="s">&#39;Evans&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s">&#39;measure&#39;</span><span class="p">:</span> <span class="mf">0</span><span class="p">},</span>
+<span class="gp">... </span>            <span class="s">&#39;Monk&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s">&#39;measure&#39;</span><span class="p">:</span> <span class="mf">1</span><span class="p">}</span>
 <span class="gp">... </span>        <span class="p">},</span>
-<span class="gp">... </span>        <span class="mi">1944</span><span class="p">:</span> <span class="p">{</span>
-<span class="gp">... </span>            <span class="s">&#39;Davis&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s">&#39;measure&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">},</span>
-<span class="gp">... </span>            <span class="s">&#39;Hubbard&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s">&#39;measure&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">},</span>
-<span class="gp">... </span>            <span class="s">&#39;Evans&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s">&#39;measure&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">},</span>
-<span class="gp">... </span>            <span class="s">&#39;Monk&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s">&#39;measure&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">}</span>
+<span class="gp">... </span>        <span class="mf">1944</span><span class="p">:</span> <span class="p">{</span>
+<span class="gp">... </span>            <span class="s">&#39;Davis&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s">&#39;measure&#39;</span><span class="p">:</span> <span class="mf">0</span><span class="p">},</span>
+<span class="gp">... </span>            <span class="s">&#39;Hubbard&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s">&#39;measure&#39;</span><span class="p">:</span> <span class="mf">0</span><span class="p">},</span>
+<span class="gp">... </span>            <span class="s">&#39;Evans&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s">&#39;measure&#39;</span><span class="p">:</span> <span class="mf">0</span><span class="p">},</span>
+<span class="gp">... </span>            <span class="s">&#39;Monk&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s">&#39;measure&#39;</span><span class="p">:</span> <span class="mf">1</span><span class="p">}</span>
 <span class="gp">... </span>        <span class="p">},</span>
-<span class="gp">... </span>        <span class="mi">1969</span><span class="p">:</span> <span class="p">{</span>
-<span class="gp">... </span>            <span class="s">&#39;Davis&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s">&#39;measure&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">},</span>
-<span class="gp">... </span>            <span class="s">&#39;Hubbard&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s">&#39;measure&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">},</span>
-<span class="gp">... </span>            <span class="s">&#39;Evans&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s">&#39;measure&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">},</span>
-<span class="gp">... </span>            <span class="s">&#39;Monk&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s">&#39;measure&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">}</span>
+<span class="gp">... </span>        <span class="mf">1969</span><span class="p">:</span> <span class="p">{</span>
+<span class="gp">... </span>            <span class="s">&#39;Davis&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s">&#39;measure&#39;</span><span class="p">:</span> <span class="mf">0</span><span class="p">},</span>
+<span class="gp">... </span>            <span class="s">&#39;Hubbard&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s">&#39;measure&#39;</span><span class="p">:</span> <span class="mf">0</span><span class="p">},</span>
+<span class="gp">... </span>            <span class="s">&#39;Evans&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s">&#39;measure&#39;</span><span class="p">:</span> <span class="mf">0</span><span class="p">},</span>
+<span class="gp">... </span>            <span class="s">&#39;Monk&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s">&#39;measure&#39;</span><span class="p">:</span> <span class="mf">0</span><span class="p">}</span>
 <span class="gp">... </span>        <span class="p">},</span>
-<span class="gp">... </span>        <span class="mi">1959</span><span class="p">:</span> <span class="p">{</span>
-<span class="gp">... </span>            <span class="s">&#39;Davis&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s">&#39;measure&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">},</span>
-<span class="gp">... </span>            <span class="s">&#39;Hubbard&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s">&#39;measure&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">},</span>
-<span class="gp">... </span>            <span class="s">&#39;Evans&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s">&#39;measure&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">},</span>
-<span class="gp">... </span>            <span class="s">&#39;Monk&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s">&#39;measure&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">}</span>
+<span class="gp">... </span>        <span class="mf">1959</span><span class="p">:</span> <span class="p">{</span>
+<span class="gp">... </span>            <span class="s">&#39;Davis&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s">&#39;measure&#39;</span><span class="p">:</span> <span class="mf">0</span><span class="p">},</span>
+<span class="gp">... </span>            <span class="s">&#39;Hubbard&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s">&#39;measure&#39;</span><span class="p">:</span> <span class="mf">0</span><span class="p">},</span>
+<span class="gp">... </span>            <span class="s">&#39;Evans&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s">&#39;measure&#39;</span><span class="p">:</span> <span class="mf">0</span><span class="p">},</span>
+<span class="gp">... </span>            <span class="s">&#39;Monk&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s">&#39;measure&#39;</span><span class="p">:</span> <span class="mf">0</span><span class="p">}</span>
 <span class="gp">... </span>        <span class="p">},</span>
 <span class="gp">... </span>    <span class="p">}</span>
 <span class="gp">... </span><span class="p">}</span>
@@ -411,25 +427,25 @@
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">c</span> <span class="o">=</span> <span class="n">MusicianCube</span><span class="p">(</span><span class="n">Musician</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">all</span><span class="p">())</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">c</span><span class="o">.</span><span class="n">measure_dict</span><span class="p">(</span><span class="s">&#39;instrument_cat&#39;</span><span class="p">,</span> <span class="s">&#39;firstname&#39;</span><span class="p">,</span> <span class="n">full</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span> <span class="o">==</span> <span class="p">{</span>
 <span class="gp">... </span>    <span class="p">(</span><span class="s">&#39;trumpet&#39;</span><span class="p">,</span> <span class="s">&#39;piano&#39;</span><span class="p">):</span> <span class="p">{</span>
-<span class="gp">... </span>        <span class="s">&#39;Bill&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s">&#39;measure&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">},</span>
-<span class="gp">... </span>        <span class="s">&#39;Erroll&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s">&#39;measure&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">},</span>
-<span class="gp">... </span>        <span class="s">&#39;Miles&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s">&#39;measure&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">},</span>
-<span class="gp">... </span>        <span class="s">&#39;Freddie&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s">&#39;measure&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">},</span>
-<span class="gp">... </span>        <span class="s">&#39;Thelonious&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s">&#39;measure&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">},</span>
+<span class="gp">... </span>        <span class="s">&#39;Bill&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s">&#39;measure&#39;</span><span class="p">:</span> <span class="mf">1</span><span class="p">},</span>
+<span class="gp">... </span>        <span class="s">&#39;Erroll&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s">&#39;measure&#39;</span><span class="p">:</span> <span class="mf">1</span><span class="p">},</span>
+<span class="gp">... </span>        <span class="s">&#39;Miles&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s">&#39;measure&#39;</span><span class="p">:</span> <span class="mf">1</span><span class="p">},</span>
+<span class="gp">... </span>        <span class="s">&#39;Freddie&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s">&#39;measure&#39;</span><span class="p">:</span> <span class="mf">1</span><span class="p">},</span>
+<span class="gp">... </span>        <span class="s">&#39;Thelonious&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s">&#39;measure&#39;</span><span class="p">:</span> <span class="mf">1</span><span class="p">},</span>
 <span class="gp">... </span>    <span class="p">},</span>
 <span class="gp">... </span>    <span class="p">(</span><span class="s">&#39;trumpet&#39;</span><span class="p">,</span> <span class="s">&#39;sax&#39;</span><span class="p">):</span> <span class="p">{</span>
-<span class="gp">... </span>        <span class="s">&#39;Bill&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s">&#39;measure&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">},</span>
-<span class="gp">... </span>        <span class="s">&#39;Erroll&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s">&#39;measure&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">},</span>
-<span class="gp">... </span>        <span class="s">&#39;Miles&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s">&#39;measure&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">},</span>
-<span class="gp">... </span>        <span class="s">&#39;Freddie&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s">&#39;measure&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">},</span>
-<span class="gp">... </span>        <span class="s">&#39;Thelonious&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s">&#39;measure&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">},</span>
+<span class="gp">... </span>        <span class="s">&#39;Bill&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s">&#39;measure&#39;</span><span class="p">:</span> <span class="mf">1</span><span class="p">},</span>
+<span class="gp">... </span>        <span class="s">&#39;Erroll&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s">&#39;measure&#39;</span><span class="p">:</span> <span class="mf">0</span><span class="p">},</span>
+<span class="gp">... </span>        <span class="s">&#39;Miles&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s">&#39;measure&#39;</span><span class="p">:</span> <span class="mf">1</span><span class="p">},</span>
+<span class="gp">... </span>        <span class="s">&#39;Freddie&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s">&#39;measure&#39;</span><span class="p">:</span> <span class="mf">1</span><span class="p">},</span>
+<span class="gp">... </span>        <span class="s">&#39;Thelonious&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s">&#39;measure&#39;</span><span class="p">:</span> <span class="mf">0</span><span class="p">},</span>
 <span class="gp">... </span>    <span class="p">},</span>
 <span class="gp">... </span>    <span class="p">(</span><span class="s">&#39;sax&#39;</span><span class="p">,</span> <span class="s">&#39;piano&#39;</span><span class="p">):</span> <span class="p">{</span>
-<span class="gp">... </span>        <span class="s">&#39;Bill&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s">&#39;measure&#39;</span><span class="p">:</span> <span class="mi">2</span><span class="p">},</span>
-<span class="gp">... </span>        <span class="s">&#39;Erroll&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s">&#39;measure&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">},</span>
-<span class="gp">... </span>        <span class="s">&#39;Miles&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s">&#39;measure&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">},</span>
-<span class="gp">... </span>        <span class="s">&#39;Freddie&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s">&#39;measure&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">},</span>
-<span class="gp">... </span>        <span class="s">&#39;Thelonious&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s">&#39;measure&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">},</span>
+<span class="gp">... </span>        <span class="s">&#39;Bill&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s">&#39;measure&#39;</span><span class="p">:</span> <span class="mf">2</span><span class="p">},</span>
+<span class="gp">... </span>        <span class="s">&#39;Erroll&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s">&#39;measure&#39;</span><span class="p">:</span> <span class="mf">1</span><span class="p">},</span>
+<span class="gp">... </span>        <span class="s">&#39;Miles&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s">&#39;measure&#39;</span><span class="p">:</span> <span class="mf">0</span><span class="p">},</span>
+<span class="gp">... </span>        <span class="s">&#39;Freddie&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s">&#39;measure&#39;</span><span class="p">:</span> <span class="mf">0</span><span class="p">},</span>
+<span class="gp">... </span>        <span class="s">&#39;Thelonious&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s">&#39;measure&#39;</span><span class="p">:</span> <span class="mf">1</span><span class="p">},</span>
 <span class="gp">... </span>    <span class="p">},</span>
 <span class="gp">... </span><span class="p">}</span>
 <span class="go">True</span>
@@ -581,10 +597,10 @@
         <div class="sphinxsidebarwrapper">
             <h3><a href="index.html">Table Of Contents</a></h3>
             <ul>
-<li><a class="reference external" href="#">Snippets</a><ul>
+<li><a class="reference external" href="">Snippets</a><ul>
 <li><a class="reference external" href="#dimension">Dimension</a><ul>
+<li><a class="reference external" href="#set-the-dimensions-s-sample-space">Set the dimensions&#8217;s sample space</a></li>
 <li><a class="reference external" href="#getting-default-sample-space-of-a-dimension">Getting default sample space of a dimension</a></li>
-<li><a class="reference external" href="#explicitely-give-the-dimensions-s-sample-space">Explicitely give the dimensions&#8217;s sample space</a></li>
 <li><a class="reference external" href="#give-dimension-s-sample-space-as-a-callable">Give dimension&#8217;s sample space as a callable</a></li>
 <li><a class="reference external" href="#override-the-display-for-a-dimension">Override the display for a dimension</a></li>
 </ul>
@@ -656,7 +672,7 @@
     </div>
     <div class="footer">
       &copy; Copyright 2010, Sébastien Piquemal.
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.4.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.2.
     </div>
   </body>
 </html>
