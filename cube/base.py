@@ -39,14 +39,14 @@ class BaseDimension(object):
     @property
     def name(self):
         """
-        str -- The name of the dimension.
+        :class:`str` -- The name of the dimension.
         """
         return self._name
 
     @property
     def constraint(self):
         """
-        object -- The value to which the dimension is constrained
+        :class:`object` -- The value to which the dimension is constrained
         """
         return self._constraint
 
@@ -60,20 +60,20 @@ class BaseDimension(object):
     @property
     def pretty_constraint(self):
         """
-        str -- A pretty string representation of the constraint's value 
+        :class:`str` -- A pretty string representation of the constraint's value 
         """
         return self.constraint
 
     def get_sample_space(self):
         """
-        :returns: list -- The sorted sample space for the calling dimension. 
+        :returns: :class:`list` -- The sorted sample space for the calling dimension. 
         """
         return self._sort_sample_space(self.sample_space)
 
     def _sort_sample_space(self, sspace):
         """
         :param sspace: the sample space to sort, can be any iterable
-        :returns: list -- the sample space sorted
+        :returns: :class:`list` -- the sample space sorted
         """
         return sorted(list(sspace))
 
@@ -138,7 +138,7 @@ class BaseCube(object):
      
     def subcubes(self, *dim_names):
         """
-        Return an ordered iterator, on all the sucubes with dimensions in *dim_names* constrained. For example :
+        Return an ordered iterator on all the sucubes with dimensions in *dim_names* constrained. For example :
 
             >>> class MyCube(Cube):
             ...     name = Dimension(sample_space=['John', 'Jack'])
@@ -172,9 +172,15 @@ class BaseCube(object):
 
     def constrain(self, **extra_constraint):
         """
-        Merges (or overrides) the calling cube's constraint with *extra_constraint*.
+        Updates the calling cube's *constraint* with *extra_constraint*.
 
-        :returns: Cube -- a subcube of the calling cube, with the new constraint.
+            >>> cube = MyCube(queryset)
+            >>> subcube = cube.constrain(dimensionA=2)
+            >>> cube ; subcube
+            MyCube(dimensionA)
+            MyCube(dimensionA=2)
+
+        :returns: :class:`Cube` -- a subcube of the calling cube, with the updated constraint.
         """
         cube_copy = copy.deepcopy(self)
         dimensions = cube_copy.dimensions
@@ -283,14 +289,14 @@ class BaseCube(object):
 
     def get_sample_space(self, dim_name):
         """
-        :returns: list -- the sample space for the cube for the dimension *dim_name*. 
+        :returns: :class:`list` -- the sample space for the cube for the dimension *dim_name*. 
         """
         return self.dimensions[dim_name].get_sample_space()
 
     @property
     def constraint(self):
         """
-        dict -- a dictionnary *dimension_name: constraint_value*. The dimensions that are not constrained are not in this dictionnary.
+        :class:`dict` -- a dictionnary *{dimension_name: constraint_value}*. Dimensions that are not constrained do not appear in this dictionnary.
         """
         constraint_dict = {}
         for dimension in self.dimensions.values():

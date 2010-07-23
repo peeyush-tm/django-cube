@@ -48,115 +48,67 @@
         <div class="bodywrapper">
           <div class="body">
             
-  <div class="section" id="api-documentation">
-<h1>API documentation<a class="headerlink" href="#api-documentation" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="module-cube.models">
-<h2>Django cube, dimension &#8211; <tt class="xref docutils literal"><span class="pre">cube.models</span></tt><a class="headerlink" href="#module-cube.models" title="Permalink to this headline">¶</a></h2>
+  <div class="section" id="module-cube.models">
+<h1>API documentation<a class="headerlink" href="#module-cube.models" title="Permalink to this headline">¶</a></h1>
 <dl class="class">
 <dt id="cube.models.Cube">
 <em class="property">
 class </em><tt class="descclassname">cube.models.</tt><tt class="descname">Cube</tt><big>(</big><em>queryset</em>, <em>measure_none=0</em><big>)</big><a class="headerlink" href="#cube.models.Cube" title="Permalink to this definition">¶</a></dt>
-<dd><p>A cube that calculates measures on a Django queryset.</p>
+<dd><p>A cube that can calculates measures on a Django queryset.</p>
 <dl class="staticmethod">
 <dt id="cube.models.Cube.aggregation">
 <em class="property">
 static </em><tt class="descname">aggregation</tt><big>(</big><em>queryset</em><big>)</big><a class="headerlink" href="#cube.models.Cube.aggregation" title="Permalink to this definition">¶</a></dt>
-<dd>Abstract static method to override in order to calculate a the cube&#8217;s aggregation on <em>queryset</em>.</dd></dl>
-
-</dd></dl>
-
-<dl class="class">
-<dt id="cube.models.Dimension">
-<em class="property">
-class </em><tt class="descclassname">cube.models.</tt><tt class="descname">Dimension</tt><big>(</big><em>field=None</em>, <em>queryset=None</em>, <em>sample_space=</em><span class="optional">[</span><span class="optional">]</span><big>)</big><a class="headerlink" href="#cube.models.Dimension" title="Permalink to this definition">¶</a></dt>
-<dd><p>A dimension for a django model field.</p>
-<dl class="attribute">
-<dt id="cube.models.Dimension.field">
-<tt class="descname">field</tt><a class="headerlink" href="#cube.models.Dimension.field" title="Permalink to this definition">¶</a></dt>
-<dd>str &#8211; the model field this dimension refers to.</dd></dl>
-
-<dl class="method">
-<dt id="cube.models.Dimension.get_sample_space">
-<tt class="descname">get_sample_space</tt><big>(</big><big>)</big><a class="headerlink" href="#cube.models.Dimension.get_sample_space" title="Permalink to this definition">¶</a></dt>
-<dd><table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field"><th class="field-name">Returns:</th><td class="field-body">list &#8211; The sorted sample space of the calling dimension.</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="cube.models.Dimension.to_queryset_filter">
-<tt class="descname">to_queryset_filter</tt><big>(</big><big>)</big><a class="headerlink" href="#cube.models.Dimension.to_queryset_filter" title="Permalink to this definition">¶</a></dt>
-<dd><table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field"><th class="field-name">Returns:</th><td class="field-body">dict &#8211; the django queryset filter equivalent to this dimension and its constraint. Returns <em>{}</em> if the dimension is not constrained.</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-</dd></dl>
-
+<dd><p>Abstract method. Given a <em>queryset</em>, this method should calculate and return the measure. For example :</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">def</span> <span class="nf">aggregation</span><span class="p">(</span><span class="n">queryset</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="k">return</span> <span class="n">queryset</span><span class="o">.</span><span class="n">count</span><span class="p">()</span>
+</pre></div>
 </div>
-<div class="section" id="module-cube.base">
-<h2>Base classes &#8211; <tt class="xref docutils literal"><span class="pre">cube.base</span></tt><a class="headerlink" href="#module-cube.base" title="Permalink to this headline">¶</a></h2>
-<dl class="class">
-<dt id="cube.base.BaseCube">
-<em class="property">
-class </em><tt class="descclassname">cube.base.</tt><tt class="descname">BaseCube</tt><a class="headerlink" href="#cube.base.BaseCube" title="Permalink to this definition">¶</a></dt>
-<dd><p>The base class for a cube.</p>
+<p>In practice, the <em>queryset</em> received as a parameter will <strong>always</strong> be : the cube&#8217;s base queryset, filtered according to the cube&#8217;s constraints.</p>
+</dd></dl>
+
 <dl class="method">
-<dt id="cube.base.BaseCube.constrain">
-<tt class="descname">constrain</tt><big>(</big><em>**extra_constraint</em><big>)</big><a class="headerlink" href="#cube.base.BaseCube.constrain" title="Permalink to this definition">¶</a></dt>
-<dd><p>Merges (or overrides) the calling cube&#8217;s constraint with <em>extra_constraint</em>.</p>
+<dt id="cube.models.Cube.constrain">
+<tt class="descname">constrain</tt><big>(</big><em>**extra_constraint</em><big>)</big><a class="headerlink" href="#cube.models.Cube.constrain" title="Permalink to this definition">¶</a></dt>
+<dd><p>Updates the calling cube&#8217;s <em>constraint</em> with <em>extra_constraint</em>.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">cube</span> <span class="o">=</span> <span class="n">MyCube</span><span class="p">(</span><span class="n">queryset</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">subcube</span> <span class="o">=</span> <span class="n">cube</span><span class="o">.</span><span class="n">constrain</span><span class="p">(</span><span class="n">dimensionA</span><span class="o">=</span><span class="mf">2</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cube</span> <span class="p">;</span> <span class="n">subcube</span>
+<span class="go">MyCube(dimensionA)</span>
+<span class="go">MyCube(dimensionA=2)</span>
+</pre></div>
+</div>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field"><th class="field-name">Returns:</th><td class="field-body">Cube &#8211; a subcube of the calling cube, with the new constraint.</td>
+<tr class="field"><th class="field-name">Returns:</th><td class="field-body"><a title="cube.models.Cube" class="reference internal" href="#cube.models.Cube"><tt class="xref docutils literal"><span class="pre">Cube</span></tt></a> &#8211; a subcube of the calling cube, with the updated constraint.</td>
 </tr>
 </tbody>
 </table>
 </dd></dl>
 
 <dl class="attribute">
-<dt id="cube.base.BaseCube.constraint">
-<tt class="descname">constraint</tt><a class="headerlink" href="#cube.base.BaseCube.constraint" title="Permalink to this definition">¶</a></dt>
-<dd>dict &#8211; a dictionnary <em>dimension_name: constraint_value</em>. The dimensions that are not constrained are not in this dictionnary.</dd></dl>
+<dt id="cube.models.Cube.constraint">
+<tt class="descname">constraint</tt><a class="headerlink" href="#cube.models.Cube.constraint" title="Permalink to this definition">¶</a></dt>
+<dd><a title="(in Python v2.7)" class="reference external" href="http://docs.python.org/library/stdtypes.html#dict"><tt class="xref docutils literal"><span class="pre">dict</span></tt></a> &#8211; a dictionnary <em>{dimension_name: constraint_value}</em>. Dimensions that are not constrained do not appear in this dictionnary.</dd></dl>
 
 <dl class="method">
-<dt id="cube.base.BaseCube.get_sample_space">
-<tt class="descname">get_sample_space</tt><big>(</big><em>dim_name</em><big>)</big><a class="headerlink" href="#cube.base.BaseCube.get_sample_space" title="Permalink to this definition">¶</a></dt>
+<dt id="cube.models.Cube.get_sample_space">
+<tt class="descname">get_sample_space</tt><big>(</big><em>dim_name</em><big>)</big><a class="headerlink" href="#cube.models.Cube.get_sample_space" title="Permalink to this definition">¶</a></dt>
 <dd><table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field"><th class="field-name">Returns:</th><td class="field-body">list &#8211; the sample space for the cube for the dimension <em>dim_name</em>.</td>
+<tr class="field"><th class="field-name">Returns:</th><td class="field-body"><a title="(in Python v2.7)" class="reference external" href="http://docs.python.org/library/functions.html#list"><tt class="xref docutils literal"><span class="pre">list</span></tt></a> &#8211; the sample space for the cube for the dimension <em>dim_name</em>.</td>
 </tr>
 </tbody>
 </table>
 </dd></dl>
 
 <dl class="method">
-<dt id="cube.base.BaseCube.measure">
-<tt class="descname">measure</tt><big>(</big><em>**coordinates</em><big>)</big><a class="headerlink" href="#cube.base.BaseCube.measure" title="Permalink to this definition">¶</a></dt>
-<dd><p>Calculates and returns the measure on the cube at <em>coordinates</em>. For example :</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">cube</span><span class="o">.</span><span class="n">measure</span><span class="p">(</span><span class="n">dim1</span><span class="o">=</span><span class="n">val1</span><span class="p">,</span> <span class="n">dim2</span><span class="o">=</span><span class="n">val2</span><span class="p">,</span> <span class="n">dimN</span><span class="o">=</span><span class="n">valN</span><span class="p">)</span>
-<span class="go">12.98</span>
-</pre></div>
-</div>
-<p>If <em>coordinates</em> is empty, the measure returned is calculated on the whole cube.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="cube.base.BaseCube.measure_dict">
-<tt class="descname">measure_dict</tt><big>(</big><em>*dim_names</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#cube.base.BaseCube.measure_dict" title="Permalink to this definition">¶</a></dt>
+<dt id="cube.models.Cube.measure_dict">
+<tt class="descname">measure_dict</tt><big>(</big><em>*dim_names</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#cube.models.Cube.measure_dict" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns an ordered dictionnary of measures from the cube, structured following <em>dim_names</em>. For example :</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">cube</span><span class="p">([</span><span class="s">&#39;dim1&#39;</span><span class="p">,</span> <span class="s">&#39;dim2&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">measures_dict</span><span class="p">(</span><span class="s">&#39;dim2&#39;</span><span class="p">,</span> <span class="s">&#39;dim1&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="p">{</span>
 <span class="gp">... </span>    <span class="s">&#39;subcubes&#39;</span><span class="p">:</span> <span class="p">{</span>
@@ -194,8 +146,8 @@ class </em><tt class="descclassname">cube.base.</tt><tt class="descname">BaseCub
 </dd></dl>
 
 <dl class="method">
-<dt id="cube.base.BaseCube.measure_list">
-<tt class="descname">measure_list</tt><big>(</big><em>*dim_names</em><big>)</big><a class="headerlink" href="#cube.base.BaseCube.measure_list" title="Permalink to this definition">¶</a></dt>
+<dt id="cube.models.Cube.measure_list">
+<tt class="descname">measure_list</tt><big>(</big><em>*dim_names</em><big>)</big><a class="headerlink" href="#cube.models.Cube.measure_list" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns a multidimensionnal list of measures from the cube, structured following <em>dim_names</em>. For example :</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">cube</span><span class="p">([</span><span class="s">&#39;dim1&#39;</span><span class="p">,</span> <span class="s">&#39;dim2&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">measures_list</span><span class="p">(</span><span class="s">&#39;dim2&#39;</span><span class="p">,</span> <span class="s">&#39;dim1&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="p">[</span>
 <span class="gp">... </span>    <span class="p">[</span><span class="n">measure_11_21</span><span class="p">,</span> <span class="n">measure_11_22</span><span class="p">,</span> <span class="p">,</span> <span class="n">measure_11_2N</span><span class="p">],</span>
@@ -208,9 +160,9 @@ class </em><tt class="descclassname">cube.base.</tt><tt class="descname">BaseCub
 </dd></dl>
 
 <dl class="method">
-<dt id="cube.base.BaseCube.subcubes">
-<tt class="descname">subcubes</tt><big>(</big><em>*dim_names</em><big>)</big><a class="headerlink" href="#cube.base.BaseCube.subcubes" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return an ordered iterator, on all the sucubes with dimensions in <em>dim_names</em> constrained. For example :</p>
+<dt id="cube.models.Cube.subcubes">
+<tt class="descname">subcubes</tt><big>(</big><em>*dim_names</em><big>)</big><a class="headerlink" href="#cube.models.Cube.subcubes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return an ordered iterator on all the sucubes with dimensions in <em>dim_names</em> constrained. For example :</p>
 <blockquote>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">class</span> <span class="nc">MyCube</span><span class="p">(</span><span class="n">Cube</span><span class="p">):</span>
 <span class="gp">... </span>    <span class="n">name</span> <span class="o">=</span> <span class="n">Dimension</span><span class="p">(</span><span class="n">sample_space</span><span class="o">=</span><span class="p">[</span><span class="s">&#39;John&#39;</span><span class="p">,</span> <span class="s">&#39;Jack&#39;</span><span class="p">])</span>
@@ -232,53 +184,71 @@ class </em><tt class="descclassname">cube.base.</tt><tt class="descname">BaseCub
 </dd></dl>
 
 <dl class="class">
-<dt id="cube.base.BaseCubeMetaclass">
+<dt id="cube.models.Dimension">
 <em class="property">
-class </em><tt class="descclassname">cube.base.</tt><tt class="descname">BaseCubeMetaclass</tt><a class="headerlink" href="#cube.base.BaseCubeMetaclass" title="Permalink to this definition">¶</a></dt>
-<dd>Metaclass for <a title="cube.base.BaseCube" class="reference internal" href="#cube.base.BaseCube"><tt class="xref docutils literal"><span class="pre">BaseCube</span></tt></a>.</dd></dl>
-
-<dl class="class">
-<dt id="cube.base.BaseCubeOptions">
-<em class="property">
-class </em><tt class="descclassname">cube.base.</tt><tt class="descname">BaseCubeOptions</tt><a class="headerlink" href="#cube.base.BaseCubeOptions" title="Permalink to this definition">¶</a></dt>
-<dd>&#8216;Container&#8217; object for meta informations on a cube class.</dd></dl>
-
-<dl class="class">
-<dt id="cube.base.BaseDimension">
-<em class="property">
-class </em><tt class="descclassname">cube.base.</tt><tt class="descname">BaseDimension</tt><big>(</big><em>sample_space=</em><span class="optional">[</span><span class="optional">]</span><big>)</big><a class="headerlink" href="#cube.base.BaseDimension" title="Permalink to this definition">¶</a></dt>
-<dd><p>The base class for a dimension of a cube.</p>
+class </em><tt class="descclassname">cube.models.</tt><tt class="descname">Dimension</tt><big>(</big><em>field=None</em>, <em>queryset=None</em>, <em>sample_space=</em><span class="optional">[</span><span class="optional">]</span><big>)</big><a class="headerlink" href="#cube.models.Dimension" title="Permalink to this definition">¶</a></dt>
+<dd><p>A dimension that is associated with a Django model&#8217;s field.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><em>field</em> &#8211; str &#8211; The name of the model&#8217;s field this dimension refers to.</li>
+<li><em>queryset</em> &#8211; Queryset &#8211; A queryset to take the default sample space from. Usefull if the parameter <em>sample_space</em> is not given. Defaults to the dimension&#8217;s cube&#8217;s queryset if not given.</li>
+<li><em>sample_space</em> &#8211; list|callable &#8211; The sample space for this dimension. Can be any iterable, or any callable. If this parameter is a callable, it will receive the dimension&#8217;s base queryset as only parameter, and must return a list.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
 <dl class="attribute">
-<dt id="cube.base.BaseDimension.constraint">
-<tt class="descname">constraint</tt><a class="headerlink" href="#cube.base.BaseDimension.constraint" title="Permalink to this definition">¶</a></dt>
-<dd>object &#8211; The value to which the dimension is constrained</dd></dl>
+<dt id="cube.models.Dimension.constraint">
+<tt class="descname">constraint</tt><a class="headerlink" href="#cube.models.Dimension.constraint" title="Permalink to this definition">¶</a></dt>
+<dd><a title="(in Python v2.7)" class="reference external" href="http://docs.python.org/library/functions.html#object"><tt class="xref docutils literal"><span class="pre">object</span></tt></a> &#8211; The value to which the dimension is constrained</dd></dl>
+
+<dl class="attribute">
+<dt id="cube.models.Dimension.field">
+<tt class="descname">field</tt><a class="headerlink" href="#cube.models.Dimension.field" title="Permalink to this definition">¶</a></dt>
+<dd><a title="(in Python v2.7)" class="reference external" href="http://docs.python.org/library/functions.html#str"><tt class="xref docutils literal"><span class="pre">str</span></tt></a> &#8211; the name of the model&#8217;s field this dimension refers to.</dd></dl>
 
 <dl class="method">
-<dt id="cube.base.BaseDimension.get_sample_space">
-<tt class="descname">get_sample_space</tt><big>(</big><big>)</big><a class="headerlink" href="#cube.base.BaseDimension.get_sample_space" title="Permalink to this definition">¶</a></dt>
+<dt id="cube.models.Dimension.get_sample_space">
+<tt class="descname">get_sample_space</tt><big>(</big><big>)</big><a class="headerlink" href="#cube.models.Dimension.get_sample_space" title="Permalink to this definition">¶</a></dt>
 <dd><table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field"><th class="field-name">Returns:</th><td class="field-body">list &#8211; The sorted sample space for the calling dimension.</td>
+<tr class="field"><th class="field-name">Returns:</th><td class="field-body"><a title="(in Python v2.7)" class="reference external" href="http://docs.python.org/library/functions.html#list"><tt class="xref docutils literal"><span class="pre">list</span></tt></a> &#8211; The sorted sample space of the calling dimension.</td>
 </tr>
 </tbody>
 </table>
 </dd></dl>
 
 <dl class="attribute">
-<dt id="cube.base.BaseDimension.name">
-<tt class="descname">name</tt><a class="headerlink" href="#cube.base.BaseDimension.name" title="Permalink to this definition">¶</a></dt>
-<dd>str &#8211; The name of the dimension.</dd></dl>
+<dt id="cube.models.Dimension.name">
+<tt class="descname">name</tt><a class="headerlink" href="#cube.models.Dimension.name" title="Permalink to this definition">¶</a></dt>
+<dd><a title="(in Python v2.7)" class="reference external" href="http://docs.python.org/library/functions.html#str"><tt class="xref docutils literal"><span class="pre">str</span></tt></a> &#8211; The name of the dimension.</dd></dl>
 
 <dl class="attribute">
-<dt id="cube.base.BaseDimension.pretty_constraint">
-<tt class="descname">pretty_constraint</tt><a class="headerlink" href="#cube.base.BaseDimension.pretty_constraint" title="Permalink to this definition">¶</a></dt>
-<dd>str &#8211; A pretty string representation of the constraint&#8217;s value</dd></dl>
+<dt id="cube.models.Dimension.pretty_constraint">
+<tt class="descname">pretty_constraint</tt><a class="headerlink" href="#cube.models.Dimension.pretty_constraint" title="Permalink to this definition">¶</a></dt>
+<dd><a title="(in Python v2.7)" class="reference external" href="http://docs.python.org/library/functions.html#str"><tt class="xref docutils literal"><span class="pre">str</span></tt></a> &#8211; A pretty string representation of the constraint&#8217;s value</dd></dl>
+
+<dl class="method">
+<dt id="cube.models.Dimension.to_queryset_filter">
+<tt class="descname">to_queryset_filter</tt><big>(</big><big>)</big><a class="headerlink" href="#cube.models.Dimension.to_queryset_filter" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Returns:</th><td class="field-body"><a title="(in Python v2.7)" class="reference external" href="http://docs.python.org/library/stdtypes.html#dict"><tt class="xref docutils literal"><span class="pre">dict</span></tt></a> &#8211; the django queryset filter equivalent to this dimension and its constraint. Returns <em>{}</em> if the dimension is not constrained.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 </dd></dl>
 
-</div>
 </div>
 
 
@@ -287,15 +257,6 @@ class </em><tt class="descclassname">cube.base.</tt><tt class="descname">BaseDim
       </div>
       <div class="sphinxsidebar">
         <div class="sphinxsidebarwrapper">
-            <h3><a href="index.html">Table Of Contents</a></h3>
-            <ul>
-<li><a class="reference external" href="">API documentation</a><ul>
-<li><a class="reference external" href="#module-cube.models">Django cube, dimension &#8211; <tt class="docutils literal"><span class="pre">cube.models</span></tt></a></li>
-<li><a class="reference external" href="#module-cube.base">Base classes &#8211; <tt class="docutils literal"><span class="pre">cube.base</span></tt></a></li>
-</ul>
-</li>
-</ul>
-
             <h4>Previous topic</h4>
             <p class="topless"><a href="snippets.html"
                                   title="previous chapter">Snippets</a></p>
