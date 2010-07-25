@@ -18,7 +18,7 @@ cube.models.Cube.subcubes method api_doc.html
 cube.models.Cube.constrain method api_doc.html
 cube.models.Cube class api_doc.html
 cube.templatetags.cube_templatetags.do_subcubes function tags_filters.html
-cube.templatetags.cube_templatetags.do_tablefromcube function tags_filters.html
-cube.models.Dimension.name attribute api_doc.html
 cube.models.Cube.measure_dict method api_doc.html
+cube.models.Dimension.name attribute api_doc.html
+cube.templatetags.cube_templatetags.do_tablefromcube function tags_filters.html
 cube.templatetags.cube_templatetags.prettyconstraint function tags_filters.html

@@ -54,7 +54,11 @@
 <dt id="cube.models.Cube">
 <em class="property">
 class </em><tt class="descclassname">cube.models.</tt><tt class="descname">Cube</tt><big>(</big><em>queryset</em>, <em>measure_none=0</em><big>)</big><a class="headerlink" href="#cube.models.Cube" title="Permalink to this definition">¶</a></dt>
-<dd><p>A cube that can calculates measures on a Django queryset.</p>
+<dd><p>A cube that can calculates measures on Django querysets.</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd>queryset (Queryset): the base queryset of the cube. All measures will be calculated from filtered querysets of this base queryset. The way these querysets are filtered, depends on the cube&#8217;s constraint.</dd>
+</dl>
 <dl class="staticmethod">
 <dt id="cube.models.Cube.aggregation">
 <em class="property">
@@ -64,13 +68,13 @@ static </em><tt class="descname">aggregation</tt><big>(</big><em>queryset</em><b
 <span class="gp">... </span>    <span class="k">return</span> <span class="n">queryset</span><span class="o">.</span><span class="n">count</span><span class="p">()</span>
 </pre></div>
 </div>
-<p>In practice, the <em>queryset</em> received as a parameter will <strong>always</strong> be : the cube&#8217;s base queryset, filtered according to the cube&#8217;s constraints.</p>
+<p><strong>In practice</strong>, the <em>queryset</em> received as a parameter will <strong>always</strong> be : the cube&#8217;s base queryset, filtered according to the cube&#8217;s constraints.</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="cube.models.Cube.constrain">
 <tt class="descname">constrain</tt><big>(</big><em>**extra_constraint</em><big>)</big><a class="headerlink" href="#cube.models.Cube.constrain" title="Permalink to this definition">¶</a></dt>
-<dd><p>Updates the calling cube&#8217;s <em>constraint</em> with <em>extra_constraint</em>.</p>
+<dd><p>Updates the calling cube&#8217;s <em>constraint</em> with <em>extra_constraint</em>. Example :</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">cube</span> <span class="o">=</span> <span class="n">MyCube</span><span class="p">(</span><span class="n">queryset</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">subcube</span> <span class="o">=</span> <span class="n">cube</span><span class="o">.</span><span class="n">constrain</span><span class="p">(</span><span class="n">dimensionA</span><span class="o">=</span><span class="mf">2</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">cube</span> <span class="p">;</span> <span class="n">subcube</span>
@@ -78,38 +82,36 @@ static </em><tt class="descname">aggregation</tt><big>(</big><em>queryset</em><b
 <span class="go">MyCube(dimensionA=2)</span>
 </pre></div>
 </div>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field"><th class="field-name">Returns:</th><td class="field-body"><a title="cube.models.Cube" class="reference internal" href="#cube.models.Cube"><tt class="xref docutils literal"><span class="pre">Cube</span></tt></a> &#8211; a subcube of the calling cube, with the updated constraint.</td>
-</tr>
-</tbody>
-</table>
+<dl class="docutils">
+<dt>Returns:</dt>
+<dd>Cube. A subcube of the calling cube, with the updated constraint.</dd>
+</dl>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="cube.models.Cube.constraint">
 <tt class="descname">constraint</tt><a class="headerlink" href="#cube.models.Cube.constraint" title="Permalink to this definition">¶</a></dt>
-<dd><a title="(in Python v2.7)" class="reference external" href="http://docs.python.org/library/stdtypes.html#dict"><tt class="xref docutils literal"><span class="pre">dict</span></tt></a> &#8211; a dictionnary <em>{dimension_name: constraint_value}</em>. Dimensions that are not constrained do not appear in this dictionnary.</dd></dl>
+<dd><dl class="docutils">
+<dt>Returns:</dt>
+<dd>dict. A dictionnary of pairs (key, value) : <em>(dimension_name, constraint_value)</em>. Dimensions that are not constrained do not appear in this dictionnary.</dd>
+</dl>
+</dd></dl>
 
 <dl class="method">
 <dt id="cube.models.Cube.get_sample_space">
 <tt class="descname">get_sample_space</tt><big>(</big><em>dim_name</em><big>)</big><a class="headerlink" href="#cube.models.Cube.get_sample_space" title="Permalink to this definition">¶</a></dt>
-<dd><table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field"><th class="field-name">Returns:</th><td class="field-body"><a title="(in Python v2.7)" class="reference external" href="http://docs.python.org/library/functions.html#list"><tt class="xref docutils literal"><span class="pre">list</span></tt></a> &#8211; the sample space for the cube for the dimension <em>dim_name</em>.</td>
-</tr>
-</tbody>
-</table>
+<dd><dl class="docutils">
+<dt>Returns:</dt>
+<dd>list. The sample space for the cube for the dimension <em>dim_name</em>.</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
 <dt id="cube.models.Cube.measure_dict">
 <tt class="descname">measure_dict</tt><big>(</big><em>*dim_names</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#cube.models.Cube.measure_dict" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns an ordered dictionnary of measures from the cube, structured following <em>dim_names</em>. For example :</p>
+<dd><dl class="docutils">
+<dt>Returns: </dt>
+<dd><p class="first">dict. An ordered dictionnary of measures from the cube, structured following <em>dim_names</em>. For example :</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">cube</span><span class="p">([</span><span class="s">&#39;dim1&#39;</span><span class="p">,</span> <span class="s">&#39;dim2&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">measures_dict</span><span class="p">(</span><span class="s">&#39;dim2&#39;</span><span class="p">,</span> <span class="s">&#39;dim1&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="p">{</span>
 <span class="gp">... </span>    <span class="s">&#39;subcubes&#39;</span><span class="p">:</span> <span class="p">{</span>
 <span class="gp">... </span>        <span class="n">dim2_val1</span><span class="p">:</span> <span class="p">{</span>
@@ -130,7 +132,7 @@ static </em><tt class="descname">aggregation</tt><big>(</big><em>queryset</em><b
 </pre></div>
 </div>
 <p>If <em>full=False</em>, only the measures for which all dimensions in <em>dim_names</em> are fixed will be returned. For example :</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">cube</span><span class="p">([</span><span class="s">&#39;dim1&#39;</span><span class="p">,</span> <span class="s">&#39;dim2&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">measures_dict</span><span class="p">(</span><span class="s">&#39;dim2&#39;</span><span class="p">,</span> <span class="s">&#39;dim1&#39;</span><span class="p">,</span> <span class="n">full</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span> <span class="o">==</span> <span class="p">{</span>
+<div class="last highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">cube</span><span class="p">([</span><span class="s">&#39;dim1&#39;</span><span class="p">,</span> <span class="s">&#39;dim2&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">measures_dict</span><span class="p">(</span><span class="s">&#39;dim2&#39;</span><span class="p">,</span> <span class="s">&#39;dim1&#39;</span><span class="p">,</span> <span class="n">full</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span> <span class="o">==</span> <span class="p">{</span>
 <span class="gp">... </span>    <span class="n">dim2_val1</span><span class="p">:</span> <span class="p">{</span>
 <span class="gp">... </span>        <span class="n">dim1_val1</span><span class="p">:</span> <span class="p">{</span><span class="s">&#39;measure&#39;</span><span class="p">:</span> <span class="n">measure1_1</span><span class="p">},</span>
 <span class="gp">...</span>
@@ -143,13 +145,17 @@ static </em><tt class="descname">aggregation</tt><big>(</big><em>queryset</em><b
 <span class="gp">... </span><span class="p">}</span>
 </pre></div>
 </div>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
 <dt id="cube.models.Cube.measure_list">
 <tt class="descname">measure_list</tt><big>(</big><em>*dim_names</em><big>)</big><a class="headerlink" href="#cube.models.Cube.measure_list" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns a multidimensionnal list of measures from the cube, structured following <em>dim_names</em>. For example :</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">cube</span><span class="p">([</span><span class="s">&#39;dim1&#39;</span><span class="p">,</span> <span class="s">&#39;dim2&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">measures_list</span><span class="p">(</span><span class="s">&#39;dim2&#39;</span><span class="p">,</span> <span class="s">&#39;dim1&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="p">[</span>
+<dd><dl class="docutils">
+<dt>Returns:</dt>
+<dd><p class="first">list. A multidimensionnal list of measures from the cube, structured following <em>dim_names</em>. For example :</p>
+<div class="last highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">cube</span><span class="p">([</span><span class="s">&#39;dim1&#39;</span><span class="p">,</span> <span class="s">&#39;dim2&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">measures_list</span><span class="p">(</span><span class="s">&#39;dim2&#39;</span><span class="p">,</span> <span class="s">&#39;dim1&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="p">[</span>
 <span class="gp">... </span>    <span class="p">[</span><span class="n">measure_11_21</span><span class="p">,</span> <span class="n">measure_11_22</span><span class="p">,</span> <span class="p">,</span> <span class="n">measure_11_2N</span><span class="p">],</span>
 <span class="gp">... </span>    <span class="p">[</span><span class="n">measure_12_21</span><span class="p">,</span> <span class="n">measure_12_22</span><span class="p">,</span> <span class="p">,</span> <span class="n">measure_12_2N</span><span class="p">],</span>
 <span class="gp">... </span>
@@ -157,24 +163,28 @@ static </em><tt class="descname">aggregation</tt><big>(</big><em>queryset</em><b
 <span class="gp">... </span><span class="p">]</span> <span class="c"># Where &lt;measure_AB_CD&gt; means measure of cube with dimA=valB and dimC=valD</span>
 </pre></div>
 </div>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
 <dt id="cube.models.Cube.subcubes">
 <tt class="descname">subcubes</tt><big>(</big><em>*dim_names</em><big>)</big><a class="headerlink" href="#cube.models.Cube.subcubes" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return an ordered iterator on all the sucubes with dimensions in <em>dim_names</em> constrained. For example :</p>
-<blockquote>
+<dd><dl class="docutils">
+<dt>Returns:</dt>
+<dd><p class="first">iterator. An ordered iterator on all the sucubes with dimensions in <em>dim_names</em> constrained. For example :</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">class</span> <span class="nc">MyCube</span><span class="p">(</span><span class="n">Cube</span><span class="p">):</span>
 <span class="gp">... </span>    <span class="n">name</span> <span class="o">=</span> <span class="n">Dimension</span><span class="p">(</span><span class="n">sample_space</span><span class="o">=</span><span class="p">[</span><span class="s">&#39;John&#39;</span><span class="p">,</span> <span class="s">&#39;Jack&#39;</span><span class="p">])</span>
 <span class="gp">... </span>    <span class="n">instrument</span> <span class="o">=</span> <span class="n">Dimension</span><span class="p">(</span><span class="n">sample_space</span><span class="o">=</span><span class="p">[</span><span class="s">&#39;Trumpet&#39;</span><span class="p">])</span>
 <span class="gp">... </span>    <span class="n">age</span> <span class="o">=</span> <span class="n">Dimension</span><span class="p">(</span><span class="n">sample_space</span><span class="o">=</span><span class="p">[</span><span class="mf">14</span><span class="p">,</span> <span class="mf">89</span><span class="p">])</span>
 </pre></div>
 </div>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="nb">list</span><span class="p">(</span><span class="n">MyCube</span><span class="p">()</span><span class="o">.</span><span class="n">subcubes</span><span class="p">(</span><span class="s">&#39;name&#39;</span><span class="p">,</span> <span class="s">&#39;instrument&#39;</span><span class="p">))</span>
+<div class="last highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="nb">list</span><span class="p">(</span><span class="n">MyCube</span><span class="p">()</span><span class="o">.</span><span class="n">subcubes</span><span class="p">(</span><span class="s">&#39;name&#39;</span><span class="p">,</span> <span class="s">&#39;instrument&#39;</span><span class="p">))</span>
 <span class="go">[Cube(age, instrument=&#39;Trumpet&#39;, name=&#39;Jack&#39;), Cube(age, instrument=&#39;Trumpet&#39;, name=&#39;John&#39;)]</span>
 </pre></div>
 </div>
-</blockquote>
+</dd>
+</dl>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
 <p class="last">If one of the dimensions whose name passed as parameter is already constrained in the calling cube, it is not considered as an error.</p>
@@ -188,63 +198,67 @@ static </em><tt class="descname">aggregation</tt><big>(</big><em>queryset</em><b
 <em class="property">
 class </em><tt class="descclassname">cube.models.</tt><tt class="descname">Dimension</tt><big>(</big><em>field=None</em>, <em>queryset=None</em>, <em>sample_space=</em><span class="optional">[</span><span class="optional">]</span><big>)</big><a class="headerlink" href="#cube.models.Dimension" title="Permalink to this definition">¶</a></dt>
 <dd><p>A dimension that is associated with a Django model&#8217;s field.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><em>field</em> &#8211; str &#8211; The name of the model&#8217;s field this dimension refers to.</li>
-<li><em>queryset</em> &#8211; Queryset &#8211; A queryset to take the default sample space from. Usefull if the parameter <em>sample_space</em> is not given. Defaults to the dimension&#8217;s cube&#8217;s queryset if not given.</li>
-<li><em>sample_space</em> &#8211; list|callable &#8211; The sample space for this dimension. Can be any iterable, or any callable. If this parameter is a callable, it will receive the dimension&#8217;s base queryset as only parameter, and must return a list.</li>
+<dl class="docutils">
+<dt>Kwargs:</dt>
+<dd><ul class="first last simple">
+<li>sample_space (iterable|callable): The sample space of the dimension to create. If this parameter is a callable, the call will receive the dimension&#8217;s base queryset as only parameter, and must return a list.</li>
+<li>field (str): The name of the model&#8217;s field this dimension refers to.</li>
+<li>queryset (Queryset): A queryset to take the default sample space from. Usefull if the parameter <em>sample_space</em> is not given. Defaults to the dimension&#8217;s cube&#8217;s queryset.</li>
 </ul>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+</dl>
 <dl class="attribute">
 <dt id="cube.models.Dimension.constraint">
 <tt class="descname">constraint</tt><a class="headerlink" href="#cube.models.Dimension.constraint" title="Permalink to this definition">¶</a></dt>
-<dd><a title="(in Python v2.7)" class="reference external" href="http://docs.python.org/library/functions.html#object"><tt class="xref docutils literal"><span class="pre">object</span></tt></a> &#8211; The value to which the dimension is constrained</dd></dl>
+<dd><dl class="docutils">
+<dt>Returns:</dt>
+<dd>object. The value to which the dimension is constrained</dd>
+</dl>
+</dd></dl>
 
 <dl class="attribute">
 <dt id="cube.models.Dimension.field">
 <tt class="descname">field</tt><a class="headerlink" href="#cube.models.Dimension.field" title="Permalink to this definition">¶</a></dt>
-<dd><a title="(in Python v2.7)" class="reference external" href="http://docs.python.org/library/functions.html#str"><tt class="xref docutils literal"><span class="pre">str</span></tt></a> &#8211; the name of the model&#8217;s field this dimension refers to.</dd></dl>
+<dd><dl class="docutils">
+<dt>Returns:</dt>
+<dd>str. The name of the model&#8217;s field this dimension refers to.</dd>
+</dl>
+</dd></dl>
 
 <dl class="method">
 <dt id="cube.models.Dimension.get_sample_space">
 <tt class="descname">get_sample_space</tt><big>(</big><big>)</big><a class="headerlink" href="#cube.models.Dimension.get_sample_space" title="Permalink to this definition">¶</a></dt>
-<dd><table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field"><th class="field-name">Returns:</th><td class="field-body"><a title="(in Python v2.7)" class="reference external" href="http://docs.python.org/library/functions.html#list"><tt class="xref docutils literal"><span class="pre">list</span></tt></a> &#8211; The sorted sample space of the calling dimension.</td>
-</tr>
-</tbody>
-</table>
+<dd><dl class="docutils">
+<dt>Returns:</dt>
+<dd>list. The sorted sample space of the calling dimension.</dd>
+</dl>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="cube.models.Dimension.name">
 <tt class="descname">name</tt><a class="headerlink" href="#cube.models.Dimension.name" title="Permalink to this definition">¶</a></dt>
-<dd><a title="(in Python v2.7)" class="reference external" href="http://docs.python.org/library/functions.html#str"><tt class="xref docutils literal"><span class="pre">str</span></tt></a> &#8211; The name of the dimension.</dd></dl>
+<dd><dl class="docutils">
+<dt>Returns:</dt>
+<dd>str. The name of the dimension.</dd>
+</dl>
+</dd></dl>
 
 <dl class="attribute">
 <dt id="cube.models.Dimension.pretty_constraint">
 <tt class="descname">pretty_constraint</tt><a class="headerlink" href="#cube.models.Dimension.pretty_constraint" title="Permalink to this definition">¶</a></dt>
-<dd><a title="(in Python v2.7)" class="reference external" href="http://docs.python.org/library/functions.html#str"><tt class="xref docutils literal"><span class="pre">str</span></tt></a> &#8211; A pretty string representation of the constraint&#8217;s value</dd></dl>
+<dd><dl class="docutils">
+<dt>Returns:</dt>
+<dd>str. A pretty string representation of the constraint&#8217;s value</dd>
+</dl>
+</dd></dl>
 
 <dl class="method">
 <dt id="cube.models.Dimension.to_queryset_filter">
 <tt class="descname">to_queryset_filter</tt><big>(</big><big>)</big><a class="headerlink" href="#cube.models.Dimension.to_queryset_filter" title="Permalink to this definition">¶</a></dt>
-<dd><table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field"><th class="field-name">Returns:</th><td class="field-body"><a title="(in Python v2.7)" class="reference external" href="http://docs.python.org/library/stdtypes.html#dict"><tt class="xref docutils literal"><span class="pre">dict</span></tt></a> &#8211; the django queryset filter equivalent to this dimension and its constraint. Returns <em>{}</em> if the dimension is not constrained.</td>
-</tr>
-</tbody>
-</table>
+<dd><dl class="docutils">
+<dt>Returns:</dt>
+<dd>dict. The django queryset filter equivalent to this dimension and its constraint. Returns <em>{}</em> if the dimension is not constrained.</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>

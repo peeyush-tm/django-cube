@@ -56,11 +56,11 @@
 </div>
 <p>Example :</p>
 <div class="highlight-python"><pre>&lt;ul&gt;
-{% subcubes musician_cube by , dim1 "instrument" as m_subcube %}
+{% subcubes musician_cube by "instrument" as m_subcube %}
         &lt;li&gt; {{ m_subcube|prettyconstraint:"instrument" }}
         &lt;ul&gt;
-            {% subcubes m_subcube by "name" as i_subcube %}
-            &lt;li&gt;{{ i_subcube|prettyconstraint:"name" }} : {{ i_subcube.measure }}&lt;/li&gt;
+            {% subcubes m_subcube by "firstname" as i_subcube %}
+            &lt;li&gt;{{ i_subcube|prettyconstraint:"firstname" }} : {{ i_subcube.measure }}&lt;/li&gt;
             {% endfor %}
         &lt;/ul&gt;
         &lt;/li&gt;
