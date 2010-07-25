@@ -26,11 +26,13 @@ from .utils import odict
 class BaseDimension(object):
     """
     The base class for a dimension of a cube.
+
+    Kwargs:
+        sample_space (iterable|callable): The sample space of the dimension to create.
     """
 
     def __init__(self, sample_space=[]):
         """
-        :param sample_space: The sample space of the dimension to create.
         """
         self._name = ""
         self.sample_space = sample_space
@@ -39,14 +41,16 @@ class BaseDimension(object):
     @property
     def name(self):
         """
-        :class:`str` -- The name of the dimension.
+        Returns:
+            str. The name of the dimension.
         """
         return self._name
 
     @property
     def constraint(self):
         """
-        :class:`object` -- The value to which the dimension is constrained
+        Returns:
+            object. The value to which the dimension is constrained
         """
         return self._constraint
 
@@ -54,28 +58,36 @@ class BaseDimension(object):
     def constraint(self, value):
         """
         Setter for the property :meth:`constraint`.
+
+        Args:
+            value (object): The value to set the dimension's constraint to.
         """
         self._constraint = value
 
     @property
     def pretty_constraint(self):
         """
-        :class:`str` -- A pretty string representation of the constraint's value 
+        Returns:
+            str. A pretty string representation of the constraint's value 
         """
         return self.constraint
 
     def get_sample_space(self):
         """
-        :returns: :class:`list` -- The sorted sample space for the calling dimension. 
+        Returns:
+            list. The sorted sample space for the calling dimension. 
         """
         return self._sort_sample_space(self.sample_space)
 
-    def _sort_sample_space(self, sspace):
+    def _sort_sample_space(self, sample_space):
         """
-        :param sspace: the sample space to sort, can be any iterable
-        :returns: :class:`list` -- the sample space sorted
+        Args:
+            sample_space (iterable). The sample space to sort, can be any iterable.
+
+        Returns:
+            list. The sample space sorted.
         """
-        return sorted(list(sspace))
+        return sorted(list(sample_space))
 
 class BaseCubeOptions(object):
     """
@@ -138,7 +150,8 @@ class BaseCube(object):
      
     def subcubes(self, *dim_names):
         """
-        Return an ordered iterator on all the sucubes with dimensions in *dim_names* constrained. For example :
+        Returns:
+            iterator. An ordered iterator on all the sucubes with dimensions in *dim_names* constrained. For example :
 
             >>> class MyCube(Cube):
             ...     name = Dimension(sample_space=['John', 'Jack'])
@@ -172,7 +185,7 @@ class BaseCube(object):
 
     def constrain(self, **extra_constraint):
         """
-        Updates the calling cube's *constraint* with *extra_constraint*.
+        Updates the calling cube's *constraint* with *extra_constraint*. Example :
 
             >>> cube = MyCube(queryset)
             >>> subcube = cube.constrain(dimensionA=2)
@@ -180,7 +193,8 @@ class BaseCube(object):
             MyCube(dimensionA)
             MyCube(dimensionA=2)
 
-        :returns: :class:`Cube` -- a subcube of the calling cube, with the updated constraint.
+        Returns:
+            Cube. A subcube of the calling cube, with the updated constraint.
         """
         cube_copy = copy.deepcopy(self)
         dimensions = cube_copy.dimensions
@@ -195,50 +209,52 @@ class BaseCube(object):
 
     def measure(self, **coordinates):
         """
-        Calculates and returns the measure on the cube at *coordinates*. For example :
+        Returns:
+            object. The measure on the cube at *coordinates*. For example :
             
-            >>> cube.measure(dim1=val1, dim2=val2, dimN=valN)
-            12.98
+                >>> cube.measure(dim1=val1, dim2=val2, dimN=valN)
+                12.98
 
-        If *coordinates* is empty, the measure returned is calculated on the whole cube. 
+            If *coordinates* is empty, the measure returned is calculated on the whole cube. 
         """
         raise NotImplementedError
 
     def measure_dict(self, *dim_names, **kwargs):
         """
-        Returns an ordered dictionnary of measures from the cube, structured following *dim_names*. For example :
+        Returns: 
+            dict. An ordered dictionnary of measures from the cube, structured following *dim_names*. For example :
 
-            >>> cube(['dim1', 'dim2']).measures_dict('dim2', 'dim1') == {
-            ...     'subcubes': {
-            ...         dim2_val1: {
-            ...             'subcubes': {
-            ...                 dim1_val1: {'measure': measure1_1},
-            ...
-            ...                 dim1_valN: {'measure': measure1_N},
-            ...             },
-            ...             'measure': measure1
-            ...         },
-            ... 
-            ...         dim2_valN: {
-            ...
-            ...         },
-            ...     },
-            ...     'measure': measure
-            ... }
+                >>> cube(['dim1', 'dim2']).measures_dict('dim2', 'dim1') == {
+                ...     'subcubes': {
+                ...         dim2_val1: {
+                ...             'subcubes': {
+                ...                 dim1_val1: {'measure': measure1_1},
+                ...
+                ...                 dim1_valN: {'measure': measure1_N},
+                ...             },
+                ...             'measure': measure1
+                ...         },
+                ... 
+                ...         dim2_valN: {
+                ...
+                ...         },
+                ...     },
+                ...     'measure': measure
+                ... }
 
-        If *full=False*, only the measures for which all dimensions in *dim_names* are fixed will be returned. For example : ::
+            If *full=False*, only the measures for which all dimensions in *dim_names* are fixed will be returned. For example : ::
 
-            >>> cube(['dim1', 'dim2']).measures_dict('dim2', 'dim1', full=False) == {
-            ...     dim2_val1: {
-            ...         dim1_val1: {'measure': measure1_1},
-            ...
-            ...         dim1_valN: {'measure': measure1_N},
-            ...     },
-            ... 
-            ...     dim2_valN: {
-            ...
-            ...     },
-            ... }
+                >>> cube(['dim1', 'dim2']).measures_dict('dim2', 'dim1', full=False) == {
+                ...     dim2_val1: {
+                ...         dim1_val1: {'measure': measure1_1},
+                ...
+                ...         dim1_valN: {'measure': measure1_N},
+                ...     },
+                ... 
+                ...     dim2_valN: {
+                ...
+                ...     },
+                ... }
         """
         full = kwargs.setdefault('full', True)
         returned_dict = odict()
@@ -263,14 +279,15 @@ class BaseCube(object):
 
     def measure_list(self, *dim_names):
         """
-        Returns a multidimensionnal list of measures from the cube, structured following *dim_names*. For example : ::
+        Returns:
+            list. A multidimensionnal list of measures from the cube, structured following *dim_names*. For example :
 
-            >>> cube(['dim1', 'dim2']).measures_list('dim2', 'dim1') == [
-            ...     [measure_11_21, measure_11_22, , measure_11_2N],
-            ...     [measure_12_21, measure_12_22, , measure_12_2N],
-            ... 
-            ...     [measure_1N_21, measure_1N_22, , measure_1N_2N]
-            ... ] # Where <measure_AB_CD> means measure of cube with dimA=valB and dimC=valD
+                >>> cube(['dim1', 'dim2']).measures_list('dim2', 'dim1') == [
+                ...     [measure_11_21, measure_11_22, , measure_11_2N],
+                ...     [measure_12_21, measure_12_22, , measure_12_2N],
+                ... 
+                ...     [measure_1N_21, measure_1N_22, , measure_1N_2N]
+                ... ] # Where <measure_AB_CD> means measure of cube with dimA=valB and dimC=valD
         """
         returned_list = []
 
@@ -289,14 +306,16 @@ class BaseCube(object):
 
     def get_sample_space(self, dim_name):
         """
-        :returns: :class:`list` -- the sample space for the cube for the dimension *dim_name*. 
+        Returns:
+            list. The sample space for the cube for the dimension *dim_name*. 
         """
         return self.dimensions[dim_name].get_sample_space()
 
     @property
     def constraint(self):
         """
-        :class:`dict` -- a dictionnary *{dimension_name: constraint_value}*. Dimensions that are not constrained do not appear in this dictionnary.
+        Returns:
+            dict. A dictionnary of pairs (key, value) : *(dimension_name, constraint_value)*. Dimensions that are not constrained do not appear in this dictionnary.
         """
         constraint_dict = {}
         for dimension in self.dimensions.values():
@@ -308,9 +327,11 @@ class BaseCube(object):
         """
         Pops the first dimension name from *dim_names*.
 
-        :param free_only: if True, only the dimensions that are not constrained will be poped.
+        Args:
+            free_only (bool): if True, only the dimensions that are not constrained will be poped.
 
-        :returns: The poped dimension name, or None if there is no dimension name to pop.
+        Returns:
+            str|None. The poped dimension name, or None if there is no dimension name to pop.
         """
         for index, dim_name in enumerate(dim_names):
             if dim_name not in self.dimensions:

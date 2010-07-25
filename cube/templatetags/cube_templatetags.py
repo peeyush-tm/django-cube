@@ -248,11 +248,11 @@ def do_subcubes(parser, token):
     Example : ::
 
         <ul>
-        {% subcubes musician_cube by , dim1 "instrument" as m_subcube %}
+        {% subcubes musician_cube by "instrument" as m_subcube %}
                 <li> {{ m_subcube|prettyconstraint:"instrument" }}
                 <ul>
-                    {% subcubes m_subcube by "name" as i_subcube %}
-                    <li>{{ i_subcube|prettyconstraint:"name" }} : {{ i_subcube.measure }}</li>
+                    {% subcubes m_subcube by "firstname" as i_subcube %}
+                    <li>{{ i_subcube|prettyconstraint:"firstname" }} : {{ i_subcube.measure }}</li>
                     {% endfor %}
                 </ul>
                 </li>

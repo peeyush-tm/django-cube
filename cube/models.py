@@ -32,9 +32,10 @@ class Dimension(BaseDimension):
     """
     A dimension that is associated with a Django model's field.
 
-    :param field: str -- The name of the model's field this dimension refers to. 
-    :param queryset: Queryset -- A queryset to take the default sample space from. Usefull if the parameter *sample_space* is not given. Defaults to the dimension's cube's queryset if not given.
-    :param sample_space: list|callable -- The sample space for this dimension. Can be any iterable, or any callable. If this parameter is a callable, it will receive the dimension's base queryset as only parameter, and must return a list.
+    Kwargs:
+        - sample_space (iterable|callable): The sample space of the dimension to create. If this parameter is a callable, the call will receive the dimension's base queryset as only parameter, and must return a list.
+        - field (str): The name of the model's field this dimension refers to. 
+        - queryset (Queryset): A queryset to take the default sample space from. Usefull if the parameter *sample_space* is not given. Defaults to the dimension's cube's queryset.
     """
     def __init__(self, field=None, queryset=None, sample_space=[]):
         """
@@ -46,13 +47,15 @@ class Dimension(BaseDimension):
     @property
     def field(self):
         """
-        :class:`str` -- the name of the model's field this dimension refers to.
+        Returns:
+            str. The name of the model's field this dimension refers to.
         """
         return self._field or self._name
 
     def get_sample_space(self):
         """
-        :returns: :class:`list` -- The sorted sample space of the calling dimension. 
+        Returns:
+            list. The sorted sample space of the calling dimension. 
         """
         #if sample_space is given... 
         if self.sample_space:
@@ -72,7 +75,8 @@ class Dimension(BaseDimension):
 
     def to_queryset_filter(self):
         """
-        :returns: :class:`dict` -- the django queryset filter equivalent to this dimension and its constraint. Returns *{}* if the dimension is not constrained. 
+        Returns:
+            dict. The django queryset filter equivalent to this dimension and its constraint. Returns *{}* if the dimension is not constrained. 
         """
         filter_dict = {}
         lookup_list = re.split('__', self.field)
@@ -176,13 +180,16 @@ class Dimension(BaseDimension):
 
 class Cube(BaseCube):
     """
-    A cube that can calculates measures on a Django queryset.
+    A cube that can calculates measures on Django querysets.
+
+    Args:
+        queryset (Queryset): the base queryset of the cube. All measures will be calculated from filtered querysets of this base queryset. The way these querysets are filtered, depends on the cube's constraint.
     """
 
     def __init__(self, queryset, measure_none=0):
         """
-        :param queryset: the base queryset from which the cube's measures will be calculated.
-        :param measure_none: the value that the measure should actually return if the calculation returned *None*
+        Args:
+            measure_none (object): the value that the measure should actually return if the calculation returned *None*
         """
         super(Cube, self).__init__()
         self.queryset = queryset
@@ -223,6 +230,6 @@ class Cube(BaseCube):
         >>> def aggregation(queryset):
         ...     return queryset.count()
         
-        In practice, the *queryset* received as a parameter will **always** be : the cube's base queryset, filtered according to the cube's constraints.
+        **In practice**, the *queryset* received as a parameter will **always** be : the cube's base queryset, filtered according to the cube's constraints.
         """
         raise NotImplementedError
