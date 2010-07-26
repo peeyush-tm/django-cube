@@ -34,7 +34,7 @@ class Dimension(BaseDimension):
 
     Kwargs:
         - sample_space (iterable|callable): The sample space of the dimension to create. If this parameter is a callable, the call will receive the dimension's base queryset as only parameter, and must return a list.
-        - field (str): The name of the model's field this dimension refers to. 
+        - field (str): The name of the model's field this dimension refers to. Defaults to dimension's name.
         - queryset (Queryset): A queryset to take the default sample space from. Usefull if the parameter *sample_space* is not given. Defaults to the dimension's cube's queryset.
     """
     def __init__(self, field=None, queryset=None, sample_space=[]):
