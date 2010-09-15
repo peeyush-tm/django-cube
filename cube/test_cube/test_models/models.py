@@ -553,8 +553,7 @@ In your templates, you can access the pretty value of dimension's constraint by 
     ----- Test creation of table from cube context
     >>> c = MusicianCube(Musician.objects.all())
 
-    >>> from cube.views import table_from_cube_context
-    >>> table_from_cube_context(c, ['firstname', 'instrument']) == {
+    >>> c.table_helper('firstname', 'instrument') == {
     ...     'col_names': [
     ...         ('Bill', 'Bill'),
     ...         ('Erroll', 'Erroll'),
@@ -584,7 +583,6 @@ In your templates, you can access the pretty value of dimension's constraint by 
     ...     'col_dim_name': 'firstname',
     ...     'row_dim_name': 'instrument',
     ...     'overall': 6,
-    ...     'cube': c
     ... }
     True
 
