@@ -198,6 +198,19 @@ Cube
     >>> set([dim.name for dim in MyCube._meta.dimensions.values()]) == set(['dim1', 'dim2'])
     True
 
+    Inheritance
+    --------------
+    >>> class ParentCube(Cube):
+    ...     dim1 = Dimension()
+    ...     dim2 = Dimension()
+    >>> class ChildCube(ParentCube):
+    ...     pass
+    >>> set([dim.name for dim in ChildCube._meta.dimensions.values()]) == set(['dim1', 'dim2'])
+    True
+    >>> set(ChildCube._meta.dimensions.values()) == set(ParentCube._meta.dimensions.values())
+    False
+
+
 Declaring cubes 
 -----------------
 
