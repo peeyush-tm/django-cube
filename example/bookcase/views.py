@@ -4,7 +4,7 @@ from cube.models import Cube, Dimension
 class BookCaseCube(Cube):
 
     genre = Dimension('genre')
-    first_letter_title = Dimension('title__iregex', sample_space=[r'^[a-n].*', r'^[m-z].*'])
+    first_letter_title = Dimension('title__iregex', sample_space=[r'^[a-n]', r'^[m-z]'])
 
     @staticmethod
     def aggregation(queryset):
