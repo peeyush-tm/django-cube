@@ -48,8 +48,10 @@
         <div class="bodywrapper">
           <div class="body">
             
-  <div class="section" id="module-cube.models">
-<h1>API documentation<a class="headerlink" href="#module-cube.models" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="api-documentation">
+<h1>API documentation<a class="headerlink" href="#api-documentation" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="module-cube.models">
+<h2>Cube, Dimension<a class="headerlink" href="#module-cube.models" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="cube.models.Cube">
 <em class="property">
@@ -202,7 +204,7 @@ class </em><tt class="descclassname">cube.models.</tt><tt class="descname">Dimen
 <dt>Kwargs:</dt>
 <dd><ul class="first last simple">
 <li>sample_space (iterable|callable): The sample space of the dimension to create. If this parameter is a callable, the call will receive the dimension&#8217;s base queryset as only parameter, and must return a list.</li>
-<li>field (str): The name of the model&#8217;s field this dimension refers to.</li>
+<li>field (str): The name of the model&#8217;s field this dimension refers to. Defaults to dimension&#8217;s name.</li>
 <li>queryset (Queryset): A queryset to take the default sample space from. Usefull if the parameter <em>sample_space</em> is not given. Defaults to the dimension&#8217;s cube&#8217;s queryset.</li>
 </ul>
 </dd>
@@ -264,6 +266,43 @@ class </em><tt class="descclassname">cube.models.</tt><tt class="descname">Dimen
 </dd></dl>
 
 </div>
+<div class="section" id="module-cube.views">
+<h2>Views<a class="headerlink" href="#module-cube.views" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="cube.views.table_from_cube">
+<tt class="descclassname">cube.views.</tt><tt class="descname">table_from_cube</tt><big>(</big><em>request</em>, <em>cube</em>, <em>dimensions</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#cube.views.table_from_cube" title="Permalink to this definition">¶</a></dt>
+<dd>A view built on <em>direct_to_template</em>, that adds an extra_context built with <a title="cube.views.table_from_cube_context" class="reference internal" href="#cube.views.table_from_cube_context"><tt class="xref docutils literal"><span class="pre">table_from_cube_context()</span></tt></a>.</dd></dl>
+
+<dl class="function">
+<dt id="cube.views.table_from_cube_context">
+<tt class="descclassname">cube.views.</tt><tt class="descname">table_from_cube_context</tt><big>(</big><em>cube</em>, <em>dimensions</em><big>)</big><a class="headerlink" href="#cube.views.table_from_cube_context" title="Permalink to this definition">¶</a></dt>
+<dd><p>A helper function to build a table from a cube. It takes a cube and two dimensions, and creates a dictionnary from it.</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd>cube (Cube): the cube to create the table from.
+dimensions ((str, str)): the two dimension&#8217;s names.</dd>
+<dt>Returns:</dt>
+<dd><p class="first">dict. A dictionnary containing the following variables :</p>
+<blockquote class="last">
+<ul class="simple">
+<li>col_names: list of tuples <em>(&lt;column name&gt;, &lt;column pretty name&gt;)</em></li>
+<li>row_names: list of tuples <em>(&lt;row name&gt;, &lt;row pretty name&gt;)</em></li>
+<li>cols: list of columns, as <em>[{&#8216;name&#8217;: col_name, &#8216;pretty_name&#8217;: col_pretty_name, &#8216;values&#8217;: [measure1, measure2, , measureN], &#8216;overall&#8217;: col_overall}]</em></li>
+<li>rows: list of columns, as <em>[{&#8216;name&#8217;: row_name, &#8216;pretty_name&#8217;: row_pretty_name, &#8216;values&#8217;: [measure1, measure2, , measureN], &#8216;overall&#8217;: row_overall}]</em></li>
+<li>row_overalls: list of measure on whole rows, therefore the measure is taken on the row dimension, with <em>row_name</em> as value</li>
+<li>col_overalls: list of measure on whole columns, therefore the measure is taken on the column dimension, with <em>col_name</em> as value</li>
+<li>col_dim_name: the dimension on which the columns are calculated</li>
+<li>row_dim_name: the dimension on which the rows are calculated</li>
+<li>overall: measure on the whole cube</li>
+<li>cube: the cube passed as a parameter to the tag.</li>
+</ul>
+</blockquote>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+</div>
 
 
           </div>
@@ -271,6 +310,15 @@ class </em><tt class="descclassname">cube.models.</tt><tt class="descname">Dimen
       </div>
       <div class="sphinxsidebar">
         <div class="sphinxsidebarwrapper">
+            <h3><a href="index.html">Table Of Contents</a></h3>
+            <ul>
+<li><a class="reference external" href="">API documentation</a><ul>
+<li><a class="reference external" href="#module-cube.models">Cube, Dimension</a></li>
+<li><a class="reference external" href="#module-cube.views">Views</a></li>
+</ul>
+</li>
+</ul>
+
             <h4>Previous topic</h4>
             <p class="topless"><a href="snippets.html"
                                   title="previous chapter">Snippets</a></p>

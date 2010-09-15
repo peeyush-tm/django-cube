@@ -513,6 +513,46 @@
 <span class="go">u&#39;&gt;FUNKY&lt;Sax&gt;FUNKY&lt;&#39;</span>
 </pre></div>
 </div>
+<blockquote>
+<p>&#8212;&#8211; Test creation of table from cube context
+&gt;&gt;&gt; c = MusicianCube(Musician.objects.all())</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cube.views</span> <span class="kn">import</span> <span class="n">table_from_cube_context</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">table_from_cube_context</span><span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="p">[</span><span class="s">&#39;firstname&#39;</span><span class="p">,</span> <span class="s">&#39;instrument&#39;</span><span class="p">])</span> <span class="o">==</span> <span class="p">{</span>
+<span class="gp">... </span>    <span class="s">&#39;col_names&#39;</span><span class="p">:</span> <span class="p">[</span>
+<span class="gp">... </span>        <span class="p">(</span><span class="s">&#39;Bill&#39;</span><span class="p">,</span> <span class="s">&#39;Bill&#39;</span><span class="p">),</span>
+<span class="gp">... </span>        <span class="p">(</span><span class="s">&#39;Erroll&#39;</span><span class="p">,</span> <span class="s">&#39;Erroll&#39;</span><span class="p">),</span>
+<span class="gp">... </span>        <span class="p">(</span><span class="s">&#39;Freddie&#39;</span><span class="p">,</span> <span class="s">&#39;Freddie&#39;</span><span class="p">),</span>
+<span class="gp">... </span>        <span class="p">(</span><span class="s">&#39;Miles&#39;</span><span class="p">,</span> <span class="s">&#39;Miles&#39;</span><span class="p">),</span>
+<span class="gp">... </span>        <span class="p">(</span><span class="s">&#39;Thelonious&#39;</span><span class="p">,</span> <span class="s">&#39;Thelonious&#39;</span><span class="p">),</span>
+<span class="gp">... </span>    <span class="p">],</span>
+<span class="gp">... </span>    <span class="s">&#39;cols&#39;</span><span class="p">:</span> <span class="p">[</span>
+<span class="gp">... </span>        <span class="p">{</span><span class="s">&#39;name&#39;</span><span class="p">:</span> <span class="s">&#39;Bill&#39;</span><span class="p">,</span> <span class="s">&#39;pretty_name&#39;</span><span class="p">:</span> <span class="s">&#39;Bill&#39;</span><span class="p">,</span> <span class="s">&#39;values&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mf">0</span><span class="p">,</span> <span class="mf">1</span><span class="p">,</span> <span class="mf">1</span><span class="p">],</span> <span class="s">&#39;overall&#39;</span><span class="p">:</span> <span class="mf">2</span><span class="p">},</span>
+<span class="gp">... </span>        <span class="p">{</span><span class="s">&#39;name&#39;</span><span class="p">:</span> <span class="s">&#39;Erroll&#39;</span><span class="p">,</span> <span class="s">&#39;pretty_name&#39;</span><span class="p">:</span> <span class="s">&#39;Erroll&#39;</span><span class="p">,</span> <span class="s">&#39;values&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mf">0</span><span class="p">,</span> <span class="mf">1</span><span class="p">,</span> <span class="mf">0</span><span class="p">],</span> <span class="s">&#39;overall&#39;</span><span class="p">:</span> <span class="mf">1</span><span class="p">},</span>
+<span class="gp">... </span>        <span class="p">{</span><span class="s">&#39;name&#39;</span><span class="p">:</span> <span class="s">&#39;Freddie&#39;</span><span class="p">,</span> <span class="s">&#39;pretty_name&#39;</span><span class="p">:</span> <span class="s">&#39;Freddie&#39;</span><span class="p">,</span> <span class="s">&#39;values&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mf">1</span><span class="p">,</span> <span class="mf">0</span><span class="p">,</span> <span class="mf">0</span><span class="p">],</span> <span class="s">&#39;overall&#39;</span><span class="p">:</span> <span class="mf">1</span><span class="p">},</span>
+<span class="gp">... </span>        <span class="p">{</span><span class="s">&#39;name&#39;</span><span class="p">:</span> <span class="s">&#39;Miles&#39;</span><span class="p">,</span> <span class="s">&#39;pretty_name&#39;</span><span class="p">:</span> <span class="s">&#39;Miles&#39;</span><span class="p">,</span> <span class="s">&#39;values&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mf">1</span><span class="p">,</span> <span class="mf">0</span><span class="p">,</span> <span class="mf">0</span><span class="p">],</span> <span class="s">&#39;overall&#39;</span><span class="p">:</span> <span class="mf">1</span><span class="p">},</span>
+<span class="gp">... </span>        <span class="p">{</span><span class="s">&#39;name&#39;</span><span class="p">:</span> <span class="s">&#39;Thelonious&#39;</span><span class="p">,</span> <span class="s">&#39;pretty_name&#39;</span><span class="p">:</span> <span class="s">&#39;Thelonious&#39;</span><span class="p">,</span> <span class="s">&#39;values&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mf">0</span><span class="p">,</span> <span class="mf">1</span><span class="p">,</span> <span class="mf">0</span><span class="p">],</span> <span class="s">&#39;overall&#39;</span><span class="p">:</span> <span class="mf">1</span><span class="p">}</span>
+<span class="gp">... </span>    <span class="p">],</span>
+<span class="gp">... </span>    <span class="s">&#39;col_overalls&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mf">2</span><span class="p">,</span> <span class="mf">1</span><span class="p">,</span> <span class="mf">1</span><span class="p">,</span> <span class="mf">1</span><span class="p">,</span> <span class="mf">1</span><span class="p">],</span>
+<span class="gp">... </span>    <span class="s">&#39;row_names&#39;</span><span class="p">:</span> <span class="p">[</span>
+<span class="gp">... </span>        <span class="p">(</span><span class="n">trumpet</span><span class="p">,</span> <span class="s">&#39;Trumpet&#39;</span><span class="p">),</span>
+<span class="gp">... </span>        <span class="p">(</span><span class="n">piano</span><span class="p">,</span> <span class="s">&#39;Piano&#39;</span><span class="p">),</span>
+<span class="gp">... </span>        <span class="p">(</span><span class="n">sax</span><span class="p">,</span> <span class="s">&#39;Sax&#39;</span><span class="p">),</span>
+<span class="gp">... </span>    <span class="p">],</span>
+<span class="gp">... </span>    <span class="s">&#39;rows&#39;</span><span class="p">:</span> <span class="p">[</span>
+<span class="gp">... </span>        <span class="p">{</span><span class="s">&#39;name&#39;</span><span class="p">:</span> <span class="n">trumpet</span><span class="p">,</span> <span class="s">&#39;pretty_name&#39;</span><span class="p">:</span> <span class="s">&#39;Trumpet&#39;</span><span class="p">,</span> <span class="s">&#39;values&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mf">0</span><span class="p">,</span> <span class="mf">0</span><span class="p">,</span> <span class="mf">1</span><span class="p">,</span> <span class="mf">1</span><span class="p">,</span> <span class="mf">0</span><span class="p">],</span> <span class="s">&#39;overall&#39;</span><span class="p">:</span> <span class="mf">2</span><span class="p">},</span>
+<span class="gp">... </span>        <span class="p">{</span><span class="s">&#39;name&#39;</span><span class="p">:</span> <span class="n">piano</span><span class="p">,</span> <span class="s">&#39;pretty_name&#39;</span><span class="p">:</span> <span class="s">&#39;Piano&#39;</span><span class="p">,</span> <span class="s">&#39;values&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mf">1</span><span class="p">,</span> <span class="mf">1</span><span class="p">,</span> <span class="mf">0</span><span class="p">,</span> <span class="mf">0</span><span class="p">,</span> <span class="mf">1</span><span class="p">],</span> <span class="s">&#39;overall&#39;</span><span class="p">:</span> <span class="mf">3</span><span class="p">},</span>
+<span class="gp">... </span>        <span class="p">{</span><span class="s">&#39;name&#39;</span><span class="p">:</span> <span class="n">sax</span><span class="p">,</span> <span class="s">&#39;pretty_name&#39;</span><span class="p">:</span> <span class="s">&#39;Sax&#39;</span><span class="p">,</span> <span class="s">&#39;values&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mf">1</span><span class="p">,</span> <span class="mf">0</span><span class="p">,</span> <span class="mf">0</span><span class="p">,</span> <span class="mf">0</span><span class="p">,</span> <span class="mf">0</span><span class="p">],</span> <span class="s">&#39;overall&#39;</span><span class="p">:</span> <span class="mf">1</span><span class="p">},</span>
+<span class="gp">... </span>    <span class="p">],</span>
+<span class="gp">... </span>    <span class="s">&#39;row_overalls&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mf">2</span><span class="p">,</span> <span class="mf">3</span><span class="p">,</span> <span class="mf">1</span><span class="p">],</span>
+<span class="gp">... </span>    <span class="s">&#39;col_dim_name&#39;</span><span class="p">:</span> <span class="s">&#39;firstname&#39;</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="s">&#39;row_dim_name&#39;</span><span class="p">:</span> <span class="s">&#39;instrument&#39;</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="s">&#39;overall&#39;</span><span class="p">:</span> <span class="mf">6</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="s">&#39;cube&#39;</span><span class="p">:</span> <span class="n">c</span>
+<span class="gp">... </span><span class="p">}</span>
+<span class="go">True</span>
+</pre></div>
+</div>
+</blockquote>
 </div>
 <div class="section" id="insert-a-table">
 <h3>Insert a table<a class="headerlink" href="#insert-a-table" title="Permalink to this headline">¶</a></h3>
@@ -530,6 +570,78 @@
 </div>
 <p>Here is what the rendering gives :</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">awaited</span> <span class="o">=</span> <span class="s">&#39;&#39;</span>\
+<span class="gp">... </span><span class="s">&#39;&lt;table&gt;&#39;</span>\
+<span class="gp">... </span>    <span class="s">&#39;&lt;theader&gt;&#39;</span>\
+<span class="gp">... </span>        <span class="s">&#39;&lt;tr&gt;&#39;</span>\
+<span class="gp">... </span>            <span class="s">&#39;&lt;th&gt;&lt;/th&gt;&#39;</span>\
+<span class="gp">... </span>            <span class="s">&#39;&lt;th&gt;Bill&lt;/th&gt;&#39;</span>\
+<span class="gp">... </span>            <span class="s">&#39;&lt;th&gt;Erroll&lt;/th&gt;&#39;</span>\
+<span class="gp">... </span>            <span class="s">&#39;&lt;th&gt;Freddie&lt;/th&gt;&#39;</span>\
+<span class="gp">... </span>            <span class="s">&#39;&lt;th&gt;Miles&lt;/th&gt;&#39;</span>\
+<span class="gp">... </span>            <span class="s">&#39;&lt;th&gt;Thelonious&lt;/th&gt;&#39;</span>\
+<span class="gp">... </span>            <span class="s">&#39;&lt;th&gt;OVERALL&lt;/th&gt;&#39;</span>\
+<span class="gp">... </span>        <span class="s">&#39;&lt;/tr&gt;&#39;</span>\
+<span class="gp">... </span>    <span class="s">&#39;&lt;/theader&gt;&#39;</span>\
+<span class="gp">... </span>    <span class="s">&#39;&lt;tbody&gt;&#39;</span>\
+<span class="gp">... </span>        <span class="s">&#39;&lt;tr&gt;&#39;</span>\
+<span class="gp">... </span>            <span class="s">&#39;&lt;th&gt;piano&lt;/th&gt;&#39;</span>\
+<span class="gp">... </span>            <span class="s">&#39;&lt;td&gt;1&lt;/td&gt;&#39;</span>\
+<span class="gp">... </span>            <span class="s">&#39;&lt;td&gt;1&lt;/td&gt;&#39;</span>\
+<span class="gp">... </span>            <span class="s">&#39;&lt;td&gt;0&lt;/td&gt;&#39;</span>\
+<span class="gp">... </span>            <span class="s">&#39;&lt;td&gt;0&lt;/td&gt;&#39;</span>\
+<span class="gp">... </span>            <span class="s">&#39;&lt;td&gt;1&lt;/td&gt;&#39;</span>\
+<span class="gp">... </span>            <span class="s">&#39;&lt;td&gt;3&lt;/td&gt;&#39;</span>\
+<span class="gp">... </span>        <span class="s">&#39;&lt;/tr&gt;&#39;</span>\
+<span class="gp">... </span>        <span class="s">&#39;&lt;tr&gt;&#39;</span>\
+<span class="gp">... </span>            <span class="s">&#39;&lt;th&gt;sax&lt;/th&gt;&#39;</span>\
+<span class="gp">... </span>            <span class="s">&#39;&lt;td&gt;1&lt;/td&gt;&#39;</span>\
+<span class="gp">... </span>            <span class="s">&#39;&lt;td&gt;0&lt;/td&gt;&#39;</span>\
+<span class="gp">... </span>            <span class="s">&#39;&lt;td&gt;0&lt;/td&gt;&#39;</span>\
+<span class="gp">... </span>            <span class="s">&#39;&lt;td&gt;0&lt;/td&gt;&#39;</span>\
+<span class="gp">... </span>            <span class="s">&#39;&lt;td&gt;0&lt;/td&gt;&#39;</span>\
+<span class="gp">... </span>            <span class="s">&#39;&lt;td&gt;1&lt;/td&gt;&#39;</span>\
+<span class="gp">... </span>        <span class="s">&#39;&lt;/tr&gt;&#39;</span>\
+<span class="gp">... </span>        <span class="s">&#39;&lt;tr&gt;&#39;</span>\
+<span class="gp">... </span>            <span class="s">&#39;&lt;th&gt;trumpet&lt;/th&gt;&#39;</span>\
+<span class="gp">... </span>            <span class="s">&#39;&lt;td&gt;0&lt;/td&gt;&#39;</span>\
+<span class="gp">... </span>            <span class="s">&#39;&lt;td&gt;0&lt;/td&gt;&#39;</span>\
+<span class="gp">... </span>            <span class="s">&#39;&lt;td&gt;1&lt;/td&gt;&#39;</span>\
+<span class="gp">... </span>            <span class="s">&#39;&lt;td&gt;1&lt;/td&gt;&#39;</span>\
+<span class="gp">... </span>            <span class="s">&#39;&lt;td&gt;0&lt;/td&gt;&#39;</span>\
+<span class="gp">... </span>            <span class="s">&#39;&lt;td&gt;2&lt;/td&gt;&#39;</span>\
+<span class="gp">... </span>        <span class="s">&#39;&lt;/tr&gt;&#39;</span>\
+<span class="gp">... </span>    <span class="s">&#39;&lt;/tbody&gt;&#39;</span>\
+<span class="gp">... </span>    <span class="s">&#39;&lt;tfoot&gt;&#39;</span>\
+<span class="gp">... </span>        <span class="s">&#39;&lt;tr&gt;&#39;</span>\
+<span class="gp">... </span>            <span class="s">&#39;&lt;th&gt;OVERALL&lt;/th&gt;&#39;</span>\
+<span class="gp">... </span>            <span class="s">&#39;&lt;td&gt;2&lt;/td&gt;&#39;</span>\
+<span class="gp">... </span>            <span class="s">&#39;&lt;td&gt;1&lt;/td&gt;&#39;</span>\
+<span class="gp">... </span>            <span class="s">&#39;&lt;td&gt;1&lt;/td&gt;&#39;</span>\
+<span class="gp">... </span>            <span class="s">&#39;&lt;td&gt;1&lt;/td&gt;&#39;</span>\
+<span class="gp">... </span>            <span class="s">&#39;&lt;td&gt;1&lt;/td&gt;&#39;</span>\
+<span class="gp">... </span>            <span class="s">&#39;&lt;td&gt;6&lt;/td&gt;&#39;</span>\
+<span class="gp">... </span>        <span class="s">&#39;&lt;/tr&gt;&#39;</span>\
+<span class="gp">... </span>    <span class="s">&#39;&lt;/tfoot&gt;&#39;</span>\
+<span class="gp">... </span><span class="s">&#39;&lt;/table&gt;&#39;</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="views">
+<h2>Views<a class="headerlink" href="#views" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="get-a-table-from-a-cube">
+<h3>Get a table from a cube<a class="headerlink" href="#get-a-table-from-a-cube" title="Permalink to this headline">¶</a></h3>
+<p>Let&#8217;s create a cube</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">c</span> <span class="o">=</span> <span class="n">MusicianCube</span><span class="p">(</span><span class="n">Musician</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">all</span><span class="p">())</span>
+</pre></div>
+</div>
+<p>Let&#8217;s use the view <em>table_from_cube</em> that renders the context with variables allowing to display easily the table (it is similar to <em>tablefromcube</em> inclusion tag) :</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">response</span> <span class="o">=</span> <span class="n">table_from_cube</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="p">[</span><span class="s">&#39;firstname&#39;</span><span class="p">,</span> <span class="s">&#39;instrument_name&#39;</span><span class="p">],</span> <span class="n">template</span><span class="o">=</span><span class="s">&#39;table_from_cube.html&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Here is what the rendering gives :</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">awaited</span> <span class="o">=</span> <span class="s">&#39;&#39;</span>\
+<span class="gp">... </span><span class="s">&#39;Content-Type:text/html;charset=utf-8&#39;</span>\
 <span class="gp">... </span><span class="s">&#39;&lt;table&gt;&#39;</span>\
 <span class="gp">... </span>    <span class="s">&#39;&lt;theader&gt;&#39;</span>\
 <span class="gp">... </span>        <span class="s">&#39;&lt;tr&gt;&#39;</span>\
@@ -618,6 +730,10 @@
 <li><a class="reference external" href="#id1">Iterating over cube&#8217;s subcubes</a></li>
 <li><a class="reference external" href="#get-a-pretty-display-of-a-dimension-s-constraint">Get a pretty display of a dimension&#8217;s constraint</a></li>
 <li><a class="reference external" href="#insert-a-table">Insert a table</a></li>
+</ul>
+</li>
+<li><a class="reference external" href="#views">Views</a><ul>
+<li><a class="reference external" href="#get-a-table-from-a-cube">Get a table from a cube</a></li>
 </ul>
 </li>
 </ul>

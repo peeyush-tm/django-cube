@@ -1,0 +1,19 @@
+[
+  {
+    "model": "bookcase.book",
+    "pk": 1,
+    "fields": {
+      "title": "In dubious battle",
+      "genre": "novel"
+    }
+  },
+  {
+    "model": "bookcase.book",
+    "pk": 2,
+    "fields": {
+      "title": "Das Kapital",
+      "genre": "philosophy"
+    }
+  }
+]
+
