@@ -323,6 +323,89 @@ class BaseCube(object):
                 constraint_dict[dimension.name] = dimension.constraint
         return constraint_dict
 
+    def table_helper(self, *dim_names):
+        """
+        A helper function to build a table from a cube. It takes two dimensions, and creates a dictionnary from it.  
+
+        Args:
+            dim_names ((str, str)): the two dimension's names. 
+
+        Returns:
+            dict. A dictionnary containing the following variables :
+
+                - col_names: list of tuples *(<column name>, <column pretty name>)*
+                - row_names: list of tuples *(<row name>, <row pretty name>)*
+                - cols: list of columns, as *[{'name': col_name, 'pretty_name': col_pretty_name, 'values': [measure1, measure2, , measureN], 'overall': col_overall}]*
+                - rows: list of columns, as *[{'name': row_name, 'pretty_name': row_pretty_name, 'values': [measure1, measure2, , measureN], 'overall': row_overall}]*
+                - row_overalls: list of measure on whole rows, therefore the measure is taken on the row dimension, with *row_name* as value
+                - col_overalls: list of measure on whole columns, therefore the measure is taken on the column dimension, with *col_name* as value
+                - col_dim_name: the dimension on which the columns are calculated
+                - row_dim_name: the dimension on which the rows are calculated
+                - overall: measure on the whole cube
+        """
+        col_names = []
+        row_names = []
+        cols = []
+        rows = []
+        row_overalls = []
+        col_overalls = []
+        col_dim_name = str(dim_names[0])
+        row_dim_name = str(dim_names[1])
+        overall = None
+
+        #columns variables in the context
+        for col_subcube in self.subcubes(col_dim_name):
+            col_dimension = col_subcube.dimensions[col_dim_name]
+            #column level variables
+            col_names.append((
+                col_dimension.constraint,
+                col_dimension.pretty_constraint
+            ))
+            col_overalls.append(col_subcube.measure())
+            col = {
+                'values': [],
+                'overall': col_subcube.measure(),
+                'name': col_dimension.constraint, 
+                'pretty_name': col_dimension.pretty_constraint,
+            }
+            #cell level variables
+            for cell_subcube in col_subcube.subcubes(row_dim_name):
+                col['values'].append(cell_subcube.measure())
+            cols.append(col)
+
+        #rows variables in the context
+        for row_subcube in self.subcubes(row_dim_name):
+            row_dimension = row_subcube.dimensions[row_dim_name]
+            #row level variables
+            row_names.append((
+                row_dimension.constraint,
+                row_dimension.pretty_constraint
+            ))
+            row_overalls.append(row_subcube.measure())
+            row = {
+                'values': [],
+                'overall': row_subcube.measure(),
+                'name': row_dimension.constraint, 
+                'pretty_name': row_dimension.pretty_constraint,
+            }
+            #cell level variables
+            for cell_subcube in row_subcube.subcubes(col_dim_name):
+                row['values'].append(cell_subcube.measure())
+            rows.append(row)
+
+        #context dict
+        return {
+            'col_names': col_names,
+            'row_names': row_names,
+            'cols': cols,
+            'rows': rows,
+            'row_overalls': row_overalls,
+            'col_overalls': col_overalls,
+            'col_dim_name': col_dim_name,
+            'row_dim_name': row_dim_name,
+            'overall': self.measure(),
+        }
+
     def _pop_first_dim(self, dim_names, free_only=False):
         """
         Pops the first dimension name from *dim_names*.
