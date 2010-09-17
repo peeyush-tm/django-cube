@@ -27,6 +27,7 @@ from django.db.models import ForeignKey, FieldDoesNotExist, Model
 from django.db.models.sql import constants
 
 from base import BaseDimension, BaseCube
+from query import CubeQueryMixin
 
 class Dimension(BaseDimension):
     """
@@ -52,12 +53,17 @@ class Dimension(BaseDimension):
         """
         return self._field or self._name
 
-    def get_sample_space(self):
+    def get_sample_space(self, sort=False):
         """
+        Kwargs:
+            sort (bool): whether to sort or not the sample space returned.
+
         Returns:
-            list. The sorted sample space of the calling dimension. 
+            list. The sample space for the calling dimension. If the dimension is constrained, the sample space is only the constraint value.
         """
-        #if sample_space is given... 
+        #if sample_space is given...
+        if self.constraint:
+            return [self.constraint]
         if self.sample_space:
             #... is it iterable ?
             try:
@@ -71,7 +77,10 @@ class Dimension(BaseDimension):
         else:
             sample_space = self._default_sample_space()
 
-        return self._sort_sample_space(sample_space)
+        if sort:
+            return self._sort_sample_space(sample_space)
+        else:
+            return sample_space
 
     def to_queryset_filter(self):
         """
@@ -178,12 +187,12 @@ class Dimension(BaseDimension):
         else:
             return super(Dimension, self)._sort_sample_space(sample_space)
 
-class Cube(BaseCube):
+class Cube(BaseCube, CubeQueryMixin):
     """
     A cube that can calculates measures on Django querysets.
 
     Args:
-        queryset (Queryset): the base queryset of the cube. All measures will be calculated from filtered querysets of this base queryset. The way these querysets are filtered, depends on the cube's constraint.
+        queryset (Queryset): the base queryset of the cube.
     """
 
     def __init__(self, queryset, measure_none=0):
@@ -230,6 +239,6 @@ class Cube(BaseCube):
         >>> def aggregation(queryset):
         ...     return queryset.count()
         
-        **In practice**, the *queryset* received as a parameter will **always** be : the cube's base queryset, filtered according to the cube's constraints.
+        **In practice**, the *queryset* received as a parameter will **always** be : the cube's base queryset, filtered according to the cube's constraint.
         """
         raise NotImplementedError
