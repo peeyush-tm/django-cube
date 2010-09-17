@@ -96,7 +96,7 @@ Set the dimensions's sample space
 You can set explicitely the sample space for a dimension, by passing to the constructor a keyword *sample_space* that is an iterable. It works with lists :
 
     >>> d = Dimension(field='instrument__name', sample_space=['trumpet', 'piano'])
-    >>> d.get_sample_space() == sorted(['trumpet', 'piano'])
+    >>> d.get_sample_space(sort=True) == sorted(['trumpet', 'piano'])
     True
 
 But also with querysets (any iterable):
@@ -111,7 +111,7 @@ Getting default sample space of a dimension
 If you didn't give explicitely the sample space of a dimension, the method :meth:`get_sample_space` will return a default sample space taken from the dimension's queryset.
 
     >>> d = Dimension(field='title', queryset=Song.objects.all())
-    >>> d.get_sample_space() == sorted([
+    >>> set(d.get_sample_space()) == set([
     ...     'So What', 'All Blues', 'Blue In Green',
     ...     'South Street Stroll', 'Well You Needn\\'t', 'Blue Monk'
     ... ])
@@ -141,19 +141,19 @@ And you can also use the special "field-lookups" *absmonth* or *absday*
 You can traverse foreign keys,
 
     >>> d = Dimension(field='author__firstname', queryset=Song.objects.all())
-    >>> d.get_sample_space() == sorted(['Bill', 'Miles', 'Thelonious', 'Freddie'])
+    >>> d.get_sample_space(sort=True) == sorted(['Bill', 'Miles', 'Thelonious', 'Freddie'])
     True
     >>> d = Dimension(field='author__instrument__name', queryset=Song.objects.all())
-    >>> d.get_sample_space() == sorted(['piano', 'trumpet'])
+    >>> d.get_sample_space(sort=True) == sorted(['piano', 'trumpet'])
     True
 
 and refer to any type of field, even a django object
 
     >>> d = Dimension(field='author__instrument', queryset=Song.objects.all())
-    >>> d.get_sample_space() == [trumpet, piano] # django objects are ordered by their pk
+    >>> d.get_sample_space(sort=True) == [trumpet, piano] # django objects are ordered by their pk
     True
     >>> d = Dimension(field='author', queryset=Song.objects.all())
-    >>> d.get_sample_space() == [
+    >>> d.get_sample_space(sort=True) == [
     ...     miles_davis, freddie_hubbard,
     ...     bill_evans_p, thelonious_monk,
     ... ]
@@ -254,9 +254,46 @@ Declaring a cube is very similar to declaring a Django model, with dimensions in
     True
     True
 
-    ----- get_sample_space
-    >>> set(c.get_sample_space('firstname')) == set(['Miles', 'Erroll', 'Bill', 'Thelonious', 'Freddie'])
+Get a cube's sample space
+----------------------------
+
+You can get the cube's sample space on one dimension like this :
+    
+    >>> c.get_sample_space('firstname', format='flat') == ['Bill', 'Erroll', 'Freddie', 'Miles', 'Thelonious']
     True
+    
+You can get the cube's sample space for several dimensions as dictionnaries :
+    
+    >>> c.get_sample_space('firstname', 'instrument_name') == [
+    ...     {'firstname': 'Bill', 'instrument_name': 'piano'},
+    ...     {'firstname': 'Bill', 'instrument_name': 'sax'},
+    ...     {'firstname': 'Bill', 'instrument_name': 'trumpet'},
+    ...     {'firstname': 'Erroll', 'instrument_name': 'piano'},
+    ...     {'firstname': 'Erroll', 'instrument_name': 'sax'},
+    ...     {'firstname': 'Erroll', 'instrument_name': 'trumpet'},
+    ...     {'firstname': 'Freddie', 'instrument_name': 'piano'},
+    ...     {'firstname': 'Freddie', 'instrument_name': 'sax'},
+    ...     {'firstname': 'Freddie', 'instrument_name': 'trumpet'},
+    ...     {'firstname': 'Miles', 'instrument_name': 'piano'},
+    ...     {'firstname': 'Miles', 'instrument_name': 'sax'},
+    ...     {'firstname': 'Miles', 'instrument_name': 'trumpet'},
+    ...     {'firstname': 'Thelonious', 'instrument_name': 'piano'},
+    ...     {'firstname': 'Thelonious', 'instrument_name': 'sax'},
+    ...     {'firstname': 'Thelonious', 'instrument_name': 'trumpet'},
+    ... ]
+    True
+
+And note that if one dimension is already constrained, the sample space for the cube on this dimension is the constraint value :
+    
+    >>> c = c.constrain(firstname='Bill')
+    >>> c.get_sample_space('firstname', 'instrument_name') == [
+    ...     {'firstname': 'Bill', 'instrument_name': 'piano'},
+    ...     {'firstname': 'Bill', 'instrument_name': 'sax'},
+    ...     {'firstname': 'Bill', 'instrument_name': 'trumpet'},
+    ... ]
+    True
+    
+
 
 Getting a measure from the cube
 --------------------------------
@@ -279,7 +316,6 @@ Iterating over cube's subcubes
 ---------------------------------
 
 If your cube has no constrained dimension, querying its subcubes will yield as many subcubes as there are combinations of elements from the dimensions' sample spaces. For example : 
-
     >>> ['%s' % subcube for subcube in c.subcubes('firstname', 'instrument_name')] == [
     ...     'Cube(instrument, instrument_cat, lastname, firstname=Bill, instrument_name=piano)',
     ...     'Cube(instrument, instrument_cat, lastname, firstname=Bill, instrument_name=sax)',
@@ -489,6 +525,65 @@ As well as using Django field-lookup syntax for relations (see the dimensions de
     ... }
     True
 
+Sorting results
+---------------------
+We declare a cube that overrides *sort_key* to provide custom sorting.
+
+    >>> class SortedCube(Cube):
+    ...     instrument_name = Dimension(field='instrument__name')
+    ...     firstname = Dimension()
+    ...     lastname = Dimension()
+    ...     
+    ...     @staticmethod
+    ...     def sort_key(coordinates):
+    ...         coordinates = dict(coordinates)
+    ...         if coordinates.get('firstname'):
+    ...             return coordinates.pop('firstname') + ''.join(coordinates.values())
+    ...
+    ...     @staticmethod
+    ...     def aggregation(queryset):
+    ...         return queryset.count()
+
+Now, everytime that the dimension *firstname* is used, it has priority on other dimensions for sorting.
+
+    >>> ['%s' % c for c in SortedCube(Musician.objects.all()).subcubes('instrument_name', 'firstname')] == [
+    ...     u'Cube(lastname, firstname=Bill, instrument_name=piano)',
+    ...     u'Cube(lastname, firstname=Bill, instrument_name=sax)',
+    ...     u'Cube(lastname, firstname=Bill, instrument_name=trumpet)',
+    ...     u'Cube(lastname, firstname=Erroll, instrument_name=piano)',
+    ...     u'Cube(lastname, firstname=Erroll, instrument_name=sax)',
+    ...     u'Cube(lastname, firstname=Erroll, instrument_name=trumpet)',
+    ...     u'Cube(lastname, firstname=Freddie, instrument_name=piano)',
+    ...     u'Cube(lastname, firstname=Freddie, instrument_name=sax)',
+    ...     u'Cube(lastname, firstname=Freddie, instrument_name=trumpet)',
+    ...     u'Cube(lastname, firstname=Miles, instrument_name=piano)',
+    ...     u'Cube(lastname, firstname=Miles, instrument_name=sax)',
+    ...     u'Cube(lastname, firstname=Miles, instrument_name=trumpet)',
+    ...     u'Cube(lastname, firstname=Thelonious, instrument_name=piano)',
+    ...     u'Cube(lastname, firstname=Thelonious, instrument_name=sax)',
+    ...     u'Cube(lastname, firstname=Thelonious, instrument_name=trumpet)'
+    ... ]
+    True
+
+    >>> ['%s' % c for c in SortedCube(Musician.objects.all()).subcubes('firstname', 'instrument_name')] == [
+    ...     u'Cube(lastname, firstname=Bill, instrument_name=piano)',
+    ...     u'Cube(lastname, firstname=Bill, instrument_name=sax)',
+    ...     u'Cube(lastname, firstname=Bill, instrument_name=trumpet)',
+    ...     u'Cube(lastname, firstname=Erroll, instrument_name=piano)',
+    ...     u'Cube(lastname, firstname=Erroll, instrument_name=sax)',
+    ...     u'Cube(lastname, firstname=Erroll, instrument_name=trumpet)',
+    ...     u'Cube(lastname, firstname=Freddie, instrument_name=piano)',
+    ...     u'Cube(lastname, firstname=Freddie, instrument_name=sax)',
+    ...     u'Cube(lastname, firstname=Freddie, instrument_name=trumpet)',
+    ...     u'Cube(lastname, firstname=Miles, instrument_name=piano)',
+    ...     u'Cube(lastname, firstname=Miles, instrument_name=sax)',
+    ...     u'Cube(lastname, firstname=Miles, instrument_name=trumpet)',
+    ...     u'Cube(lastname, firstname=Thelonious, instrument_name=piano)',
+    ...     u'Cube(lastname, firstname=Thelonious, instrument_name=sax)',
+    ...     u'Cube(lastname, firstname=Thelonious, instrument_name=trumpet)'
+    ... ]
+    True
+    
 
 Template tags and filters
 ============================

@@ -7,6 +7,11 @@ Cube, Dimension
     :members:
     :inherited-members:
 
+Querying a cube
+-----------------
+.. automodule:: cube.query
+    :members:
+
 Views
 -----------
 .. automodule:: cube.views

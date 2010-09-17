@@ -97,7 +97,7 @@
 <h3>Set the dimensions&#8217;s sample space<a class="headerlink" href="#set-the-dimensions-s-sample-space" title="Permalink to this headline">¶</a></h3>
 <p>You can set explicitely the sample space for a dimension, by passing to the constructor a keyword <em>sample_space</em> that is an iterable. It works with lists :</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">d</span> <span class="o">=</span> <span class="n">Dimension</span><span class="p">(</span><span class="n">field</span><span class="o">=</span><span class="s">&#39;instrument__name&#39;</span><span class="p">,</span> <span class="n">sample_space</span><span class="o">=</span><span class="p">[</span><span class="s">&#39;trumpet&#39;</span><span class="p">,</span> <span class="s">&#39;piano&#39;</span><span class="p">])</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">d</span><span class="o">.</span><span class="n">get_sample_space</span><span class="p">()</span> <span class="o">==</span> <span class="n">sorted</span><span class="p">([</span><span class="s">&#39;trumpet&#39;</span><span class="p">,</span> <span class="s">&#39;piano&#39;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">d</span><span class="o">.</span><span class="n">get_sample_space</span><span class="p">(</span><span class="n">sort</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span> <span class="o">==</span> <span class="n">sorted</span><span class="p">([</span><span class="s">&#39;trumpet&#39;</span><span class="p">,</span> <span class="s">&#39;piano&#39;</span><span class="p">])</span>
 <span class="go">True</span>
 </pre></div>
 </div>
@@ -112,7 +112,7 @@
 <h3>Getting default sample space of a dimension<a class="headerlink" href="#getting-default-sample-space-of-a-dimension" title="Permalink to this headline">¶</a></h3>
 <p>If you didn&#8217;t give explicitely the sample space of a dimension, the method <tt class="xref docutils literal"><span class="pre">get_sample_space()</span></tt> will return a default sample space taken from the dimension&#8217;s queryset.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">d</span> <span class="o">=</span> <span class="n">Dimension</span><span class="p">(</span><span class="n">field</span><span class="o">=</span><span class="s">&#39;title&#39;</span><span class="p">,</span> <span class="n">queryset</span><span class="o">=</span><span class="n">Song</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">all</span><span class="p">())</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">d</span><span class="o">.</span><span class="n">get_sample_space</span><span class="p">()</span> <span class="o">==</span> <span class="n">sorted</span><span class="p">([</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">set</span><span class="p">(</span><span class="n">d</span><span class="o">.</span><span class="n">get_sample_space</span><span class="p">())</span> <span class="o">==</span> <span class="n">set</span><span class="p">([</span>
 <span class="gp">... </span>    <span class="s">&#39;So What&#39;</span><span class="p">,</span> <span class="s">&#39;All Blues&#39;</span><span class="p">,</span> <span class="s">&#39;Blue In Green&#39;</span><span class="p">,</span>
 <span class="gp">... </span>    <span class="s">&#39;South Street Stroll&#39;</span><span class="p">,</span> <span class="s">&#39;Well You Needn</span><span class="se">\&#39;</span><span class="s">t&#39;</span><span class="p">,</span> <span class="s">&#39;Blue Monk&#39;</span>
 <span class="gp">... </span><span class="p">])</span>
@@ -142,19 +142,19 @@
 </div>
 <p>You can traverse foreign keys,</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">d</span> <span class="o">=</span> <span class="n">Dimension</span><span class="p">(</span><span class="n">field</span><span class="o">=</span><span class="s">&#39;author__firstname&#39;</span><span class="p">,</span> <span class="n">queryset</span><span class="o">=</span><span class="n">Song</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">all</span><span class="p">())</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">d</span><span class="o">.</span><span class="n">get_sample_space</span><span class="p">()</span> <span class="o">==</span> <span class="n">sorted</span><span class="p">([</span><span class="s">&#39;Bill&#39;</span><span class="p">,</span> <span class="s">&#39;Miles&#39;</span><span class="p">,</span> <span class="s">&#39;Thelonious&#39;</span><span class="p">,</span> <span class="s">&#39;Freddie&#39;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">d</span><span class="o">.</span><span class="n">get_sample_space</span><span class="p">(</span><span class="n">sort</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span> <span class="o">==</span> <span class="n">sorted</span><span class="p">([</span><span class="s">&#39;Bill&#39;</span><span class="p">,</span> <span class="s">&#39;Miles&#39;</span><span class="p">,</span> <span class="s">&#39;Thelonious&#39;</span><span class="p">,</span> <span class="s">&#39;Freddie&#39;</span><span class="p">])</span>
 <span class="go">True</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">d</span> <span class="o">=</span> <span class="n">Dimension</span><span class="p">(</span><span class="n">field</span><span class="o">=</span><span class="s">&#39;author__instrument__name&#39;</span><span class="p">,</span> <span class="n">queryset</span><span class="o">=</span><span class="n">Song</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">all</span><span class="p">())</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">d</span><span class="o">.</span><span class="n">get_sample_space</span><span class="p">()</span> <span class="o">==</span> <span class="n">sorted</span><span class="p">([</span><span class="s">&#39;piano&#39;</span><span class="p">,</span> <span class="s">&#39;trumpet&#39;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">d</span><span class="o">.</span><span class="n">get_sample_space</span><span class="p">(</span><span class="n">sort</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span> <span class="o">==</span> <span class="n">sorted</span><span class="p">([</span><span class="s">&#39;piano&#39;</span><span class="p">,</span> <span class="s">&#39;trumpet&#39;</span><span class="p">])</span>
 <span class="go">True</span>
 </pre></div>
 </div>
 <p>and refer to any type of field, even a django object</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">d</span> <span class="o">=</span> <span class="n">Dimension</span><span class="p">(</span><span class="n">field</span><span class="o">=</span><span class="s">&#39;author__instrument&#39;</span><span class="p">,</span> <span class="n">queryset</span><span class="o">=</span><span class="n">Song</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">all</span><span class="p">())</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">d</span><span class="o">.</span><span class="n">get_sample_space</span><span class="p">()</span> <span class="o">==</span> <span class="p">[</span><span class="n">trumpet</span><span class="p">,</span> <span class="n">piano</span><span class="p">]</span> <span class="c"># django objects are ordered by their pk</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">d</span><span class="o">.</span><span class="n">get_sample_space</span><span class="p">(</span><span class="n">sort</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span> <span class="o">==</span> <span class="p">[</span><span class="n">trumpet</span><span class="p">,</span> <span class="n">piano</span><span class="p">]</span> <span class="c"># django objects are ordered by their pk</span>
 <span class="go">True</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">d</span> <span class="o">=</span> <span class="n">Dimension</span><span class="p">(</span><span class="n">field</span><span class="o">=</span><span class="s">&#39;author&#39;</span><span class="p">,</span> <span class="n">queryset</span><span class="o">=</span><span class="n">Song</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">all</span><span class="p">())</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">d</span><span class="o">.</span><span class="n">get_sample_space</span><span class="p">()</span> <span class="o">==</span> <span class="p">[</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">d</span><span class="o">.</span><span class="n">get_sample_space</span><span class="p">(</span><span class="n">sort</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span> <span class="o">==</span> <span class="p">[</span>
 <span class="gp">... </span>    <span class="n">miles_davis</span><span class="p">,</span> <span class="n">freddie_hubbard</span><span class="p">,</span>
 <span class="gp">... </span>    <span class="n">bill_evans_p</span><span class="p">,</span> <span class="n">thelonious_monk</span><span class="p">,</span>
 <span class="gp">... </span><span class="p">]</span>
@@ -221,6 +221,45 @@
 </pre></div>
 </div>
 </div>
+<div class="section" id="get-a-cube-s-sample-space">
+<h3>Get a cube&#8217;s sample space<a class="headerlink" href="#get-a-cube-s-sample-space" title="Permalink to this headline">¶</a></h3>
+<p>You can get the cube&#8217;s sample space on one dimension like this :</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">c</span><span class="o">.</span><span class="n">get_sample_space</span><span class="p">(</span><span class="s">&#39;firstname&#39;</span><span class="p">,</span> <span class="n">format</span><span class="o">=</span><span class="s">&#39;flat&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="p">[</span><span class="s">&#39;Bill&#39;</span><span class="p">,</span> <span class="s">&#39;Erroll&#39;</span><span class="p">,</span> <span class="s">&#39;Freddie&#39;</span><span class="p">,</span> <span class="s">&#39;Miles&#39;</span><span class="p">,</span> <span class="s">&#39;Thelonious&#39;</span><span class="p">]</span>
+<span class="go">True</span>
+</pre></div>
+</div>
+<p>You can get the cube&#8217;s sample space for several dimensions as dictionnaries :</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">c</span><span class="o">.</span><span class="n">get_sample_space</span><span class="p">(</span><span class="s">&#39;firstname&#39;</span><span class="p">,</span> <span class="s">&#39;instrument_name&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="p">[</span>
+<span class="gp">... </span>    <span class="p">{</span><span class="s">&#39;firstname&#39;</span><span class="p">:</span> <span class="s">&#39;Bill&#39;</span><span class="p">,</span> <span class="s">&#39;instrument_name&#39;</span><span class="p">:</span> <span class="s">&#39;piano&#39;</span><span class="p">},</span>
+<span class="gp">... </span>    <span class="p">{</span><span class="s">&#39;firstname&#39;</span><span class="p">:</span> <span class="s">&#39;Bill&#39;</span><span class="p">,</span> <span class="s">&#39;instrument_name&#39;</span><span class="p">:</span> <span class="s">&#39;sax&#39;</span><span class="p">},</span>
+<span class="gp">... </span>    <span class="p">{</span><span class="s">&#39;firstname&#39;</span><span class="p">:</span> <span class="s">&#39;Bill&#39;</span><span class="p">,</span> <span class="s">&#39;instrument_name&#39;</span><span class="p">:</span> <span class="s">&#39;trumpet&#39;</span><span class="p">},</span>
+<span class="gp">... </span>    <span class="p">{</span><span class="s">&#39;firstname&#39;</span><span class="p">:</span> <span class="s">&#39;Erroll&#39;</span><span class="p">,</span> <span class="s">&#39;instrument_name&#39;</span><span class="p">:</span> <span class="s">&#39;piano&#39;</span><span class="p">},</span>
+<span class="gp">... </span>    <span class="p">{</span><span class="s">&#39;firstname&#39;</span><span class="p">:</span> <span class="s">&#39;Erroll&#39;</span><span class="p">,</span> <span class="s">&#39;instrument_name&#39;</span><span class="p">:</span> <span class="s">&#39;sax&#39;</span><span class="p">},</span>
+<span class="gp">... </span>    <span class="p">{</span><span class="s">&#39;firstname&#39;</span><span class="p">:</span> <span class="s">&#39;Erroll&#39;</span><span class="p">,</span> <span class="s">&#39;instrument_name&#39;</span><span class="p">:</span> <span class="s">&#39;trumpet&#39;</span><span class="p">},</span>
+<span class="gp">... </span>    <span class="p">{</span><span class="s">&#39;firstname&#39;</span><span class="p">:</span> <span class="s">&#39;Freddie&#39;</span><span class="p">,</span> <span class="s">&#39;instrument_name&#39;</span><span class="p">:</span> <span class="s">&#39;piano&#39;</span><span class="p">},</span>
+<span class="gp">... </span>    <span class="p">{</span><span class="s">&#39;firstname&#39;</span><span class="p">:</span> <span class="s">&#39;Freddie&#39;</span><span class="p">,</span> <span class="s">&#39;instrument_name&#39;</span><span class="p">:</span> <span class="s">&#39;sax&#39;</span><span class="p">},</span>
+<span class="gp">... </span>    <span class="p">{</span><span class="s">&#39;firstname&#39;</span><span class="p">:</span> <span class="s">&#39;Freddie&#39;</span><span class="p">,</span> <span class="s">&#39;instrument_name&#39;</span><span class="p">:</span> <span class="s">&#39;trumpet&#39;</span><span class="p">},</span>
+<span class="gp">... </span>    <span class="p">{</span><span class="s">&#39;firstname&#39;</span><span class="p">:</span> <span class="s">&#39;Miles&#39;</span><span class="p">,</span> <span class="s">&#39;instrument_name&#39;</span><span class="p">:</span> <span class="s">&#39;piano&#39;</span><span class="p">},</span>
+<span class="gp">... </span>    <span class="p">{</span><span class="s">&#39;firstname&#39;</span><span class="p">:</span> <span class="s">&#39;Miles&#39;</span><span class="p">,</span> <span class="s">&#39;instrument_name&#39;</span><span class="p">:</span> <span class="s">&#39;sax&#39;</span><span class="p">},</span>
+<span class="gp">... </span>    <span class="p">{</span><span class="s">&#39;firstname&#39;</span><span class="p">:</span> <span class="s">&#39;Miles&#39;</span><span class="p">,</span> <span class="s">&#39;instrument_name&#39;</span><span class="p">:</span> <span class="s">&#39;trumpet&#39;</span><span class="p">},</span>
+<span class="gp">... </span>    <span class="p">{</span><span class="s">&#39;firstname&#39;</span><span class="p">:</span> <span class="s">&#39;Thelonious&#39;</span><span class="p">,</span> <span class="s">&#39;instrument_name&#39;</span><span class="p">:</span> <span class="s">&#39;piano&#39;</span><span class="p">},</span>
+<span class="gp">... </span>    <span class="p">{</span><span class="s">&#39;firstname&#39;</span><span class="p">:</span> <span class="s">&#39;Thelonious&#39;</span><span class="p">,</span> <span class="s">&#39;instrument_name&#39;</span><span class="p">:</span> <span class="s">&#39;sax&#39;</span><span class="p">},</span>
+<span class="gp">... </span>    <span class="p">{</span><span class="s">&#39;firstname&#39;</span><span class="p">:</span> <span class="s">&#39;Thelonious&#39;</span><span class="p">,</span> <span class="s">&#39;instrument_name&#39;</span><span class="p">:</span> <span class="s">&#39;trumpet&#39;</span><span class="p">},</span>
+<span class="gp">... </span><span class="p">]</span>
+<span class="go">True</span>
+</pre></div>
+</div>
+<p>And note that if one dimension is already constrained, the sample space for the cube on this dimension is the constraint value :</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">c</span> <span class="o">=</span> <span class="n">c</span><span class="o">.</span><span class="n">constrain</span><span class="p">(</span><span class="n">firstname</span><span class="o">=</span><span class="s">&#39;Bill&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c</span><span class="o">.</span><span class="n">get_sample_space</span><span class="p">(</span><span class="s">&#39;firstname&#39;</span><span class="p">,</span> <span class="s">&#39;instrument_name&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="p">[</span>
+<span class="gp">... </span>    <span class="p">{</span><span class="s">&#39;firstname&#39;</span><span class="p">:</span> <span class="s">&#39;Bill&#39;</span><span class="p">,</span> <span class="s">&#39;instrument_name&#39;</span><span class="p">:</span> <span class="s">&#39;piano&#39;</span><span class="p">},</span>
+<span class="gp">... </span>    <span class="p">{</span><span class="s">&#39;firstname&#39;</span><span class="p">:</span> <span class="s">&#39;Bill&#39;</span><span class="p">,</span> <span class="s">&#39;instrument_name&#39;</span><span class="p">:</span> <span class="s">&#39;sax&#39;</span><span class="p">},</span>
+<span class="gp">... </span>    <span class="p">{</span><span class="s">&#39;firstname&#39;</span><span class="p">:</span> <span class="s">&#39;Bill&#39;</span><span class="p">,</span> <span class="s">&#39;instrument_name&#39;</span><span class="p">:</span> <span class="s">&#39;trumpet&#39;</span><span class="p">},</span>
+<span class="gp">... </span><span class="p">]</span>
+<span class="go">True</span>
+</pre></div>
+</div>
+</div>
 <div class="section" id="getting-a-measure-from-the-cube">
 <h3>Getting a measure from the cube<a class="headerlink" href="#getting-a-measure-from-the-cube" title="Permalink to this headline">¶</a></h3>
 <p>Once you have instantiated a cube with a base queryset, you can access a measure at any valid coordinates.</p>
@@ -240,8 +279,9 @@
 </div>
 <div class="section" id="iterating-over-cube-s-subcubes">
 <h3>Iterating over cube&#8217;s subcubes<a class="headerlink" href="#iterating-over-cube-s-subcubes" title="Permalink to this headline">¶</a></h3>
-<p>If your cube has no constrained dimension, querying its subcubes will yield as many subcubes as there are combinations of elements from the dimensions&#8217; sample spaces. For example :</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="p">[</span><span class="s">&#39;</span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="n">subcube</span> <span class="k">for</span> <span class="n">subcube</span> <span class="ow">in</span> <span class="n">c</span><span class="o">.</span><span class="n">subcubes</span><span class="p">(</span><span class="s">&#39;firstname&#39;</span><span class="p">,</span> <span class="s">&#39;instrument_name&#39;</span><span class="p">)]</span> <span class="o">==</span> <span class="p">[</span>
+<dl class="docutils">
+<dt>If your cube has no constrained dimension, querying its subcubes will yield as many subcubes as there are combinations of elements from the dimensions&#8217; sample spaces. For example <span class="classifier-delimiter">:</span> <span class="classifier"></span></dt>
+<dd><div class="first last highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="p">[</span><span class="s">&#39;</span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="n">subcube</span> <span class="k">for</span> <span class="n">subcube</span> <span class="ow">in</span> <span class="n">c</span><span class="o">.</span><span class="n">subcubes</span><span class="p">(</span><span class="s">&#39;firstname&#39;</span><span class="p">,</span> <span class="s">&#39;instrument_name&#39;</span><span class="p">)]</span> <span class="o">==</span> <span class="p">[</span>
 <span class="gp">... </span>    <span class="s">&#39;Cube(instrument, instrument_cat, lastname, firstname=Bill, instrument_name=piano)&#39;</span><span class="p">,</span>
 <span class="gp">... </span>    <span class="s">&#39;Cube(instrument, instrument_cat, lastname, firstname=Bill, instrument_name=sax)&#39;</span><span class="p">,</span>
 <span class="gp">... </span>    <span class="s">&#39;Cube(instrument, instrument_cat, lastname, firstname=Bill, instrument_name=trumpet)&#39;</span><span class="p">,</span>
@@ -261,6 +301,8 @@
 <span class="go">True</span>
 </pre></div>
 </div>
+</dd>
+</dl>
 <p>On the other hand, if your cube is constrained, all the subcubes yielded will be constrained as well :</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">c</span> <span class="o">=</span> <span class="n">MusicianCube</span><span class="p">(</span><span class="n">Musician</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">all</span><span class="p">())</span><span class="o">.</span><span class="n">constrain</span><span class="p">(</span><span class="n">firstname</span><span class="o">=</span><span class="s">&#39;Miles&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="p">[</span><span class="s">&#39;</span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="n">subcube</span> <span class="k">for</span> <span class="n">subcube</span> <span class="ow">in</span> <span class="n">c</span><span class="o">.</span><span class="n">subcubes</span><span class="p">(</span><span class="s">&#39;firstname&#39;</span><span class="p">)]</span> <span class="o">==</span> <span class="p">[</span>
@@ -452,6 +494,69 @@
 </pre></div>
 </div>
 </div>
+<div class="section" id="sorting-results">
+<h3>Sorting results<a class="headerlink" href="#sorting-results" title="Permalink to this headline">¶</a></h3>
+<p>We declare a cube that overrides <em>sort_key</em> to provide custom sorting.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">class</span> <span class="nc">SortedCube</span><span class="p">(</span><span class="n">Cube</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="n">instrument_name</span> <span class="o">=</span> <span class="n">Dimension</span><span class="p">(</span><span class="n">field</span><span class="o">=</span><span class="s">&#39;instrument__name&#39;</span><span class="p">)</span>
+<span class="gp">... </span>    <span class="n">firstname</span> <span class="o">=</span> <span class="n">Dimension</span><span class="p">()</span>
+<span class="gp">... </span>    <span class="n">lastname</span> <span class="o">=</span> <span class="n">Dimension</span><span class="p">()</span>
+<span class="gp">... </span>    
+<span class="gp">... </span>    <span class="nd">@staticmethod</span>
+<span class="gp">... </span>    <span class="k">def</span> <span class="nf">sort_key</span><span class="p">(</span><span class="n">coordinates</span><span class="p">):</span>
+<span class="gp">... </span>        <span class="n">coordinates</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">coordinates</span><span class="p">)</span>
+<span class="gp">... </span>        <span class="k">if</span> <span class="n">coordinates</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;firstname&#39;</span><span class="p">):</span>
+<span class="gp">... </span>            <span class="k">return</span> <span class="n">coordinates</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s">&#39;firstname&#39;</span><span class="p">)</span> <span class="o">+</span> <span class="s">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">coordinates</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
+<span class="gp">...</span>
+<span class="gp">... </span>    <span class="nd">@staticmethod</span>
+<span class="gp">... </span>    <span class="k">def</span> <span class="nf">aggregation</span><span class="p">(</span><span class="n">queryset</span><span class="p">):</span>
+<span class="gp">... </span>        <span class="k">return</span> <span class="n">queryset</span><span class="o">.</span><span class="n">count</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>Now, everytime that the dimension <em>firstname</em> is used, it has priority on other dimensions for sorting.</p>
+<blockquote>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="p">[</span><span class="s">&#39;</span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">SortedCube</span><span class="p">(</span><span class="n">Musician</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">all</span><span class="p">())</span><span class="o">.</span><span class="n">subcubes</span><span class="p">(</span><span class="s">&#39;instrument_name&#39;</span><span class="p">,</span> <span class="s">&#39;firstname&#39;</span><span class="p">)]</span> <span class="o">==</span> <span class="p">[</span>
+<span class="gp">... </span>    <span class="s">u&#39;Cube(lastname, firstname=Bill, instrument_name=piano)&#39;</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="s">u&#39;Cube(lastname, firstname=Bill, instrument_name=sax)&#39;</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="s">u&#39;Cube(lastname, firstname=Bill, instrument_name=trumpet)&#39;</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="s">u&#39;Cube(lastname, firstname=Erroll, instrument_name=piano)&#39;</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="s">u&#39;Cube(lastname, firstname=Erroll, instrument_name=sax)&#39;</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="s">u&#39;Cube(lastname, firstname=Erroll, instrument_name=trumpet)&#39;</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="s">u&#39;Cube(lastname, firstname=Freddie, instrument_name=piano)&#39;</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="s">u&#39;Cube(lastname, firstname=Freddie, instrument_name=sax)&#39;</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="s">u&#39;Cube(lastname, firstname=Freddie, instrument_name=trumpet)&#39;</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="s">u&#39;Cube(lastname, firstname=Miles, instrument_name=piano)&#39;</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="s">u&#39;Cube(lastname, firstname=Miles, instrument_name=sax)&#39;</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="s">u&#39;Cube(lastname, firstname=Miles, instrument_name=trumpet)&#39;</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="s">u&#39;Cube(lastname, firstname=Thelonious, instrument_name=piano)&#39;</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="s">u&#39;Cube(lastname, firstname=Thelonious, instrument_name=sax)&#39;</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="s">u&#39;Cube(lastname, firstname=Thelonious, instrument_name=trumpet)&#39;</span>
+<span class="gp">... </span><span class="p">]</span>
+<span class="go">True</span>
+</pre></div>
+</div>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="p">[</span><span class="s">&#39;</span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">SortedCube</span><span class="p">(</span><span class="n">Musician</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">all</span><span class="p">())</span><span class="o">.</span><span class="n">subcubes</span><span class="p">(</span><span class="s">&#39;firstname&#39;</span><span class="p">,</span> <span class="s">&#39;instrument_name&#39;</span><span class="p">)]</span> <span class="o">==</span> <span class="p">[</span>
+<span class="gp">... </span>    <span class="s">u&#39;Cube(lastname, firstname=Bill, instrument_name=piano)&#39;</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="s">u&#39;Cube(lastname, firstname=Bill, instrument_name=sax)&#39;</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="s">u&#39;Cube(lastname, firstname=Bill, instrument_name=trumpet)&#39;</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="s">u&#39;Cube(lastname, firstname=Erroll, instrument_name=piano)&#39;</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="s">u&#39;Cube(lastname, firstname=Erroll, instrument_name=sax)&#39;</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="s">u&#39;Cube(lastname, firstname=Erroll, instrument_name=trumpet)&#39;</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="s">u&#39;Cube(lastname, firstname=Freddie, instrument_name=piano)&#39;</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="s">u&#39;Cube(lastname, firstname=Freddie, instrument_name=sax)&#39;</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="s">u&#39;Cube(lastname, firstname=Freddie, instrument_name=trumpet)&#39;</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="s">u&#39;Cube(lastname, firstname=Miles, instrument_name=piano)&#39;</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="s">u&#39;Cube(lastname, firstname=Miles, instrument_name=sax)&#39;</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="s">u&#39;Cube(lastname, firstname=Miles, instrument_name=trumpet)&#39;</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="s">u&#39;Cube(lastname, firstname=Thelonious, instrument_name=piano)&#39;</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="s">u&#39;Cube(lastname, firstname=Thelonious, instrument_name=sax)&#39;</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="s">u&#39;Cube(lastname, firstname=Thelonious, instrument_name=trumpet)&#39;</span>
+<span class="gp">... </span><span class="p">]</span>
+<span class="go">True</span>
+</pre></div>
+</div>
+</blockquote>
+</div>
 </div>
 <div class="section" id="template-tags-and-filters">
 <h2>Template tags and filters<a class="headerlink" href="#template-tags-and-filters" title="Permalink to this headline">¶</a></h2>
@@ -516,8 +621,7 @@
 <blockquote>
 <p>&#8212;&#8211; Test creation of table from cube context
 &gt;&gt;&gt; c = MusicianCube(Musician.objects.all())</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cube.views</span> <span class="kn">import</span> <span class="n">table_from_cube_context</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">table_from_cube_context</span><span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="p">[</span><span class="s">&#39;firstname&#39;</span><span class="p">,</span> <span class="s">&#39;instrument&#39;</span><span class="p">])</span> <span class="o">==</span> <span class="p">{</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">c</span><span class="o">.</span><span class="n">table_helper</span><span class="p">(</span><span class="s">&#39;firstname&#39;</span><span class="p">,</span> <span class="s">&#39;instrument&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="p">{</span>
 <span class="gp">... </span>    <span class="s">&#39;col_names&#39;</span><span class="p">:</span> <span class="p">[</span>
 <span class="gp">... </span>        <span class="p">(</span><span class="s">&#39;Bill&#39;</span><span class="p">,</span> <span class="s">&#39;Bill&#39;</span><span class="p">),</span>
 <span class="gp">... </span>        <span class="p">(</span><span class="s">&#39;Erroll&#39;</span><span class="p">,</span> <span class="s">&#39;Erroll&#39;</span><span class="p">),</span>
@@ -547,7 +651,6 @@
 <span class="gp">... </span>    <span class="s">&#39;col_dim_name&#39;</span><span class="p">:</span> <span class="s">&#39;firstname&#39;</span><span class="p">,</span>
 <span class="gp">... </span>    <span class="s">&#39;row_dim_name&#39;</span><span class="p">:</span> <span class="s">&#39;instrument&#39;</span><span class="p">,</span>
 <span class="gp">... </span>    <span class="s">&#39;overall&#39;</span><span class="p">:</span> <span class="mf">6</span><span class="p">,</span>
-<span class="gp">... </span>    <span class="s">&#39;cube&#39;</span><span class="p">:</span> <span class="n">c</span>
 <span class="gp">... </span><span class="p">}</span>
 <span class="go">True</span>
 </pre></div>
@@ -719,11 +822,13 @@
 </li>
 <li><a class="reference external" href="#cube">Cube</a><ul>
 <li><a class="reference external" href="#declaring-cubes">Declaring cubes</a></li>
+<li><a class="reference external" href="#get-a-cube-s-sample-space">Get a cube&#8217;s sample space</a></li>
 <li><a class="reference external" href="#getting-a-measure-from-the-cube">Getting a measure from the cube</a></li>
 <li><a class="reference external" href="#iterating-over-cube-s-subcubes">Iterating over cube&#8217;s subcubes</a></li>
 <li><a class="reference external" href="#multidimensionnal-dictionnary-of-measures">Multidimensionnal dictionnary of measures</a></li>
 <li><a class="reference external" href="#multidimensionnal-list-of-measures">Multidimensionnal list of measures</a></li>
 <li><a class="reference external" href="#getting-a-subcube">Getting a subcube</a></li>
+<li><a class="reference external" href="#sorting-results">Sorting results</a></li>
 </ul>
 </li>
 <li><a class="reference external" href="#template-tags-and-filters">Template tags and filters</a><ul>
