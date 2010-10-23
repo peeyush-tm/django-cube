@@ -5,8 +5,6 @@ from django.template import Node, NodeList, TemplateSyntaxError, Library, Variab
 from django.template.loader  import get_template
 from django.conf import settings
 
-from ..views import table_from_cube_context
-
 register = Library()
 
 
@@ -56,8 +54,9 @@ class TableFromCubeNode(Node):
 
         #build context
         try:
-            extra_context = table_from_cube_context(cube, dimensions)
-        except ValueError as e:
+            extra_context = cube.table_helper(*dimensions)
+            extra_context['cube'] = cube
+        except ValueError, e:
             if settings.DEBUG:
                 return "[%s]" % e
             else:
