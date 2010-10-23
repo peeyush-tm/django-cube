@@ -56,7 +56,7 @@ class TableFromCubeNode(Node):
         try:
             extra_context = cube.table_helper(*dimensions)
             extra_context['cube'] = cube
-        except ValueError as e:
+        except ValueError, e:
             if settings.DEBUG:
                 return "[%s]" % e
             else:
