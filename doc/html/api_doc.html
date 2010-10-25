@@ -10,7 +10,7 @@
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    '',
+        URL_ROOT:    '#',
         VERSION:     '0.3',
         COLLAPSE_MODINDEX: false,
         FILE_SUFFIX: '.html',
@@ -54,23 +54,23 @@
 <h2>Cube, Dimension<a class="headerlink" href="#module-cube.models" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="cube.models.Cube">
-<em class="property">
-class </em><tt class="descclassname">cube.models.</tt><tt class="descname">Cube</tt><big>(</big><em>queryset</em>, <em>measure_none=0</em><big>)</big><a class="headerlink" href="#cube.models.Cube" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><tt class="descclassname">cube.models.</tt><tt class="descname">Cube</tt><big>(</big><em>queryset</em>, <em>measure_none=0</em><big>)</big><a class="headerlink" href="#cube.models.Cube" title="Permalink to this definition">¶</a></dt>
 <dd><p>A cube that can calculates measures on Django querysets.</p>
 <dl class="docutils">
 <dt>Args:</dt>
-<dd>queryset (Queryset): the base queryset of the cube. All measures will be calculated from filtered querysets of this base queryset. The way these querysets are filtered, depends on the cube&#8217;s constraint.</dd>
+<dd>queryset (Queryset): the base queryset of the cube.</dd>
+<dt>Kwargs:</dt>
+<dd>measure_none (object): the value that the measure should actually return if the calculation returned <em>None</em>.</dd>
 </dl>
 <dl class="staticmethod">
 <dt id="cube.models.Cube.aggregation">
-<em class="property">
-static </em><tt class="descname">aggregation</tt><big>(</big><em>queryset</em><big>)</big><a class="headerlink" href="#cube.models.Cube.aggregation" title="Permalink to this definition">¶</a></dt>
+<em class="property">static </em><tt class="descname">aggregation</tt><big>(</big><em>queryset</em><big>)</big><a class="headerlink" href="#cube.models.Cube.aggregation" title="Permalink to this definition">¶</a></dt>
 <dd><p>Abstract method. Given a <em>queryset</em>, this method should calculate and return the measure. For example :</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">def</span> <span class="nf">aggregation</span><span class="p">(</span><span class="n">queryset</span><span class="p">):</span>
 <span class="gp">... </span>    <span class="k">return</span> <span class="n">queryset</span><span class="o">.</span><span class="n">count</span><span class="p">()</span>
 </pre></div>
 </div>
-<p><strong>In practice</strong>, the <em>queryset</em> received as a parameter will <strong>always</strong> be : the cube&#8217;s base queryset, filtered according to the cube&#8217;s constraints.</p>
+<p><strong>In practice</strong>, the <em>queryset</em> received as a parameter will <strong>always</strong> be : the cube&#8217;s base queryset, filtered according to the cube&#8217;s constraint.</p>
 </dd></dl>
 
 <dl class="method">
@@ -86,7 +86,7 @@ static </em><tt class="descname">aggregation</tt><big>(</big><em>queryset</em><b
 </div>
 <dl class="docutils">
 <dt>Returns:</dt>
-<dd>Cube. A subcube of the calling cube, with the updated constraint.</dd>
+<dd>Cube. A copy of the calling cube, with the updated constraint.</dd>
 </dl>
 </dd></dl>
 
@@ -111,7 +111,7 @@ static </em><tt class="descname">aggregation</tt><big>(</big><em>queryset</em><b
 <dd><ul class="first last simple">
 <li>&#8216;dict&#8217;: [{&#8216;dim1&#8217;: val11, ..., &#8216;dimN&#8217;: val1N}, ..., {&#8216;dim1&#8217;: valN1, ..., &#8216;dimN&#8217;: valNN}]</li>
 <li>&#8216;tuple&#8217;: [(val11, ... val1N), ..., (valN1, ..., valNN)] ; the values in the tuples map to dimensions names in <em>dim_names</em>.</li>
-<li>&#8216;flat&#8217;: [val1, ..., valN] ; only available if there is ONE <em>dim_name</em> passed as a parameter</li>
+<li>&#8216;flat&#8217;: [val1, ..., valN] ; only available if there is ONE dimension name passed as a parameter</li>
 </ul>
 </dd>
 </dl>
@@ -120,12 +120,28 @@ static </em><tt class="descname">aggregation</tt><big>(</big><em>queryset</em><b
 </dd></dl>
 
 <dl class="method">
-<dt id="cube.models.Cube.measure_dict">
-<tt class="descname">measure_dict</tt><big>(</big><em>*dim_names</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#cube.models.Cube.measure_dict" title="Permalink to this definition">¶</a></dt>
+<dt id="cube.models.Cube.measures">
+<tt class="descname">measures</tt><big>(</big><em>*dim_names</em><big>)</big><a class="headerlink" href="#cube.models.Cube.measures" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils">
+<dt>Returns:</dt>
+<dd><p class="first">list. A list of dictionnaries, whose keys are values for dimensions in <em>dim_names</em> and a special key <em>&#8216;__measure&#8217;</em>, for the measure associated with these dimensions&#8217; values. This is actually very similar to Django querysets&#8217; &#8220;values&#8221; method. For example :</p>
+<div class="last highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">cube</span><span class="o">.</span><span class="n">measures</span><span class="p">(</span><span class="s">&#39;dim2&#39;</span><span class="p">,</span> <span class="s">&#39;dim1&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="p">[</span>
+<span class="gp">... </span>    <span class="p">[{</span><span class="s">&#39;dim1&#39;</span><span class="p">:</span> <span class="n">val1_1</span><span class="p">,</span> <span class="s">&#39;dim2&#39;</span><span class="p">:</span> <span class="n">val2_1</span><span class="p">,</span> <span class="s">&#39;__measure&#39;</span><span class="p">:</span> <span class="n">measure_1_1</span><span class="p">},</span>
+<span class="gp">... </span>    <span class="p">,</span> <span class="p">,</span>
+<span class="gp">... </span>    <span class="p">{</span><span class="s">&#39;dim1&#39;</span><span class="p">:</span> <span class="n">val1_N</span><span class="p">,</span> <span class="s">&#39;dim2&#39;</span><span class="p">:</span> <span class="n">val2_N</span><span class="p">,</span> <span class="s">&#39;__measure&#39;</span><span class="p">:</span> <span class="n">measure_1_1</span><span class="p">}]</span>
+</pre></div>
+</div>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="cube.models.Cube.measures_dict">
+<tt class="descname">measures_dict</tt><big>(</big><em>*dim_names</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#cube.models.Cube.measures_dict" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="docutils">
 <dt>Returns: </dt>
 <dd><p class="first">dict. An ordered dictionnary of measures from the cube, structured following <em>dim_names</em>. For example :</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">cube</span><span class="p">([</span><span class="s">&#39;dim1&#39;</span><span class="p">,</span> <span class="s">&#39;dim2&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">measures_dict</span><span class="p">(</span><span class="s">&#39;dim2&#39;</span><span class="p">,</span> <span class="s">&#39;dim1&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="p">{</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">cube</span><span class="o">.</span><span class="n">measures_dict</span><span class="p">(</span><span class="s">&#39;dim2&#39;</span><span class="p">,</span> <span class="s">&#39;dim1&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="p">{</span>
 <span class="gp">... </span>    <span class="s">&#39;subcubes&#39;</span><span class="p">:</span> <span class="p">{</span>
 <span class="gp">... </span>        <span class="n">dim2_val1</span><span class="p">:</span> <span class="p">{</span>
 <span class="gp">... </span>            <span class="s">&#39;subcubes&#39;</span><span class="p">:</span> <span class="p">{</span>
@@ -163,12 +179,12 @@ static </em><tt class="descname">aggregation</tt><big>(</big><em>queryset</em><b
 </dd></dl>
 
 <dl class="method">
-<dt id="cube.models.Cube.measure_list">
-<tt class="descname">measure_list</tt><big>(</big><em>*dim_names</em><big>)</big><a class="headerlink" href="#cube.models.Cube.measure_list" title="Permalink to this definition">¶</a></dt>
+<dt id="cube.models.Cube.measures_list">
+<tt class="descname">measures_list</tt><big>(</big><em>*dim_names</em><big>)</big><a class="headerlink" href="#cube.models.Cube.measures_list" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="docutils">
 <dt>Returns:</dt>
 <dd><p class="first">list. A multidimensionnal list of measures from the cube, structured following <em>dim_names</em>. For example :</p>
-<div class="last highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">cube</span><span class="p">([</span><span class="s">&#39;dim1&#39;</span><span class="p">,</span> <span class="s">&#39;dim2&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">measures_list</span><span class="p">(</span><span class="s">&#39;dim2&#39;</span><span class="p">,</span> <span class="s">&#39;dim1&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="p">[</span>
+<div class="last highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">cube</span><span class="o">.</span><span class="n">measures_list</span><span class="p">(</span><span class="s">&#39;dim2&#39;</span><span class="p">,</span> <span class="s">&#39;dim1&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="p">[</span>
 <span class="gp">... </span>    <span class="p">[</span><span class="n">measure_11_21</span><span class="p">,</span> <span class="n">measure_11_22</span><span class="p">,</span> <span class="p">,</span> <span class="n">measure_11_2N</span><span class="p">],</span>
 <span class="gp">... </span>    <span class="p">[</span><span class="n">measure_12_21</span><span class="p">,</span> <span class="n">measure_12_22</span><span class="p">,</span> <span class="p">,</span> <span class="n">measure_12_2N</span><span class="p">],</span>
 <span class="gp">... </span>
@@ -182,12 +198,11 @@ static </em><tt class="descname">aggregation</tt><big>(</big><em>queryset</em><b
 
 <dl class="staticmethod">
 <dt id="cube.models.Cube.sort_key">
-<em class="property">
-static </em><tt class="descname">sort_key</tt><big>(</big><em>coordinates</em><big>)</big><a class="headerlink" href="#cube.models.Cube.sort_key" title="Permalink to this definition">¶</a></dt>
-<dd><p>This method can be overriden for custom sorting of the sample space while iterating on subcubes.</p>
+<em class="property">static </em><tt class="descname">sort_key</tt><big>(</big><em>coordinates</em><big>)</big><a class="headerlink" href="#cube.models.Cube.sort_key" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method can be overriden for custom sorting of the cube&#8217;s sample space. This will result in a custom order, when using every method that iterates on a cube for measures or subcubes.</p>
 <dl class="docutils">
 <dt>Args:</dt>
-<dd>coordinates (dict). The coordinates to generate a sorting key from. The format of <em>coordinates</em> is <em>{&#8216;dim_name1&#8217;: &#8216;val1&#8217;, &#8216;dim_name2&#8217;: &#8216;val2&#8217;, ...}</em>.</dd>
+<dd>coordinates (dict). The coordinates to generate a sorting key from. The format of <em>coordinates</em> is <em>{&#8216;dim_name1&#8217;: val1&#8217;, &#8216;dim_name2&#8217;: val2, ...}</em>.</dd>
 <dt>Returns:</dt>
 <dd>object. A key generated to sort the sample space of the cube.</dd>
 </dl>
@@ -254,8 +269,7 @@ static </em><tt class="descname">sort_key</tt><big>(</big><em>coordinates</em><b
 
 <dl class="class">
 <dt id="cube.models.Dimension">
-<em class="property">
-class </em><tt class="descclassname">cube.models.</tt><tt class="descname">Dimension</tt><big>(</big><em>field=None</em>, <em>queryset=None</em>, <em>sample_space=</em><span class="optional">[</span><span class="optional">]</span><big>)</big><a class="headerlink" href="#cube.models.Dimension" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><tt class="descclassname">cube.models.</tt><tt class="descname">Dimension</tt><big>(</big><em>field=None</em>, <em>queryset=None</em>, <em>sample_space=</em><span class="optional">[</span><span class="optional">]</span><big>)</big><a class="headerlink" href="#cube.models.Dimension" title="Permalink to this definition">¶</a></dt>
 <dd><p>A dimension that is associated with a Django model&#8217;s field.</p>
 <dl class="docutils">
 <dt>Kwargs:</dt>
@@ -329,16 +343,31 @@ class </em><tt class="descclassname">cube.models.</tt><tt class="descname">Dimen
 <h2>Querying a cube<a class="headerlink" href="#module-cube.query" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="cube.query.CubeQueryMixin">
-<em class="property">
-class </em><tt class="descclassname">cube.query.</tt><tt class="descname">CubeQueryMixin</tt><a class="headerlink" href="#cube.query.CubeQueryMixin" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><tt class="descclassname">cube.query.</tt><tt class="descname">CubeQueryMixin</tt><a class="headerlink" href="#cube.query.CubeQueryMixin" title="Permalink to this definition">¶</a></dt>
 <dd><p>Mixin class whose purpose is to separate querying of measures, from the cube logic itself.</p>
 <dl class="method">
-<dt id="cube.query.CubeQueryMixin.measure_dict">
-<tt class="descname">measure_dict</tt><big>(</big><em>*dim_names</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#cube.query.CubeQueryMixin.measure_dict" title="Permalink to this definition">¶</a></dt>
+<dt id="cube.query.CubeQueryMixin.measures">
+<tt class="descname">measures</tt><big>(</big><em>*dim_names</em><big>)</big><a class="headerlink" href="#cube.query.CubeQueryMixin.measures" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils">
+<dt>Returns:</dt>
+<dd><p class="first">list. A list of dictionnaries, whose keys are values for dimensions in <em>dim_names</em> and a special key <em>&#8216;__measure&#8217;</em>, for the measure associated with these dimensions&#8217; values. This is actually very similar to Django querysets&#8217; &#8220;values&#8221; method. For example :</p>
+<div class="last highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">cube</span><span class="o">.</span><span class="n">measures</span><span class="p">(</span><span class="s">&#39;dim2&#39;</span><span class="p">,</span> <span class="s">&#39;dim1&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="p">[</span>
+<span class="gp">... </span>    <span class="p">[{</span><span class="s">&#39;dim1&#39;</span><span class="p">:</span> <span class="n">val1_1</span><span class="p">,</span> <span class="s">&#39;dim2&#39;</span><span class="p">:</span> <span class="n">val2_1</span><span class="p">,</span> <span class="s">&#39;__measure&#39;</span><span class="p">:</span> <span class="n">measure_1_1</span><span class="p">},</span>
+<span class="gp">... </span>    <span class="p">,</span> <span class="p">,</span>
+<span class="gp">... </span>    <span class="p">{</span><span class="s">&#39;dim1&#39;</span><span class="p">:</span> <span class="n">val1_N</span><span class="p">,</span> <span class="s">&#39;dim2&#39;</span><span class="p">:</span> <span class="n">val2_N</span><span class="p">,</span> <span class="s">&#39;__measure&#39;</span><span class="p">:</span> <span class="n">measure_1_1</span><span class="p">}]</span>
+</pre></div>
+</div>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="cube.query.CubeQueryMixin.measures_dict">
+<tt class="descname">measures_dict</tt><big>(</big><em>*dim_names</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#cube.query.CubeQueryMixin.measures_dict" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="docutils">
 <dt>Returns: </dt>
 <dd><p class="first">dict. An ordered dictionnary of measures from the cube, structured following <em>dim_names</em>. For example :</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">cube</span><span class="p">([</span><span class="s">&#39;dim1&#39;</span><span class="p">,</span> <span class="s">&#39;dim2&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">measures_dict</span><span class="p">(</span><span class="s">&#39;dim2&#39;</span><span class="p">,</span> <span class="s">&#39;dim1&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="p">{</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">cube</span><span class="o">.</span><span class="n">measures_dict</span><span class="p">(</span><span class="s">&#39;dim2&#39;</span><span class="p">,</span> <span class="s">&#39;dim1&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="p">{</span>
 <span class="gp">... </span>    <span class="s">&#39;subcubes&#39;</span><span class="p">:</span> <span class="p">{</span>
 <span class="gp">... </span>        <span class="n">dim2_val1</span><span class="p">:</span> <span class="p">{</span>
 <span class="gp">... </span>            <span class="s">&#39;subcubes&#39;</span><span class="p">:</span> <span class="p">{</span>
@@ -376,12 +405,12 @@ class </em><tt class="descclassname">cube.query.</tt><tt class="descname">CubeQu
 </dd></dl>
 
 <dl class="method">
-<dt id="cube.query.CubeQueryMixin.measure_list">
-<tt class="descname">measure_list</tt><big>(</big><em>*dim_names</em><big>)</big><a class="headerlink" href="#cube.query.CubeQueryMixin.measure_list" title="Permalink to this definition">¶</a></dt>
+<dt id="cube.query.CubeQueryMixin.measures_list">
+<tt class="descname">measures_list</tt><big>(</big><em>*dim_names</em><big>)</big><a class="headerlink" href="#cube.query.CubeQueryMixin.measures_list" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="docutils">
 <dt>Returns:</dt>
 <dd><p class="first">list. A multidimensionnal list of measures from the cube, structured following <em>dim_names</em>. For example :</p>
-<div class="last highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">cube</span><span class="p">([</span><span class="s">&#39;dim1&#39;</span><span class="p">,</span> <span class="s">&#39;dim2&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">measures_list</span><span class="p">(</span><span class="s">&#39;dim2&#39;</span><span class="p">,</span> <span class="s">&#39;dim1&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="p">[</span>
+<div class="last highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">cube</span><span class="o">.</span><span class="n">measures_list</span><span class="p">(</span><span class="s">&#39;dim2&#39;</span><span class="p">,</span> <span class="s">&#39;dim1&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="p">[</span>
 <span class="gp">... </span>    <span class="p">[</span><span class="n">measure_11_21</span><span class="p">,</span> <span class="n">measure_11_22</span><span class="p">,</span> <span class="p">,</span> <span class="n">measure_11_2N</span><span class="p">],</span>
 <span class="gp">... </span>    <span class="p">[</span><span class="n">measure_12_21</span><span class="p">,</span> <span class="n">measure_12_22</span><span class="p">,</span> <span class="p">,</span> <span class="n">measure_12_2N</span><span class="p">],</span>
 <span class="gp">... </span>
@@ -440,7 +469,7 @@ class </em><tt class="descclassname">cube.query.</tt><tt class="descname">CubeQu
         <div class="sphinxsidebarwrapper">
             <h3><a href="index.html">Table Of Contents</a></h3>
             <ul>
-<li><a class="reference external" href="">API documentation</a><ul>
+<li><a class="reference external" href="#">API documentation</a><ul>
 <li><a class="reference external" href="#module-cube.models">Cube, Dimension</a></li>
 <li><a class="reference external" href="#module-cube.query">Querying a cube</a></li>
 <li><a class="reference external" href="#module-cube.views">Views</a></li>
@@ -496,7 +525,7 @@ class </em><tt class="descclassname">cube.query.</tt><tt class="descname">CubeQu
     </div>
     <div class="footer">
       &copy; Copyright 2010, Sébastien Piquemal.
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.2.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.4.
     </div>
   </body>
 </html>
