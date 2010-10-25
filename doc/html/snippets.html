@@ -10,7 +10,7 @@
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    '',
+        URL_ROOT:    '#',
         VERSION:     '0.3',
         COLLAPSE_MODINDEX: false,
         FILE_SUFFIX: '.html',
@@ -312,11 +312,31 @@
 </pre></div>
 </div>
 </div>
+<div class="section" id="list-of-measure-rows">
+<h3>List of measure rows<a class="headerlink" href="#list-of-measure-rows" title="Permalink to this headline">¶</a></h3>
+<p>Using <tt class="xref docutils literal"><span class="pre">Cube.measures()</span></tt>, you can get a list of measures, very similar to what is returned by the <cite>.values()</cite> method on a django queryset.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">c</span> <span class="o">=</span> <span class="n">MusicianCube</span><span class="p">(</span><span class="n">Musician</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">instrument__name__in</span><span class="o">=</span><span class="p">[</span><span class="s">&#39;piano&#39;</span><span class="p">,</span> <span class="s">&#39;trumpet&#39;</span><span class="p">]))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c</span><span class="o">.</span><span class="n">measures</span><span class="p">(</span><span class="s">&#39;firstname&#39;</span><span class="p">,</span> <span class="s">&#39;instrument_name&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="p">[</span>
+<span class="gp">... </span>    <span class="p">{</span><span class="s">&#39;firstname&#39;</span><span class="p">:</span> <span class="s">&#39;Bill&#39;</span><span class="p">,</span> <span class="s">&#39;instrument_name&#39;</span><span class="p">:</span> <span class="s">&#39;piano&#39;</span><span class="p">,</span> <span class="s">&#39;__measure&#39;</span><span class="p">:</span> <span class="mf">1</span><span class="p">},</span>
+<span class="gp">... </span>    <span class="p">{</span><span class="s">&#39;firstname&#39;</span><span class="p">:</span> <span class="s">&#39;Bill&#39;</span><span class="p">,</span> <span class="s">&#39;instrument_name&#39;</span><span class="p">:</span> <span class="s">&#39;trumpet&#39;</span><span class="p">,</span> <span class="s">&#39;__measure&#39;</span><span class="p">:</span> <span class="mf">0</span><span class="p">},</span>
+<span class="gp">... </span>    <span class="p">{</span><span class="s">&#39;firstname&#39;</span><span class="p">:</span> <span class="s">&#39;Erroll&#39;</span><span class="p">,</span> <span class="s">&#39;instrument_name&#39;</span><span class="p">:</span> <span class="s">&#39;piano&#39;</span><span class="p">,</span> <span class="s">&#39;__measure&#39;</span><span class="p">:</span> <span class="mf">1</span><span class="p">},</span>
+<span class="gp">... </span>    <span class="p">{</span><span class="s">&#39;firstname&#39;</span><span class="p">:</span> <span class="s">&#39;Erroll&#39;</span><span class="p">,</span> <span class="s">&#39;instrument_name&#39;</span><span class="p">:</span> <span class="s">&#39;trumpet&#39;</span><span class="p">,</span> <span class="s">&#39;__measure&#39;</span><span class="p">:</span> <span class="mf">0</span><span class="p">},</span>
+<span class="gp">... </span>    <span class="p">{</span><span class="s">&#39;firstname&#39;</span><span class="p">:</span> <span class="s">&#39;Freddie&#39;</span><span class="p">,</span> <span class="s">&#39;instrument_name&#39;</span><span class="p">:</span> <span class="s">&#39;piano&#39;</span><span class="p">,</span> <span class="s">&#39;__measure&#39;</span><span class="p">:</span> <span class="mf">0</span><span class="p">},</span>
+<span class="gp">... </span>    <span class="p">{</span><span class="s">&#39;firstname&#39;</span><span class="p">:</span> <span class="s">&#39;Freddie&#39;</span><span class="p">,</span> <span class="s">&#39;instrument_name&#39;</span><span class="p">:</span> <span class="s">&#39;trumpet&#39;</span><span class="p">,</span> <span class="s">&#39;__measure&#39;</span><span class="p">:</span> <span class="mf">1</span><span class="p">},</span>
+<span class="gp">... </span>    <span class="p">{</span><span class="s">&#39;firstname&#39;</span><span class="p">:</span> <span class="s">&#39;Miles&#39;</span><span class="p">,</span> <span class="s">&#39;instrument_name&#39;</span><span class="p">:</span> <span class="s">&#39;piano&#39;</span><span class="p">,</span> <span class="s">&#39;__measure&#39;</span><span class="p">:</span> <span class="mf">0</span><span class="p">},</span>
+<span class="gp">... </span>    <span class="p">{</span><span class="s">&#39;firstname&#39;</span><span class="p">:</span> <span class="s">&#39;Miles&#39;</span><span class="p">,</span> <span class="s">&#39;instrument_name&#39;</span><span class="p">:</span> <span class="s">&#39;trumpet&#39;</span><span class="p">,</span> <span class="s">&#39;__measure&#39;</span><span class="p">:</span> <span class="mf">1</span><span class="p">},</span>
+<span class="gp">... </span>    <span class="p">{</span><span class="s">&#39;firstname&#39;</span><span class="p">:</span> <span class="s">&#39;Thelonious&#39;</span><span class="p">,</span> <span class="s">&#39;instrument_name&#39;</span><span class="p">:</span> <span class="s">&#39;piano&#39;</span><span class="p">,</span> <span class="s">&#39;__measure&#39;</span><span class="p">:</span> <span class="mf">1</span><span class="p">},</span>
+<span class="gp">... </span>    <span class="p">{</span><span class="s">&#39;firstname&#39;</span><span class="p">:</span> <span class="s">&#39;Thelonious&#39;</span><span class="p">,</span> <span class="s">&#39;instrument_name&#39;</span><span class="p">:</span> <span class="s">&#39;trumpet&#39;</span><span class="p">,</span> <span class="s">&#39;__measure&#39;</span><span class="p">:</span> <span class="mf">0</span><span class="p">},</span>
+<span class="gp">... </span><span class="p">]</span>
+<span class="go">True</span>
+</pre></div>
+</div>
+</div>
 <div class="section" id="multidimensionnal-dictionnary-of-measures">
 <h3>Multidimensionnal dictionnary of measures<a class="headerlink" href="#multidimensionnal-dictionnary-of-measures" title="Permalink to this headline">¶</a></h3>
-<p>Using <tt class="xref docutils literal"><span class="pre">Cube.measure_dict()</span></tt>, you can get a dictionnary of all the measures, organized by dimensions :</p>
+<p>Using <tt class="xref docutils literal"><span class="pre">Cube.measures_dict()</span></tt>, you can get a dictionnary of all the measures, organized by dimensions :</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">c</span> <span class="o">=</span> <span class="n">MusicianCube</span><span class="p">(</span><span class="n">Musician</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">instrument__name__in</span><span class="o">=</span><span class="p">[</span><span class="s">&#39;piano&#39;</span><span class="p">,</span> <span class="s">&#39;trumpet&#39;</span><span class="p">]))</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">c</span><span class="o">.</span><span class="n">measure_dict</span><span class="p">(</span><span class="s">&#39;firstname&#39;</span><span class="p">,</span> <span class="s">&#39;instrument_name&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="p">{</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c</span><span class="o">.</span><span class="n">measures_dict</span><span class="p">(</span><span class="s">&#39;firstname&#39;</span><span class="p">,</span> <span class="s">&#39;instrument_name&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="p">{</span>
 <span class="gp">... </span>    <span class="s">&#39;subcubes&#39;</span><span class="p">:</span> <span class="p">{</span>
 <span class="gp">... </span>        <span class="s">&#39;Bill&#39;</span><span class="p">:</span> <span class="p">{</span>
 <span class="gp">... </span>            <span class="s">&#39;subcubes&#39;</span><span class="p">:</span> <span class="p">{</span>
@@ -359,8 +379,8 @@
 <span class="go">True</span>
 </pre></div>
 </div>
-<p>You can do the same thing, but calculating only the measures for the subcubes whose dimensions passed to <tt class="xref docutils literal"><span class="pre">measure_dict()</span></tt> are all fixed.</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">c</span><span class="o">.</span><span class="n">measure_dict</span><span class="p">(</span><span class="s">&#39;firstname&#39;</span><span class="p">,</span> <span class="s">&#39;instrument_name&#39;</span><span class="p">,</span> <span class="n">full</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span> <span class="o">==</span> <span class="p">{</span>
+<p>You can do the same thing, but calculating only the measures for the subcubes whose dimensions passed to <tt class="xref docutils literal"><span class="pre">measures_dict()</span></tt> are all fixed.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">c</span><span class="o">.</span><span class="n">measures_dict</span><span class="p">(</span><span class="s">&#39;firstname&#39;</span><span class="p">,</span> <span class="s">&#39;instrument_name&#39;</span><span class="p">,</span> <span class="n">full</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span> <span class="o">==</span> <span class="p">{</span>
 <span class="gp">... </span>    <span class="s">&#39;Bill&#39;</span><span class="p">:</span> <span class="p">{</span>
 <span class="gp">... </span>        <span class="s">&#39;piano&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s">&#39;measure&#39;</span><span class="p">:</span> <span class="mf">1</span><span class="p">},</span>
 <span class="gp">... </span>        <span class="s">&#39;trumpet&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s">&#39;measure&#39;</span><span class="p">:</span> <span class="mf">0</span><span class="p">},</span>
@@ -388,8 +408,8 @@
 </div>
 <div class="section" id="multidimensionnal-list-of-measures">
 <h3>Multidimensionnal list of measures<a class="headerlink" href="#multidimensionnal-list-of-measures" title="Permalink to this headline">¶</a></h3>
-<p>Using <tt class="xref docutils literal"><span class="pre">Cube.measure_list()</span></tt>, you can get a list of measures organized by dimension :</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">c</span><span class="o">.</span><span class="n">measure_list</span><span class="p">(</span><span class="s">&#39;firstname&#39;</span><span class="p">,</span> <span class="s">&#39;instrument_name&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="p">[</span>
+<p>Using <tt class="xref docutils literal"><span class="pre">Cube.measures_list()</span></tt>, you can get a list of measures organized by dimension :</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">c</span><span class="o">.</span><span class="n">measures_list</span><span class="p">(</span><span class="s">&#39;firstname&#39;</span><span class="p">,</span> <span class="s">&#39;instrument_name&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="p">[</span>
 <span class="gp">... </span>    <span class="p">[</span><span class="mf">1</span><span class="p">,</span> <span class="mf">0</span><span class="p">],</span> <span class="c">#Bill: piano, trumpet</span>
 <span class="gp">... </span>    <span class="p">[</span><span class="mf">1</span><span class="p">,</span> <span class="mf">0</span><span class="p">],</span> <span class="c">#Erroll ...</span>
 <span class="gp">... </span>    <span class="p">[</span><span class="mf">0</span><span class="p">,</span> <span class="mf">1</span><span class="p">],</span> <span class="c">#Freddie ...</span>
@@ -398,7 +418,7 @@
 <span class="gp">... </span><span class="p">]</span>
 <span class="go">True</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">other_c</span> <span class="o">=</span> <span class="n">MusicianCube</span><span class="p">(</span><span class="n">Musician</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">instrument__name__in</span><span class="o">=</span><span class="p">[</span><span class="s">&#39;piano&#39;</span><span class="p">]))</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">other_c</span><span class="o">.</span><span class="n">measure_list</span><span class="p">(</span><span class="s">&#39;firstname&#39;</span><span class="p">,</span> <span class="s">&#39;instrument_name&#39;</span><span class="p">,</span> <span class="s">&#39;lastname&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="p">[</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">other_c</span><span class="o">.</span><span class="n">measures_list</span><span class="p">(</span><span class="s">&#39;firstname&#39;</span><span class="p">,</span> <span class="s">&#39;instrument_name&#39;</span><span class="p">,</span> <span class="s">&#39;lastname&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="p">[</span>
 <span class="gp">... </span>    <span class="p">[[</span><span class="mf">1</span><span class="p">,</span> <span class="mf">0</span><span class="p">,</span> <span class="mf">0</span><span class="p">]],</span> <span class="c">#Bill: piano: Evans, Garner, Monk</span>
 <span class="gp">... </span>    <span class="p">[[</span><span class="mf">0</span><span class="p">,</span> <span class="mf">1</span><span class="p">,</span> <span class="mf">0</span><span class="p">]],</span> <span class="c">#Erroll ...</span>
 <span class="gp">... </span>    <span class="p">[[</span><span class="mf">0</span><span class="p">,</span> <span class="mf">0</span><span class="p">,</span> <span class="mf">1</span><span class="p">]],</span> <span class="c">#Thelonious ...</span>
@@ -411,7 +431,7 @@
 <h3>Getting a subcube<a class="headerlink" href="#getting-a-subcube" title="Permalink to this headline">¶</a></h3>
 <p>You can get a subcube of a cube by constraining it :</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">subcube</span> <span class="o">=</span> <span class="n">c</span><span class="o">.</span><span class="n">constrain</span><span class="p">(</span><span class="n">instrument_name</span><span class="o">=</span><span class="s">&#39;trumpet&#39;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">subcube</span><span class="o">.</span><span class="n">measure_dict</span><span class="p">(</span><span class="s">&#39;firstname&#39;</span><span class="p">,</span> <span class="s">&#39;instrument_name&#39;</span><span class="p">,</span> <span class="n">full</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span> <span class="o">==</span> <span class="p">{</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">subcube</span><span class="o">.</span><span class="n">measures_dict</span><span class="p">(</span><span class="s">&#39;firstname&#39;</span><span class="p">,</span> <span class="s">&#39;instrument_name&#39;</span><span class="p">,</span> <span class="n">full</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span> <span class="o">==</span> <span class="p">{</span>
 <span class="gp">... </span>    <span class="s">&#39;Bill&#39;</span><span class="p">:</span> <span class="p">{</span>
 <span class="gp">... </span>        <span class="s">&#39;trumpet&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s">&#39;measure&#39;</span><span class="p">:</span> <span class="mf">0</span><span class="p">},</span>
 <span class="gp">... </span>    <span class="p">},</span>
@@ -434,7 +454,7 @@
 <p>Using Django field-lookup syntax for date dimensions (see the dimensions declaration) works pretty well too :</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">c</span> <span class="o">=</span> <span class="n">SongCube</span><span class="p">(</span><span class="n">Song</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">all</span><span class="p">())</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">subcube</span> <span class="o">=</span> <span class="n">c</span><span class="o">.</span><span class="n">constrain</span><span class="p">(</span><span class="n">date_month</span><span class="o">=</span><span class="mf">2</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">subcube</span><span class="o">.</span><span class="n">measure_dict</span><span class="p">(</span><span class="s">&#39;date_month&#39;</span><span class="p">,</span> <span class="s">&#39;date_year&#39;</span><span class="p">,</span> <span class="s">&#39;auth_name&#39;</span><span class="p">,</span> <span class="n">full</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span> <span class="o">==</span> <span class="p">{</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">subcube</span><span class="o">.</span><span class="n">measures_dict</span><span class="p">(</span><span class="s">&#39;date_month&#39;</span><span class="p">,</span> <span class="s">&#39;date_year&#39;</span><span class="p">,</span> <span class="s">&#39;auth_name&#39;</span><span class="p">,</span> <span class="n">full</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span> <span class="o">==</span> <span class="p">{</span>
 <span class="gp">... </span>    <span class="mf">2</span><span class="p">:</span> <span class="p">{</span>
 <span class="gp">... </span>        <span class="mf">1945</span><span class="p">:</span> <span class="p">{</span>
 <span class="gp">... </span>            <span class="s">&#39;Davis&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s">&#39;measure&#39;</span><span class="p">:</span> <span class="mf">0</span><span class="p">},</span>
@@ -467,7 +487,7 @@
 </div>
 <p>As well as using Django field-lookup syntax for relations (see the dimensions declaration) :</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">c</span> <span class="o">=</span> <span class="n">MusicianCube</span><span class="p">(</span><span class="n">Musician</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">all</span><span class="p">())</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">c</span><span class="o">.</span><span class="n">measure_dict</span><span class="p">(</span><span class="s">&#39;instrument_cat&#39;</span><span class="p">,</span> <span class="s">&#39;firstname&#39;</span><span class="p">,</span> <span class="n">full</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span> <span class="o">==</span> <span class="p">{</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c</span><span class="o">.</span><span class="n">measures_dict</span><span class="p">(</span><span class="s">&#39;instrument_cat&#39;</span><span class="p">,</span> <span class="s">&#39;firstname&#39;</span><span class="p">,</span> <span class="n">full</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span> <span class="o">==</span> <span class="p">{</span>
 <span class="gp">... </span>    <span class="p">(</span><span class="s">&#39;trumpet&#39;</span><span class="p">,</span> <span class="s">&#39;piano&#39;</span><span class="p">):</span> <span class="p">{</span>
 <span class="gp">... </span>        <span class="s">&#39;Bill&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s">&#39;measure&#39;</span><span class="p">:</span> <span class="mf">1</span><span class="p">},</span>
 <span class="gp">... </span>        <span class="s">&#39;Erroll&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s">&#39;measure&#39;</span><span class="p">:</span> <span class="mf">1</span><span class="p">},</span>
@@ -812,7 +832,7 @@
         <div class="sphinxsidebarwrapper">
             <h3><a href="index.html">Table Of Contents</a></h3>
             <ul>
-<li><a class="reference external" href="">Snippets</a><ul>
+<li><a class="reference external" href="#">Snippets</a><ul>
 <li><a class="reference external" href="#dimension">Dimension</a><ul>
 <li><a class="reference external" href="#set-the-dimensions-s-sample-space">Set the dimensions&#8217;s sample space</a></li>
 <li><a class="reference external" href="#getting-default-sample-space-of-a-dimension">Getting default sample space of a dimension</a></li>
@@ -825,6 +845,7 @@
 <li><a class="reference external" href="#get-a-cube-s-sample-space">Get a cube&#8217;s sample space</a></li>
 <li><a class="reference external" href="#getting-a-measure-from-the-cube">Getting a measure from the cube</a></li>
 <li><a class="reference external" href="#iterating-over-cube-s-subcubes">Iterating over cube&#8217;s subcubes</a></li>
+<li><a class="reference external" href="#list-of-measure-rows">List of measure rows</a></li>
 <li><a class="reference external" href="#multidimensionnal-dictionnary-of-measures">Multidimensionnal dictionnary of measures</a></li>
 <li><a class="reference external" href="#multidimensionnal-list-of-measures">Multidimensionnal list of measures</a></li>
 <li><a class="reference external" href="#getting-a-subcube">Getting a subcube</a></li>
@@ -893,7 +914,7 @@
     </div>
     <div class="footer">
       &copy; Copyright 2010, Sébastien Piquemal.
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.2.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.4.
     </div>
   </body>
 </html>

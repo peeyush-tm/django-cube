@@ -343,13 +343,33 @@ On the other hand, if your cube is constrained, all the subcubes yielded will be
     ... ]
     True
 
+List of measure rows
+----------------------
+
+Using :meth:`Cube.measures`, you can get a list of measures, very similar to what is returned by the `.values()` method on a django queryset.
+
+    >>> c = MusicianCube(Musician.objects.filter(instrument__name__in=['piano', 'trumpet']))
+    >>> c.measures('firstname', 'instrument_name') == [
+    ...     {'firstname': 'Bill', 'instrument_name': 'piano', '__measure': 1},
+    ...     {'firstname': 'Bill', 'instrument_name': 'trumpet', '__measure': 0},
+    ...     {'firstname': 'Erroll', 'instrument_name': 'piano', '__measure': 1},
+    ...     {'firstname': 'Erroll', 'instrument_name': 'trumpet', '__measure': 0},
+    ...     {'firstname': 'Freddie', 'instrument_name': 'piano', '__measure': 0},
+    ...     {'firstname': 'Freddie', 'instrument_name': 'trumpet', '__measure': 1},
+    ...     {'firstname': 'Miles', 'instrument_name': 'piano', '__measure': 0},
+    ...     {'firstname': 'Miles', 'instrument_name': 'trumpet', '__measure': 1},
+    ...     {'firstname': 'Thelonious', 'instrument_name': 'piano', '__measure': 1},
+    ...     {'firstname': 'Thelonious', 'instrument_name': 'trumpet', '__measure': 0},
+    ... ]
+    True
+
 Multidimensionnal dictionnary of measures
 -------------------------------------------
 
-Using :meth:`Cube.measure_dict`, you can get a dictionnary of all the measures, organized by dimensions : 
+Using :meth:`Cube.measures_dict`, you can get a dictionnary of all the measures, organized by dimensions : 
 
     >>> c = MusicianCube(Musician.objects.filter(instrument__name__in=['piano', 'trumpet']))
-    >>> c.measure_dict('firstname', 'instrument_name') == {
+    >>> c.measures_dict('firstname', 'instrument_name') == {
     ...     'subcubes': {
     ...         'Bill': {
     ...             'subcubes': {
@@ -391,9 +411,9 @@ Using :meth:`Cube.measure_dict`, you can get a dictionnary of all the measures, 
     ... }
     True
 
-You can do the same thing, but calculating only the measures for the subcubes whose dimensions passed to :meth:`measure_dict` are all fixed.
+You can do the same thing, but calculating only the measures for the subcubes whose dimensions passed to :meth:`measures_dict` are all fixed.
 
-    >>> c.measure_dict('firstname', 'instrument_name', full=False) == {
+    >>> c.measures_dict('firstname', 'instrument_name', full=False) == {
     ...     'Bill': {
     ...         'piano': {'measure': 1},
     ...         'trumpet': {'measure': 0},
@@ -420,9 +440,9 @@ You can do the same thing, but calculating only the measures for the subcubes wh
 Multidimensionnal list of measures
 ------------------------------------
 
-Using :meth:`Cube.measure_list`, you can get a list of measures organized by dimension :
+Using :meth:`Cube.measures_list`, you can get a list of measures organized by dimension :
 
-    >>> c.measure_list('firstname', 'instrument_name') == [
+    >>> c.measures_list('firstname', 'instrument_name') == [
     ...     [1, 0], #Bill: piano, trumpet
     ...     [1, 0], #Erroll ...
     ...     [0, 1], #Freddie ...
@@ -431,7 +451,7 @@ Using :meth:`Cube.measure_list`, you can get a list of measures organized by dim
     ... ]
     True
     >>> other_c = MusicianCube(Musician.objects.filter(instrument__name__in=['piano']))
-    >>> other_c.measure_list('firstname', 'instrument_name', 'lastname') == [
+    >>> other_c.measures_list('firstname', 'instrument_name', 'lastname') == [
     ...     [[1, 0, 0]], #Bill: piano: Evans, Garner, Monk
     ...     [[0, 1, 0]], #Erroll ...
     ...     [[0, 0, 1]], #Thelonious ...
@@ -444,7 +464,7 @@ Getting a subcube
 You can get a subcube of a cube by constraining it :
 
     >>> subcube = c.constrain(instrument_name='trumpet')
-    >>> subcube.measure_dict('firstname', 'instrument_name', full=False) == {
+    >>> subcube.measures_dict('firstname', 'instrument_name', full=False) == {
     ...     'Bill': {
     ...         'trumpet': {'measure': 0},
     ...     },
@@ -467,7 +487,7 @@ Using Django field-lookup syntax for date dimensions (see the dimensions declara
 
     >>> c = SongCube(Song.objects.all())
     >>> subcube = c.constrain(date_month=2)
-    >>> subcube.measure_dict('date_month', 'date_year', 'auth_name', full=False) == {
+    >>> subcube.measures_dict('date_month', 'date_year', 'auth_name', full=False) == {
     ...     2: {
     ...         1945: {
     ...             'Davis': {'measure': 0},
@@ -500,7 +520,7 @@ Using Django field-lookup syntax for date dimensions (see the dimensions declara
 As well as using Django field-lookup syntax for relations (see the dimensions declaration) :
 
     >>> c = MusicianCube(Musician.objects.all())
-    >>> c.measure_dict('instrument_cat', 'firstname', full=False) == {
+    >>> c.measures_dict('instrument_cat', 'firstname', full=False) == {
     ...     ('trumpet', 'piano'): {
     ...         'Bill': {'measure': 1},
     ...         'Erroll': {'measure': 1},

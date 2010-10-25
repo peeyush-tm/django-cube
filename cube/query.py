@@ -24,12 +24,12 @@ class CubeQueryMixin(object):
     Mixin class whose purpose is to separate querying of measures, from the cube logic itself. 
     """
 
-    def measure_dict(self, *dim_names, **kwargs):
+    def measures_dict(self, *dim_names, **kwargs):
         """
         Returns: 
             dict. An ordered dictionnary of measures from the cube, structured following *dim_names*. For example :
 
-                >>> cube(['dim1', 'dim2']).measures_dict('dim2', 'dim1') == {
+                >>> cube.measures_dict('dim2', 'dim1') == {
                 ...     'subcubes': {
                 ...         dim2_val1: {
                 ...             'subcubes': {
@@ -68,11 +68,11 @@ class CubeQueryMixin(object):
         next_dim_name = self._pop_first_dim(dim_names)
 
         if next_dim_name:
-            #dictionnary containing *measure_dict* of the subcubes
+            #dictionnary containing *measures_dict* of the subcubes
             subcubes_dict = odict()
             for subcube in self.subcubes(next_dim_name):
                 dim_value = subcube.constraint[next_dim_name]
-                subcubes_dict[dim_value] = subcube.measure_dict(*dim_names, **kwargs)
+                subcubes_dict[dim_value] = subcube.measures_dict(*dim_names, **kwargs)
             if full:
                 returned_dict['measure'] = self.measure()
                 returned_dict['subcubes'] = subcubes_dict
@@ -82,12 +82,12 @@ class CubeQueryMixin(object):
             returned_dict['measure'] = self.measure()
         return returned_dict
 
-    def measure_list(self, *dim_names):
+    def measures_list(self, *dim_names):
         """
         Returns:
             list. A multidimensionnal list of measures from the cube, structured following *dim_names*. For example :
 
-                >>> cube(['dim1', 'dim2']).measures_list('dim2', 'dim1') == [
+                >>> cube.measures_list('dim2', 'dim1') == [
                 ...     [measure_11_21, measure_11_22, , measure_11_2N],
                 ...     [measure_12_21, measure_12_22, , measure_12_2N],
                 ... 
@@ -103,7 +103,7 @@ class CubeQueryMixin(object):
         #otherwise we return a list of measures. 
         if dim_names:
             for subcube in self.subcubes(next_dim_name):
-                returned_list.append(subcube.measure_list(*dim_names))
+                returned_list.append(subcube.measures_list(*dim_names))
         elif next_dim_name:
             for subcube in self.subcubes(next_dim_name):
                 returned_list.append(subcube.measure())
@@ -191,3 +191,21 @@ class CubeQueryMixin(object):
             'row_dim_name': row_dim_name,
             'overall': self.measure(),
         }
+    
+    def measures(self, *dim_names):
+        """
+        Returns:
+            list. A list of dictionnaries, whose keys are values for dimensions in *dim_names* and a special key *'__measure'*, for the measure associated with these dimensions' values. This is actually very similar to Django querysets' "values" method. For example :
+
+                >>> cube.measures('dim2', 'dim1') == [
+                ...     [{'dim1': val1_1, 'dim2': val2_1, '__measure': measure_1_1},
+                ...     , ,
+                ...     {'dim1': val1_N, 'dim2': val2_N, '__measure': measure_1_1}]
+        """
+        dim_names = list(dim_names)
+        dict_list = []
+        for subcube in self.subcubes(*dim_names):
+            measure_dict = subcube.constraint
+            measure_dict['__measure'] = subcube.measure()
+            dict_list.append(measure_dict)
+        return dict_list

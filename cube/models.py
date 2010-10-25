@@ -193,13 +193,12 @@ class Cube(BaseCube, CubeQueryMixin):
 
     Args:
         queryset (Queryset): the base queryset of the cube.
+
+    Kwargs:
+        measure_none (object): the value that the measure should actually return if the calculation returned *None*.
     """
 
     def __init__(self, queryset, measure_none=0):
-        """
-        Args:
-            measure_none (object): the value that the measure should actually return if the calculation returned *None*
-        """
         super(Cube, self).__init__()
         self.queryset = queryset
         self.measure_none = measure_none

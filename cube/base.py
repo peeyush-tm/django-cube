@@ -191,15 +191,15 @@ class BaseCube(object):
 
         .. note:: If one of the dimensions whose name passed as parameter is already constrained in the calling cube, it is not considered as an error.
         """
+        dim_names = list(dim_names)
         #sublist of *dim_names*, with only dimensions that are not yet constrained
         free_dim_names = []
-        dim_names = list(dim_names)
         free_dim_name = self._pop_first_dim(dim_names, free_only=True)
         while (free_dim_name):
             free_dim_names.append(free_dim_name)
             free_dim_name = self._pop_first_dim(dim_names, free_only=True)
 
-        #if no free dimension, the cube is already all constrained, no need to get further
+        #if no free dimension, the cube is completely constrained, no need to get further
         if not free_dim_names:
             yield copy.deepcopy(self)
             raise StopIteration
