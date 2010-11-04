@@ -807,7 +807,7 @@ Let's create a cube
 
 Let's use the view *table_from_cube* that renders the context with variables allowing to display easily the table (it is similar to *tablefromcube* inclusion tag) :
     
-    >>> response = table_from_cube(request, c, ['firstname', 'instrument_name'], template='table_from_cube.html')
+    >>> response = table_from_cube(request, cube=c, dimensions=['firstname', 'instrument_name'])
     
 Here is what the rendering gives :
 

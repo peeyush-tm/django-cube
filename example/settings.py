@@ -1,7 +1,7 @@
 # we add django-cube to the path
 import sys
 import os
-sys.path.append(os.path.abspath('./lib/'))
+sys.path.append(os.path.abspath('..'))
 
 # Django settings for example project.
 DEBUG = True
@@ -16,17 +16,7 @@ DATABASES = {
 
 ROOT_URLCONF = 'example.urls'
 
-TEMPLATE_DIRS = (
-    'templates',
-)
-
 INSTALLED_APPS = (
     'example.bookcase',
-    'django.contrib.auth',
-    'django.contrib.contenttypes',
-    'django.contrib.sessions',
-    'django.contrib.sites',
-    'django.contrib.messages',
-    # Uncomment the next line to enable the admin:
-    # 'django.contrib.admin',
+    'cube',
 )

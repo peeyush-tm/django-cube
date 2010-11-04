@@ -114,7 +114,7 @@ class CubeQueryMixin(object):
         A helper function to build a table from a cube. It takes two dimensions, and creates a dictionnary from it.  
 
         Args:
-            dim_names ((str, str)): the two dimension's names. 
+            dim_names. Two dimension names "dimension1", "dimension2", where "dimension1" is the name of the dimension that will be used for columns, "dimension2" the name of the dimension for rows.
 
         Returns:
             dict. A dictionnary containing the following variables :
