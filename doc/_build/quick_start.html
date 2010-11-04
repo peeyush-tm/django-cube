@@ -1,0 +1,184 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Quick start &mdash; django-cube v0.4 documentation</title>
+    <link rel="stylesheet" href="_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '0.4',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="django-cube v0.4 documentation" href="index.html" />
+    <link rel="next" title="Snippets" href="snippets.html" />
+    <link rel="prev" title="Django-cube documentation" href="index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="snippets.html" title="Snippets"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Django-cube documentation"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">django-cube v0.4 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="quick-start">
+<h1>Quick start<a class="headerlink" href="#quick-start" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="install-django-cube">
+<h2>Install django-cube<a class="headerlink" href="#install-django-cube" title="Permalink to this headline">¶</a></h2>
+<p>Put <cite>cube</cite> somewhere in your Python path, then put cube in <cite>INSTALLED_APPS</cite> in your settings</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">INSTALLED_APPS</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="c">#your other apps ...</span>
+    <span class="s">&#39;cube&#39;</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="set-up-your-cube">
+<h2>Set-up your cube<a class="headerlink" href="#set-up-your-cube" title="Permalink to this headline">¶</a></h2>
+<p>You have some django models like this one (don&#8217;t forget to sync your database...)</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">django.db</span> <span class="kn">import</span> <span class="n">models</span>
+
+<span class="k">class</span> <span class="nc">Book</span> <span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">Model</span><span class="p">):</span>
+    <span class="n">title</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">max_length</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
+    <span class="n">genre</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">max_length</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Then, anywhere in your project, just create a cube based on this model</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">cube.models</span> <span class="kn">import</span> <span class="n">Cube</span><span class="p">,</span> <span class="n">Dimension</span>
+
+<span class="k">class</span> <span class="nc">BookCaseCube</span><span class="p">(</span><span class="n">Cube</span><span class="p">):</span>
+
+    <span class="n">genre</span> <span class="o">=</span> <span class="n">Dimension</span><span class="p">(</span><span class="s">&#39;genre&#39;</span><span class="p">)</span>
+    <span class="n">first_letter_title</span> <span class="o">=</span> <span class="n">Dimension</span><span class="p">(</span><span class="s">&#39;title__iregex&#39;</span><span class="p">,</span> <span class="n">sample_space</span><span class="o">=</span><span class="p">[</span><span class="s">r&#39;^[a-n]&#39;</span><span class="p">,</span> <span class="s">r&#39;^[m-z]&#39;</span><span class="p">])</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">aggregation</span><span class="p">(</span><span class="n">queryset</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">queryset</span><span class="o">.</span><span class="n">count</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>This cube is defined with 2 dimensions :</p>
+<blockquote>
+<ul class="simple">
+<li><strong>genre</strong> : the genre of the book. Relates to the field named <cite>genre</cite> on the model.</li>
+<li><strong>first_letter_title</strong> : the first letter of book&#8217;s title. Relates to the field <cite>title</cite>, with the field-lookup <cite>iregex</cite>, and specifies the <cite>sample_space</cite> of the dimension, i.e. the list of values this dimension can take.</li>
+</ul>
+</blockquote>
+<p>, and one aggregation which is in fact a simple <cite>COUNT</cite>.</p>
+</div>
+<div class="section" id="display-a-nice-table">
+<h2>Display a nice table<a class="headerlink" href="#display-a-nice-table" title="Permalink to this headline">¶</a></h2>
+<p>Now that your cube is set-up, one use-case of django-cube is to render a table of measures.</p>
+<p>This can be very easily done by using the view <tt class="xref py py-func docutils literal"><span class="pre">table_from_cube()</span></tt>. In your urls, just write</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">cube.views</span> <span class="kn">import</span> <span class="n">table_from_cube</span>
+
+<span class="kn">from</span> <span class="nn">example.bookcase.models</span> <span class="kn">import</span> <span class="n">Book</span><span class="p">,</span> <span class="n">BookCaseCube</span>
+
+<span class="n">urlpatterns</span> <span class="o">=</span> <span class="n">patterns</span><span class="p">(</span><span class="s">&#39;&#39;</span><span class="p">,</span>
+    <span class="n">url</span><span class="p">(</span><span class="s">r&#39;^$&#39;</span><span class="p">,</span> <span class="n">table_from_cube</span><span class="p">,</span> <span class="n">kwargs</span><span class="o">=</span><span class="p">{</span>
+        <span class="s">&#39;cube&#39;</span><span class="p">:</span> <span class="n">BookCaseCube</span><span class="p">(</span><span class="n">Book</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">all</span><span class="p">()),</span>
+        <span class="s">&#39;dimensions&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s">&#39;genre&#39;</span><span class="p">,</span> <span class="s">&#39;first_letter_title&#39;</span><span class="p">],</span>
+    <span class="p">}),</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p>And you&#8217;re done !</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Quick start</a><ul>
+<li><a class="reference internal" href="#install-django-cube">Install django-cube</a></li>
+<li><a class="reference internal" href="#set-up-your-cube">Set-up your cube</a></li>
+<li><a class="reference internal" href="#display-a-nice-table">Display a nice table</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="index.html"
+                        title="previous chapter">Django-cube documentation</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="snippets.html"
+                        title="next chapter">Snippets</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/quick_start.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" size="18" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="snippets.html" title="Snippets"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Django-cube documentation"
+             >previous</a> |</li>
+        <li><a href="index.html">django-cube v0.4 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2010, Sébastien Piquemal.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.0.4.
+    </div>
+  </body>
+</html>
