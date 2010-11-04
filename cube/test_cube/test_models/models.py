@@ -5,6 +5,8 @@
     >>> from cube.views import table_from_cube
     >>> import copy
 
+.. currentmodule:: cube
+
 Some fixtures for the examples ...
 
 Some models
@@ -90,8 +92,8 @@ Dimension
     >>> d.to_queryset_filter() == {'myname': 'coucou'}
     True
 
-Set the dimensions's sample space
-----------------------------------
+Setting a dimension's sample space
+---------------------------------------
 
 You can set explicitely the sample space for a dimension, by passing to the constructor a keyword *sample_space* that is an iterable. It works with lists :
 
@@ -105,7 +107,7 @@ But also with querysets (any iterable):
     >>> d.get_sample_space() == [piano, sax]
     True
 
-Getting default sample space of a dimension
+Default sample space for a dimension
 -----------------------------------------------
 
 If you didn't give explicitely the sample space of a dimension, the method :meth:`get_sample_space` will return a default sample space taken from the dimension's queryset.
@@ -159,7 +161,7 @@ and refer to any type of field, even a django object
     ... ]
     True
 
-Give dimension's sample space as a callable
+Giving dimension's sample space as a callable
 ---------------------------------------------
 
 You can pass a callable to the dimension's constructor to set its sample space. This callable takes a queryset as parameter, and returns the sample space. For example :
@@ -176,10 +178,10 @@ You can pass a callable to the dimension's constructor to set its sample space. 
     ... ]
     True
 
-Override the display for a dimension
---------------------------------------
+Overriding the display of dimension's value
+---------------------------------------------
 
-The property :meth:`Dimension.pretty_constraint` provides a pretty display for the dimension's constraint. If you want to customize this display, just declare a new sub-class of :class:`Dimension`, and override the :meth:`pretty_constraint` property. For example, this displays an instrument object as its name, with a capital letter first : 
+:class:`Dimension` provides a property :meth:`Dimension.pretty_constraint` which gives a pretty version of the dimension's value (AKA its constraint). To customize this display, just declare a new sub-class of :class:`Dimension`, and override the :meth:`pretty_constraint` property. For example, this displays an Instrument object as its name, with a capital letter first :
 
     >>> class InstrumentDimension(Dimension):
     ...     @property
@@ -257,12 +259,12 @@ Declaring a cube is very similar to declaring a Django model, with dimensions in
 Get a cube's sample space
 ----------------------------
 
-You can get the cube's sample space on one dimension like this :
+On the cube, you can get the sample space for one dimension like this :
     
     >>> c.get_sample_space('firstname', format='flat') == ['Bill', 'Erroll', 'Freddie', 'Miles', 'Thelonious']
     True
     
-You can get the cube's sample space for several dimensions as dictionnaries :
+and the cube's sample space for several dimensions like this :
     
     >>> c.get_sample_space('firstname', 'instrument_name') == [
     ...     {'firstname': 'Bill', 'instrument_name': 'piano'},
@@ -292,8 +294,6 @@ And note that if one dimension is already constrained, the sample space for the 
     ...     {'firstname': 'Bill', 'instrument_name': 'trumpet'},
     ... ]
     True
-    
-
 
 Getting a measure from the cube
 --------------------------------
@@ -343,8 +343,8 @@ On the other hand, if your cube is constrained, all the subcubes yielded will be
     ... ]
     True
 
-List of measure rows
-----------------------
+List of measures as dictionnaries
+----------------------------------
 
 Using :meth:`Cube.measures`, you can get a list of measures, very similar to what is returned by the `.values()` method on a django queryset.
 
@@ -730,6 +730,8 @@ Here's how to use the inclusion tag *tablefromcube* to insert a table in your te
     ... '{% tablefromcube my_cube by dim1, "instrument_name" using template_name %}'
     ... )
 
+It will render 'template_name' with a context built from :meth:`models.Cube.table_helper`.
+
 Here is what the rendering gives :
 
     >>> awaited = ''\\
@@ -805,7 +807,7 @@ Let's create a cube
     >>> from django.http import HttpRequest
     >>> request = HttpRequest()
 
-Let's use the view *table_from_cube* that renders the context with variables allowing to display easily the table (it is similar to *tablefromcube* inclusion tag) :
+Let's use the view :func:`views.table_from_cube` which will render the template with a context built from :meth:`models.Cube.table_helper`. :
     
     >>> response = table_from_cube(request, cube=c, dimensions=['firstname', 'instrument_name'])
     
