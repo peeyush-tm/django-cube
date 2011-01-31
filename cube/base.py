@@ -29,8 +29,6 @@ class BaseDimension(object):
     """
 
     def __init__(self, sample_space=[]):
-        """
-        """
         self._name = ""
         self.sample_space = sample_space
         self._constraint = None
@@ -123,11 +121,12 @@ class BaseCubeMetaclass(type):
         new_class._meta = BaseCubeOptions(meta)
 
         #We take the first base class that is a subclass of *BaseCube*.
-        if name == 'BaseCube':
-            parent_cube_class = None
+        parents = [b for b in bases if isinstance(b, BaseCubeMetaclass)]
+        if parents:
+            parent_cube_class = parents[0]
         else:
-            parent_cube_class = filter(lambda base: issubclass(base, BaseCube), bases)[0]
-        #If there is one, we force inheritage of some attributes from the *parent_cube_class*
+            parent_cube_class = None
+        #If there is one, we force inheritance of some attributes from the *parent_cube_class*
         parent_dimensions = copy.deepcopy(parent_cube_class._meta.dimensions)\
             if parent_cube_class else {}
         parent_dimensions.update(dimensions)

@@ -1,3 +1,4 @@
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
@@ -5,21 +6,22 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>API documentation &mdash; django-cube v0.3 documentation</title>
-    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <title>API documentation &mdash; django-cube v0.4 documentation</title>
+    <link rel="stylesheet" href="_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    '#',
-        VERSION:     '0.3',
-        COLLAPSE_MODINDEX: false,
+        URL_ROOT:    '',
+        VERSION:     '0.4',
+        COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
       };
     </script>
     <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="django-cube v0.3 documentation" href="index.html" />
+    <link rel="top" title="django-cube v0.4 documentation" href="index.html" />
     <link rel="next" title="Template tags and filters – cube.templatetags.cube_templatetags" href="tags_filters.html" />
     <link rel="prev" title="Snippets" href="snippets.html" /> 
   </head>
@@ -31,15 +33,15 @@
           <a href="genindex.html" title="General Index"
              accesskey="I">index</a></li>
         <li class="right" >
-          <a href="modindex.html" title="Global Module Index"
-             accesskey="M">modules</a> |</li>
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
         <li class="right" >
           <a href="tags_filters.html" title="Template tags and filters – cube.templatetags.cube_templatetags"
              accesskey="N">next</a> |</li>
         <li class="right" >
           <a href="snippets.html" title="Snippets"
              accesskey="P">previous</a> |</li>
-        <li><a href="index.html">django-cube v0.3 documentation</a> &raquo;</li> 
+        <li><a href="index.html">django-cube v0.4 documentation</a> &raquo;</li> 
       </ul>
     </div>  
 
@@ -51,7 +53,7 @@
   <div class="section" id="api-documentation">
 <h1>API documentation<a class="headerlink" href="#api-documentation" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="module-cube.models">
-<h2>Cube, Dimension<a class="headerlink" href="#module-cube.models" title="Permalink to this headline">¶</a></h2>
+<span id="cube-dimension"></span><h2>Cube, Dimension<a class="headerlink" href="#module-cube.models" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="cube.models.Cube">
 <em class="property">class </em><tt class="descclassname">cube.models.</tt><tt class="descname">Cube</tt><big>(</big><em>queryset</em>, <em>measure_none=0</em><big>)</big><a class="headerlink" href="#cube.models.Cube" title="Permalink to this definition">¶</a></dt>
@@ -78,7 +80,7 @@
 <tt class="descname">constrain</tt><big>(</big><em>**extra_constraint</em><big>)</big><a class="headerlink" href="#cube.models.Cube.constrain" title="Permalink to this definition">¶</a></dt>
 <dd><p>Updates the calling cube&#8217;s <em>constraint</em> with <em>extra_constraint</em>. Example :</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">cube</span> <span class="o">=</span> <span class="n">MyCube</span><span class="p">(</span><span class="n">queryset</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">subcube</span> <span class="o">=</span> <span class="n">cube</span><span class="o">.</span><span class="n">constrain</span><span class="p">(</span><span class="n">dimensionA</span><span class="o">=</span><span class="mf">2</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">subcube</span> <span class="o">=</span> <span class="n">cube</span><span class="o">.</span><span class="n">constrain</span><span class="p">(</span><span class="n">dimensionA</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">cube</span> <span class="p">;</span> <span class="n">subcube</span>
 <span class="go">MyCube(dimensionA)</span>
 <span class="go">MyCube(dimensionA=2)</span>
@@ -213,11 +215,11 @@
 <tt class="descname">subcubes</tt><big>(</big><em>*dim_names</em><big>)</big><a class="headerlink" href="#cube.models.Cube.subcubes" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="docutils">
 <dt>Returns:</dt>
-<dd><p class="first">iterator. A sorted iterator on all the sucubes with dimensions in <em>dim_names</em> constrained. It is sorted according to <a title="cube.models.Cube.sort_key" class="reference internal" href="#cube.models.Cube.sort_key"><tt class="xref docutils literal"><span class="pre">sort_key()</span></tt></a>.For example :</p>
+<dd><p class="first">iterator. A sorted iterator on all the sucubes with dimensions in <em>dim_names</em> constrained. It is sorted according to <a class="reference internal" href="#cube.models.Cube.sort_key" title="cube.models.Cube.sort_key"><tt class="xref py py-meth docutils literal"><span class="pre">sort_key()</span></tt></a>.For example :</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">class</span> <span class="nc">MyCube</span><span class="p">(</span><span class="n">Cube</span><span class="p">):</span>
 <span class="gp">... </span>    <span class="n">name</span> <span class="o">=</span> <span class="n">Dimension</span><span class="p">(</span><span class="n">sample_space</span><span class="o">=</span><span class="p">[</span><span class="s">&#39;John&#39;</span><span class="p">,</span> <span class="s">&#39;Jack&#39;</span><span class="p">])</span>
 <span class="gp">... </span>    <span class="n">instrument</span> <span class="o">=</span> <span class="n">Dimension</span><span class="p">(</span><span class="n">sample_space</span><span class="o">=</span><span class="p">[</span><span class="s">&#39;Trumpet&#39;</span><span class="p">])</span>
-<span class="gp">... </span>    <span class="n">age</span> <span class="o">=</span> <span class="n">Dimension</span><span class="p">(</span><span class="n">sample_space</span><span class="o">=</span><span class="p">[</span><span class="mf">14</span><span class="p">,</span> <span class="mf">89</span><span class="p">])</span>
+<span class="gp">... </span>    <span class="n">age</span> <span class="o">=</span> <span class="n">Dimension</span><span class="p">(</span><span class="n">sample_space</span><span class="o">=</span><span class="p">[</span><span class="mi">14</span><span class="p">,</span> <span class="mi">89</span><span class="p">])</span>
 <span class="gp">...</span>
 <span class="gp">... </span>    <span class="nd">@staticmethod</span>
 <span class="gp">... </span>    <span class="k">def</span> <span class="nf">sort_key</span><span class="p">(</span><span class="n">coordinates</span><span class="p">):</span>
@@ -245,7 +247,7 @@
 <dd><p>A helper function to build a table from a cube. It takes two dimensions, and creates a dictionnary from it.</p>
 <dl class="docutils">
 <dt>Args:</dt>
-<dd>dim_names ((str, str)): the two dimension&#8217;s names.</dd>
+<dd>dim_names. Two dimension names &#8220;dimension1&#8221;, &#8220;dimension2&#8221;, where &#8220;dimension1&#8221; is the name of the dimension that will be used for columns, &#8220;dimension2&#8221; the name of the dimension for rows.</dd>
 <dt>Returns:</dt>
 <dd><p class="first">dict. A dictionnary containing the following variables :</p>
 <blockquote class="last">
@@ -340,7 +342,7 @@
 
 </div>
 <div class="section" id="module-cube.query">
-<h2>Querying a cube<a class="headerlink" href="#module-cube.query" title="Permalink to this headline">¶</a></h2>
+<span id="querying-a-cube"></span><h2>Querying a cube<a class="headerlink" href="#module-cube.query" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="cube.query.CubeQueryMixin">
 <em class="property">class </em><tt class="descclassname">cube.query.</tt><tt class="descname">CubeQueryMixin</tt><a class="headerlink" href="#cube.query.CubeQueryMixin" title="Permalink to this definition">¶</a></dt>
@@ -428,7 +430,7 @@
 <dd><p>A helper function to build a table from a cube. It takes two dimensions, and creates a dictionnary from it.</p>
 <dl class="docutils">
 <dt>Args:</dt>
-<dd>dim_names ((str, str)): the two dimension&#8217;s names.</dd>
+<dd>dim_names. Two dimension names &#8220;dimension1&#8221;, &#8220;dimension2&#8221;, where &#8220;dimension1&#8221; is the name of the dimension that will be used for columns, &#8220;dimension2&#8221; the name of the dimension for rows.</dd>
 <dt>Returns:</dt>
 <dd><p class="first">dict. A dictionnary containing the following variables :</p>
 <blockquote class="last">
@@ -452,11 +454,16 @@
 
 </div>
 <div class="section" id="module-cube.views">
-<h2>Views<a class="headerlink" href="#module-cube.views" title="Permalink to this headline">¶</a></h2>
+<span id="views"></span><h2>Views<a class="headerlink" href="#module-cube.views" title="Permalink to this headline">¶</a></h2>
 <dl class="function">
 <dt id="cube.views.table_from_cube">
-<tt class="descclassname">cube.views.</tt><tt class="descname">table_from_cube</tt><big>(</big><em>request</em>, <em>cube</em>, <em>dimensions</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#cube.views.table_from_cube" title="Permalink to this definition">¶</a></dt>
-<dd>A view built on <em>direct_to_template</em>, that adds an extra_context built with <tt class="xref docutils literal"><span class="pre">table_from_cube_context()</span></tt>.</dd></dl>
+<tt class="descclassname">cube.views.</tt><tt class="descname">table_from_cube</tt><big>(</big><em>request</em>, <em>cube=None</em>, <em>dimensions=None</em>, <em>extra_context={}</em>, <em>template_name='table_from_cube.html'</em><big>)</big><a class="headerlink" href="#cube.views.table_from_cube" title="Permalink to this definition">¶</a></dt>
+<dd><p>A view that renders <em>template_name</em> with a context built with <a class="reference internal" href="#cube.models.Cube.table_helper" title="cube.models.Cube.table_helper"><tt class="xref py py-func docutils literal"><span class="pre">cube.models.Cube.table_helper()</span></tt></a>.</p>
+<p>Kwargs:</p>
+<blockquote>
+cube(Cube). The cube to build the table from.
+dimensions(list). A list [&#8220;dimension1&#8221;, &#8220;dimension2&#8221;], where &#8220;dimension1&#8221; is the name of the dimension that will be used for columns, &#8220;dimension2&#8221; the name of the dimension for rows.</blockquote>
+</dd></dl>
 
 </div>
 </div>
@@ -467,40 +474,40 @@
       </div>
       <div class="sphinxsidebar">
         <div class="sphinxsidebarwrapper">
-            <h3><a href="index.html">Table Of Contents</a></h3>
-            <ul>
-<li><a class="reference external" href="#">API documentation</a><ul>
-<li><a class="reference external" href="#module-cube.models">Cube, Dimension</a></li>
-<li><a class="reference external" href="#module-cube.query">Querying a cube</a></li>
-<li><a class="reference external" href="#module-cube.views">Views</a></li>
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">API documentation</a><ul>
+<li><a class="reference internal" href="#module-cube.models">Cube, Dimension</a></li>
+<li><a class="reference internal" href="#module-cube.query">Querying a cube</a></li>
+<li><a class="reference internal" href="#module-cube.views">Views</a></li>
 </ul>
 </li>
 </ul>
 
-            <h4>Previous topic</h4>
-            <p class="topless"><a href="snippets.html"
-                                  title="previous chapter">Snippets</a></p>
-            <h4>Next topic</h4>
-            <p class="topless"><a href="tags_filters.html"
-                                  title="next chapter">Template tags and filters &#8211; <tt class="docutils literal"><span class="pre">cube.templatetags.cube_templatetags</span></tt></a></p>
-            <h3>This Page</h3>
-            <ul class="this-page-menu">
-              <li><a href="_sources/api_doc.txt"
-                     rel="nofollow">Show Source</a></li>
-            </ul>
-          <div id="searchbox" style="display: none">
-            <h3>Quick search</h3>
-              <form class="search" action="search.html" method="get">
-                <input type="text" name="q" size="18" />
-                <input type="submit" value="Go" />
-                <input type="hidden" name="check_keywords" value="yes" />
-                <input type="hidden" name="area" value="default" />
-              </form>
-              <p class="searchtip" style="font-size: 90%">
-              Enter search terms or a module, class or function name.
-              </p>
-          </div>
-          <script type="text/javascript">$('#searchbox').show(0);</script>
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="snippets.html"
+                        title="previous chapter">Snippets</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="tags_filters.html"
+                        title="next chapter">Template tags and filters &#8211; <tt class="docutils literal"><span class="pre">cube.templatetags.cube_templatetags</span></tt></a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/api_doc.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" size="18" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
         </div>
       </div>
       <div class="clearer"></div>
@@ -512,7 +519,7 @@
           <a href="genindex.html" title="General Index"
              >index</a></li>
         <li class="right" >
-          <a href="modindex.html" title="Global Module Index"
+          <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
           <a href="tags_filters.html" title="Template tags and filters – cube.templatetags.cube_templatetags"
@@ -520,12 +527,12 @@
         <li class="right" >
           <a href="snippets.html" title="Snippets"
              >previous</a> |</li>
-        <li><a href="index.html">django-cube v0.3 documentation</a> &raquo;</li> 
+        <li><a href="index.html">django-cube v0.4 documentation</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
-      &copy; Copyright 2010, Sébastien Piquemal.
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.4.
+        &copy; Copyright 2010, Sébastien Piquemal.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.0.6.
     </div>
   </body>
 </html>
